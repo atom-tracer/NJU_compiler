@@ -73,17 +73,42 @@ Type VarDec(TreeNode *root, Type type)
     else if (strcmp(root->child[0]->name, "VarDec") == 0)
     {
         // 数组定义
+        new_type = VarDec(root->child[0], type);
         Type typetail = new_type;
         while (typetail->kind != BASIC)
             typetail = typetail->content.array.elem;
         typetail->kind = ARRAY;
         typetail->content.array.elem = createArray(createBasic(typetail->content.basic), root->child[2]->int_val);
+        return new_type;
     }
     else
         return false;
 }
-bool FunDec(TreeNode *root, Type type);
-bool VarList(TreeNode *root, Type type);
+bool FunDec(TreeNode *root, Type type)
+{
+    if (my_is_error)
+        return false;
+    if (strcmp(root->child[2]->name, "VarList") == 0)
+    {
+        ; // 插入符号表，判断合法性
+    }
+    else if (strcmp(root->child[2]->name, "RP") == 0)
+    {
+        ; // 插入符号表，判断合法性
+    }
+    else
+        return false;
+}
+bool VarList(TreeNode *root, Type type)
+{
+    if (my_is_error)
+        return false;
+    if (strcmp(root->child[0]->name, "ParamDec") == 0)
+        return ParamDec(root->child[0], type) && VarList(root->child[2], type);
+    else
+        return false;
+
+}
 bool ParamDec(TreeNode *root, Type type);
 bool CompSt(TreeNode *root, Type type);
 bool StmtList(TreeNode *root, Type type);

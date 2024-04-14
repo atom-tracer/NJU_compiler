@@ -18,7 +18,7 @@ struct Type_
     enum TypeKind kind;
     union
     {
-        int basic;
+        enum ValueType basic; // 基本元素类型
         struct
         {
             Type elem;
