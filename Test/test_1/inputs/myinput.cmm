@@ -1,0 +1,8 @@
+int main()
+{
+    int i;
+    int q=1;
+    int j=2,p;
+    int t,b=2;
+    int t=2,c=2;
+}

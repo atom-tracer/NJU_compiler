@@ -1,0 +1,8 @@
+5c5
+<         TYPE: float
+---
+>         TYPE: int
+15c15
+<               TYPE: float
+---
+>               TYPE: int

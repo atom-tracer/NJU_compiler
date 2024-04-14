@@ -1,0 +1,40 @@
+12c12
+<               TYPE: float
+---
+>               TYPE: int
+27c27
+<                 TYPE: float
+---
+>                 TYPE: int
+42c42
+<                   TYPE: float
+---
+>                   TYPE: int
+59c59
+<               TYPE: float
+---
+>               TYPE: int
+85c85
+<                       TYPE: float
+---
+>                       TYPE: int
+111c111
+<                               TYPE: float
+---
+>                               TYPE: int
+264c264
+<           TYPE: float
+---
+>           TYPE: int
+274c274
+<                 TYPE: float
+---
+>                 TYPE: int
+291c291
+<                   TYPE: float
+---
+>                   TYPE: int
+308c308
+<                     TYPE: float
+---
+>                     TYPE: int

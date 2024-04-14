@@ -1,0 +1,56 @@
+5c5
+<         TYPE: float
+---
+>         TYPE: int
+12c12
+<               TYPE: float
+---
+>               TYPE: int
+23c23
+<                 TYPE: float
+---
+>                 TYPE: int
+36c36
+<               TYPE: float
+---
+>               TYPE: int
+150c150
+<           TYPE: float
+---
+>           TYPE: int
+157c157
+<                 TYPE: float
+---
+>                 TYPE: int
+172c172
+<                   TYPE: float
+---
+>                   TYPE: int
+181c181
+<                 TYPE: float
+---
+>                 TYPE: int
+194c194
+<                   TYPE: float
+---
+>                   TYPE: int
+207c207
+<                     TYPE: float
+---
+>                     TYPE: int
+219c219
+<                       TYPE: float
+---
+>                       TYPE: int
+319c319
+<                             TYPE: float
+---
+>                             TYPE: int
+521c521
+<             TYPE: float
+---
+>             TYPE: int
+531c531
+<                   TYPE: float
+---
+>                   TYPE: int
