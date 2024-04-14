@@ -1,4 +1,5 @@
 #include "semantic.h"
+extern int var_list[], fun_list[];
 bool Program(TreeNode *root)
 {
     if (my_is_error)
@@ -15,14 +16,14 @@ bool ExtDefList(TreeNode *root)
 }
 Type Specifier(TreeNode *root)
 {
-    if(my_is_error)
+    if (my_is_error)
         return NULL;
     if (strcmp(root->child[0]->name, "TYPE") == 0)
     {
-        if(strcmp(root->child[0]->value, "int") == 0)
+        if (root->child[0]->type == INT_TYPE)
             return createBasic(INT_TYPE);
-        else if(strcmp(root->child[0]->value, "float") == 0)
-            return createBasic(1);
+        else if (root->child[0]->type == FLOAT_TYPE)
+            return createBasic(FLOAT_TYPE);
         else
             return NULL;
     }
@@ -47,12 +48,40 @@ bool ExtDef(TreeNode *root)
     else
         return false;
 }
-bool ExtDecList(TreeNode *root, Type type);
+bool ExtDecList(TreeNode *root, Type type)
+{
+    if (my_is_error)
+        return false;
+    if (root->child_num == 1)
+        return VarDec(root->child[0], type);
+    else if (root->child_num == 3)
+        return VarDec(root->child[0], type) && ExtDecList(root->child[2], type);
+}
 
 bool StructSpecifier(TreeNode *root);
 bool OptTag(TreeNode *root, Type type);
 bool Tag(TreeNode *root);
-bool VarDec(TreeNode *root, Type type);
+Type VarDec(TreeNode *root, Type type)
+{
+    if (my_is_error)
+        return false;
+    Type new_type = type;
+    if (strcmp(root->child[0]->name, "ID") == 0)
+    {
+        ; // 查找是否重复定义并插入
+    }
+    else if (strcmp(root->child[0]->name, "VarDec") == 0)
+    {
+        // 数组定义
+        Type typetail = new_type;
+        while (typetail->kind != BASIC)
+            typetail = typetail->content.array.elem;
+        typetail->kind = ARRAY;
+        typetail->content.array.elem = createArray(createBasic(typetail->content.basic), root->child[2]->int_val);
+    }
+    else
+        return false;
+}
 bool FunDec(TreeNode *root, Type type);
 bool VarList(TreeNode *root, Type type);
 bool ParamDec(TreeNode *root, Type type);
