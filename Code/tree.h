@@ -6,11 +6,7 @@
 #include "tools.h"
 
 typedef struct TreeNode TreeNode;
-enum
-{
-    INT_TYPE = 1,
-    FLOAT_TYPE
-};
+
 enum
 {
     node_grammar,

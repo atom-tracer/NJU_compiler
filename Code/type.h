@@ -5,7 +5,7 @@
 #include <stdarg.h>
 #include "tools.h";
 typedef struct Type_ *Type;
-enum
+enum TypeKind
 {
     BASIC,
     ARRAY,
@@ -14,7 +14,7 @@ enum
 };
 struct Type_
 {
-    int kind;
+    enum TypeKind kind;
     union
     {
         int basic;
