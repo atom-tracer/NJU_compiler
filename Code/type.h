@@ -2,8 +2,9 @@
 #include <assert.h>
 #include <stdio.h>
 #include "tree.h"
+#include "tools.h"
 #include <stdarg.h>
-#include "tools.h";
+// 类型
 typedef struct Type_ *Type;
 enum TypeKind
 {
@@ -36,3 +37,8 @@ Type createArray(Type elem, int size);
 Type createStructure(char *name, int num, ...);
 Type createFunction(Type ret, int num, ...);
 int compareType(Type a, Type b);
+// 符号表
+extern Type var_list[], fun_list[];
+extern int var_num, func_num;
+void add_symbol(Type arr[], Type type);
+bool find_symbol(Type arr[], Type type);
