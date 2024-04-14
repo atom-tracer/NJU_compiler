@@ -29,14 +29,17 @@ struct Type_
             char *name;
             Type type;
             Type next;
+            enum FunctionType functiontype;//函数类型（定义或声明）
         } tail; // 函数或结构体；注意：函数的返回值作为第一个类型参数
     } content;
 };
-Type createBasic(int basic);
+Type createBasic(enum ValueType basic);
 Type createArray(Type elem, int size);
+//如果存在域名重复定义（错误15），则返回NULL
 Type createStructure(char *name, int num, ...);
-Type createFunction(Type ret, int num, ...);
+Type createFunction(Type ret, enum FunctionType functiontype, int num, ...);
+Type getFunctionRet(Type type);
 int compareType(Type a, Type b);
 // 符号表
 void add_symbol(char *name, Type type);
-bool find_symbol(char *name, Type type);
+Type find_symbol(char *name);

@@ -32,11 +32,12 @@ Type createStructure(char *name, int num, ...)
     }
     return type;
 }
-Type createFunction(Type ret, int num, ...)
+Type createFunction(Type ret, enum FunctionType functiontype, int num, ...)
 {
     Type type = (Type)malloc(sizeof(struct Type_));
     type->kind = FUNCTION;
     type->content.tail.type = ret;
+    type->content.tail.functiontype = functiontype;
     va_list args;
     va_start(args, num);
     type->content.tail.next = (Type)malloc(sizeof(struct Type_));
@@ -50,6 +51,10 @@ Type createFunction(Type ret, int num, ...)
         p->content.tail.next = NULL;
     }
     return type;
+}
+Type getFunctionRet(Type type)
+{
+    return type->content.tail.type;
 }
 // 比较两个类型是否相同
 int compareType(Type a, Type b)
@@ -85,7 +90,7 @@ struct Node
 {
     Type type;
     struct Node *next;
-} *var_table[N + 1], *func_table[N + 1];
+} *hash_table[N + 1];
 unsigned int hash_pjw(char *name)
 {
     unsigned int val = 0, i;
@@ -99,23 +104,22 @@ unsigned int hash_pjw(char *name)
 }
 void add_symbol(char *name, Type type)
 {
-    struct Node **hash_table = type->kind == FUNCTION ? func_table : var_table;
     unsigned int val = hash_pjw(name);
     struct Node *p = (struct Node *)malloc(sizeof(struct Node));
     p->type = type;
     p->next = hash_table[val];
     hash_table[val] = p;
 }
-bool find_symbol(char *name, Type type)
+Type find_symbol(char *name)
 {
-    struct Node **hash_table = type->kind == FUNCTION ? func_table : var_table;
     unsigned int val = hash_pjw(name);
     struct Node *p = hash_table[val];
     while (p)
     {
-        if (strcmp(p->type->content.tail.name, name) == 0)
-            return true;
+        if (strcmp(p->type->content.tail.name, name) == 0){
+            return p->type;
+        }
         p = p->next;
     }
-    return false;
+    return NULL;
 }
