@@ -79,7 +79,7 @@ int compareType(Type a, Type b)
         assert(0);
     }
 }
-// 符号表
+//符号表
 const int N = 1e5;
 Type var_list[N], func_list[N];
 int var_num = 0, func_num = 0;
