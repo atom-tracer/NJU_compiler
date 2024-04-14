@@ -3,6 +3,7 @@
 #include <stdlib.h> 
 #include <string.h>
 #include <assert.h>
+#include "tools.h"
 
 typedef struct TreeNode TreeNode;
 enum{
@@ -32,7 +33,6 @@ struct TreeNode{
 };
 
 extern TreeNode* root;
-extern int my_is_error;
 
 void print_tree(struct TreeNode* root, int level);
 void print_node(struct TreeNode* node, int level);

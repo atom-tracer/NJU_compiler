@@ -1,6 +1,7 @@
 %{
 #include "tree.h"
 #include "syntax.tab.h"
+#include "tools.h"
 int yycolumn = 1;
 int debug_printf=0;
 
