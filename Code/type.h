@@ -5,13 +5,14 @@
 #include <stdarg.h>
 typedef struct Type_* Type;
 typedef struct FieldList_* FieldList;
+enum {BASIC, ARRAY, STRUCTURE, FUNCTION};
 struct FieldList_{
     char* name;
     Type type;
     FieldList tail;
 };
 struct Type_{
-    enum {BASIC, ARRAY, STRUCTURE, FUNCTION} kind;
+    int kind;
     union{
         int basic;
         struct {Type elem; int size;} array;
