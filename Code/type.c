@@ -80,6 +80,42 @@ int compareType(Type a, Type b)
     }
 }
 //符号表
-const int N = 1e5;
-Type var_list[N], func_list[N];
-int var_num = 0, func_num = 0;
+const int N = 0x3fff;
+struct Node
+{
+    Type type;
+    struct Node *next;
+} *var_table[N + 1], *func_table[N + 1];
+unsigned int hash_pjw(char *name)
+{
+    unsigned int val = 0, i;
+    for (; *name; ++name)
+    {
+        val = (val << 2) + *name;
+        if (i = val & ~N)
+            val = (val ^ (i >> 12)) & N;
+    }
+    return val;
+}
+void add_symbol(char *name, Type type)
+{
+    struct Node **hash_table = type->kind == FUNCTION ? func_table : var_table;
+    unsigned int val = hash_pjw(name);
+    struct Node *p = (struct Node *)malloc(sizeof(struct Node));
+    p->type = type;
+    p->next = hash_table[val];
+    hash_table[val] = p;
+}
+bool find_symbol(char *name, Type type)
+{
+    struct Node **hash_table = type->kind == FUNCTION ? func_table : var_table;
+    unsigned int val = hash_pjw(name);
+    struct Node *p = hash_table[val];
+    while (p)
+    {
+        if (strcmp(p->type->content.tail.name, name) == 0)
+            return true;
+        p = p->next;
+    }
+    return false;
+}
