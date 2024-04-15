@@ -33,11 +33,14 @@ syntax-c: $(YFILE)
 
 # 定义的一些伪目标
 .PHONY: clean test
-test:
 
-	./parser ../Test/test_2/1.cmm
-	./parser ../Test/test_2/2.cmm
-	./parser ../Test/test_2/3.cmm
+test:
+	for file in ../Test/test_2/*.cmm; do \
+		filename=$$(basename "$$file" .cmm); \
+		./parser "$$file" >> ../Test/exp2/"$$filename".txt; \
+	done
+
+
 
 clean:
 	rm -f parser lex.yy.c syntax.tab.c syntax.tab.h syntax.output
