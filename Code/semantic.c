@@ -9,10 +9,6 @@ bool compareName(TreeNode *root, int num, ...)
     for (int i = 0; i < num; i++)
     {
         if (strcmp(root->child[i]->name, va_arg(args, char *)) != 0)
-    va_start(args, num);
-    for (int i = 0; i < num; i++)
-    {
-        if (strcmp(root->child[i]->name, va_arg(args, char *)) != 0)
             return false;
     }
     va_end(args);
@@ -63,48 +59,15 @@ bool ExtDef(TreeNode *root)
     else
         return false;
 }
-bool ExtDecList(TreeNode *root, Type type)//变量定义
+bool ExtDecList(TreeNode *root, Type type) // 变量定义
 {
-    StructureField field = NULL;//对于变量定义，这个符号表没有用
+    StructureField field = NULL; // 对于变量定义，这个符号表没有用
     if (root->child_num == 1)
         return VarDec(root->child[0], type, field);
-    {
-        Type vartype = VarDec(root->child[0], type);
-    }
     else if (root->child_num == 3)
         return VarDec(root->child[0], type, field) && ExtDecList(root->child[2], type);
 }
 
-Type StructSpecifier(TreeNode *root){
-    if(compareName(root, 5, "STRUCT", "Tag", "LC", "DefList", "RC")){
-        StructureField field = NULL;
-        if(!DefList(root->child[3], field))
-            return NULL;
-        Type type = createStructure(Tag(root->child[1]), field);
-        add_symbol(Tag(root->child[1]), type);//存储结构体类型
-        return type;
-    }
-    if(compareName(root, 2, "STRUCT", "Tag")){
-        Type type = find_symbol(Tag(root->child[1]));
-        if(type==NULL||type->kind!=STRUCTURE)
-            return NULL;
-        return type;
-    }
-}
-char* OptTag(TreeNode *root, Type type){
-    if(strcmp(root->child[0]->name,"ID")==0){
-        return root->child[0]->id;
-    }
-    return NULL;
-}
-char* Tag(TreeNode *root){
-    return root->child[0]->id;
-}
-Type VarDec(TreeNode *root, Type type, StructureField *field)
-        return VarDec(root->child[0], type) && ExtDecList(root->child[2], type);
-    else
-        return false;
-}
 bool StructSpecifier(TreeNode *root)
 {
     if (compareName(root, 2, "STRUCT", "Tag"))
@@ -134,10 +97,19 @@ bool StructSpecifier(TreeNode *root)
     else
         return false;
 }
-
-bool OptTag(TreeNode *root, Type type);
-bool Tag(TreeNode *root);
-bool VarDec(TreeNode *root, Type type)
+char *OptTag(TreeNode *root, Type type)
+{
+    if (strcmp(root->child[0]->name, "ID") == 0)
+    {
+        return root->child[0]->id;
+    }
+    return NULL;
+}
+char *Tag(TreeNode *root)
+{
+    return root->child[0]->id;
+}
+bool VarDec(TreeNode *root, Type type, StructureField *field)
 {
     if (compareName(root, 1, "ID"))
     {
@@ -180,11 +152,12 @@ bool VarList(TreeNode *root, Type type)
         return false;
 }
 // 函数参数项
-bool ParamDec(TreeNode *root, StructureField *field){
+bool ParamDec(TreeNode *root, StructureField *field)
+{
     Type new_type = Specifier(root->child[0]);
-    if(new_type==NULL)
+    if (new_type == NULL)
         return false;
-    return VarDec(root->child[1],new_type,field);
+    return VarDec(root->child[1], new_type, field);
 }
 // 函数体
 bool CompSt(TreeNode *root, Type rettype) // rettype是函数返回值类型
@@ -325,13 +298,6 @@ Type Exp(TreeNode *root)
         char *op = basic3Operator[i];
         if (compareName(root, 3, "Exp", op, "Exp"))
         {
-    // 三元运算符
-    char **basic3Operator = {"PLUS", "MINUS", "STAR", "DIV", "AND", "OR", "RELOP"};
-    for (int i = 0; i < 7; i++)
-    {
-        char *op = basic3Operator[i];
-        if (compareName(root, 3, "Exp", op, "Exp"))
-        {
             Type type1 = Exp(root->child[0]);
             Type type2 = Exp(root->child[2]);
             if (type1 == NULL || type2 == NULL)
@@ -339,12 +305,8 @@ Type Exp(TreeNode *root)
             if (!compareType(type1, type2) || type1->kind != BASIC || type2->kind != BASIC || i > 4 && (type1->content.basic != INT_TYPE || type2->content.basic != INT_TYPE))
             { // 类型不同或不是基本类型
                 add_semantic_error(7, root->line);
-            if (type1 == NULL || type2 == NULL)
                 return NULL;
             }
-            { // 类型不同或不是基本类型
-                add_semantic_error(7, root->line);
-            if (!compareType(type1, type2) || type1->kind != BASIC || type2->kind != BASIC)
             { // 类型不同或不是基本类型
                 add_semantic_error(7, root->line);
                 return NULL;
@@ -355,24 +317,14 @@ Type Exp(TreeNode *root)
     }
     // 括号
     if (compareName(root, 3, "LP", "Exp", "RP"))
-    // 括号
-    if (compareName(root, 3, "LP", "Exp", "RP"))
         return Exp(root->child[1]);
-    // 直接确定类型
-    if (compareName(root, 1, "INT") || compareName(root, 1, "FLOAT"))
     // 直接确定类型
     if (compareName(root, 1, "INT") || compareName(root, 1, "FLOAT"))
         return createBasic(root->child[0]->type);
     // 变量
     if (compareName(root, 1, "ID"))
     {
-    // 变量
-    if (compareName(root, 1, "ID"))
-    {
         Type type = find_symbol(root->child[0]->id);
-        if (type == NULL)
-        {
-            add_semantic_error(1, root->line);
         if (type == NULL)
         {
             add_semantic_error(1, root->line);
@@ -385,16 +337,8 @@ Type Exp(TreeNode *root)
     {
         Type type1 = Exp(root->child[1]);
         if (type1 == NULL)
-    // 负号
-    if (compareName(root, 2, "MINUS", "Exp"))
-    {
-        Type type = Exp(root->child[1]);
-        if (type == NULL)
             return NULL;
         if (type1->kind != BASIC)
-        {
-            add_semantic_error(7, root->line);
-        if (type->kind != BASIC)
         {
             add_semantic_error(7, root->line);
             return NULL;
@@ -406,25 +350,15 @@ Type Exp(TreeNode *root)
     // 数组解析
     if (compareName(root, 4, "Exp", "LB", "Exp", "RB"))
     {
-    // 数组解析
-    if (compareName(root, 4, "Exp", "LB", "Exp", "RB"))
-    {
         Type type1 = Exp(root->child[0]);
         Type type2 = Exp(root->child[2]);
         if (type1 == NULL || type2 == NULL)
-        if (type1 == NULL || type2 == NULL)
             return NULL;
-        if (type1->kind != ARRAY)
-        { // 不是数组
-            add_semantic_error(10, root->line);
         if (type1->kind != ARRAY)
         { // 不是数组
             add_semantic_error(10, root->line);
             return NULL;
         }
-        if (type2->kind != BASIC || type2->content.basic != INT_TYPE)
-        { // 下标不是整数
-            add_semantic_error(12, root->line);
         if (type2->kind != BASIC || type2->content.basic != INT_TYPE)
         { // 下标不是整数
             add_semantic_error(12, root->line);
@@ -435,25 +369,14 @@ Type Exp(TreeNode *root)
     // 结构体解析
     if (compareName(root, 3, "Exp", "DOT", "ID"))
     {
-    // 结构体解析
-    if (compareName(root, 3, "Exp", "DOT", "ID"))
-    {
         Type type = Exp(root->child[0]);
         if (type == NULL)
-        if (type == NULL)
             return NULL;
-        if (type->kind != STRUCTURE)
-        {
-            add_semantic_error(13, root->line); // 不是结构体
         if (type->kind != STRUCTURE)
         {
             add_semantic_error(13, root->line); // 不是结构体
             return NULL;
         }
-        Type field = find_symbol_in(type, root->child[2]->id);
-        if (field == NULL)
-        { // 域不存在
-            add_semantic_error(14, root->line);
         Type field = find_symbol_in(type, root->child[2]->id);
         if (field == NULL)
         { // 域不存在
@@ -465,29 +388,17 @@ Type Exp(TreeNode *root)
     // 无参函数调用
     if (compareName(root, 3, "ID", "LP", "RP"))
     {
-    // 无参函数调用
-    if (compareName(root, 3, "ID", "LP", "RP"))
-    {
         Type type = find_symbol(root->child[0]->id);
         if (type == NULL)
         { // 函数不存在
             add_semantic_error(2, root->line);
-        if (type == NULL)
-        { // 函数不存在
-            add_semantic_error(2, root->line);
             return NULL;
         }
         if (type->kind != FUNCTION)
         { // 不是函数
             add_semantic_error(11, root->line);
-        if (type->kind != FUNCTION)
-        { // 不是函数
-            add_semantic_error(11, root->line);
             return NULL;
         }
-        if (type->content.func.tail != NULL)
-        { // 参数不匹配
-            add_semantic_error(9, root->line);
         if (type->content.func.tail != NULL)
         { // 参数不匹配
             add_semantic_error(9, root->line);
@@ -498,21 +409,12 @@ Type Exp(TreeNode *root)
     // 有参函数调用
     if (compareName(root, 4, "ID", "LP", "Args", "RP"))
     {
-    // 有参函数调用
-    if (compareName(root, 4, "ID", "LP", "Args", "RP"))
-    {
         Type type = find_symbol(root->child[0]->id);
-        if (type == NULL)
-        {
-            add_semantic_error(2, root->line);
         if (type == NULL)
         {
             add_semantic_error(2, root->line);
             return NULL;
         }
-        if (type->kind != FUNCTION)
-        {
-            add_semantic_error(11, root->line);
         if (type->kind != FUNCTION)
         {
             add_semantic_error(11, root->line);
@@ -520,11 +422,7 @@ Type Exp(TreeNode *root)
         }
         StructureField field = NULL;
         if (!Args(root->child[2], field))
-        if (!Args(root->child[2], field))
             return NULL;
-        if (!compareArgs(type->content.func.tail, field))
-        {
-            add_semantic_error(9, root->line);
         if (!compareArgs(type->content.func.tail, field))
         {
             add_semantic_error(9, root->line);
@@ -537,16 +435,8 @@ Type Exp(TreeNode *root)
     {
         Type type1 = Exp(root->child[1]);
         if (type1 == NULL)
-    // not操作
-    if (compareName(root, 2, "NOT", "Exp"))
-    {
-        Type type = Exp(root->child[1]);
-        if (type == NULL)
             return NULL;
         if (type1->kind != BASIC || type1->content.basic != INT_TYPE)
-        {
-            add_semantic_error(7, root->line);
-        if (type->kind != BASIC)
         {
             add_semantic_error(7, root->line);
             return NULL;
@@ -557,9 +447,6 @@ Type Exp(TreeNode *root)
     // 赋值操作
     if (compareName(root, 3, "Exp", "ASSIGNOP", "Exp"))
     {
-    // 赋值操作
-    if (compareName(root, 3, "Exp", "ASSIGNOP", "Exp"))
-    {
         Type type1 = Exp(root->child[0]);
         Type type2 = Exp(root->child[2]);
         if (type1 == NULL || type2 == NULL)
@@ -567,18 +454,13 @@ Type Exp(TreeNode *root)
         if (!compareType(type1, type2))
         { // 类型不同
             add_semantic_error(5, root->line);
-        if (type1 == NULL || type2 == NULL)
             return NULL;
         }
         if (!type1->is_left)
         { // 不是左值
             add_semantic_error(6, root->line);
-        if (!compareType(type1, type2))
-        { // 类型不同
-            add_semantic_error(5, root->line);
             return NULL;
         }
-
         return type1;
     }
     assign(0);
