@@ -2,7 +2,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Debug",
+            "name": "debug",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/Code/parser",
@@ -21,8 +21,8 @@
                     "ignoreFailures": true
                 }
             ],
-            //"preLaunchTask": "build", // 在调试前执行build任务
-            "miDebuggerPath": "/usr/bin/gdb"
+            "preLaunchTask": "build", // 在调试前执行build任务
+            "miDebuggerPath": "/usr/bin/gdb",
         }
     ]
 }
