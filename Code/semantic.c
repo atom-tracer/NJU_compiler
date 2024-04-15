@@ -41,7 +41,6 @@ Type Specifier(TreeNode *root)
         return NULL;
 }
 bool ExtDef(TreeNode *root)
-// TODO:类型是否定义过了；函数是否定义过了；函数是否冲突
 {
     Type type = Specifier(root->child[0]); // 继承属性，确定类型
     if (type == NULL)
@@ -50,12 +49,10 @@ bool ExtDef(TreeNode *root)
         return true;
     else if (compareName(root, 3, "Specifier", "ExtDecList", "SEMI")) // 变量定义
         return ExtDecList(root->child[1], type);
-    // TODO：也许我不需要传递type？
     else if (compareName(root, 3, "Specifier", "FunDec", "CompSt")) // 函数定义
-        return FunDec(root->child[1], type) && CompSt(root->child[2], type);
-    // TODO:也许我需要传递参数类型，在CompSt中判断返回值是否匹配
+        return FunDec(root->child[1], FUNCTION_DEFINITION, type) && CompSt(root->child[2], type);
     else if (compareName(root, 3, "Specifier", "FunDec", "SEMI")) // 函数声明
-        return FunDec(root->child[1], type);
+        return FunDec(root->child[1], FUNCTION_DECLARATION, type);
     else
         return false;
 }
@@ -109,56 +106,99 @@ char *Tag(TreeNode *root)
 {
     return root->child[0]->id;
 }
-bool VarDec(TreeNode *root, Type type, StructureField *field)
+Type VarDec(TreeNode *root, Type type, Type stru) // field可能有用
 {
     if (compareName(root, 1, "ID"))
     {
-        if (find_symbol(root->child[0]->id) != NULL)
+        if (stru == NULL)
         {
-            add_semantic_error(3, root->line);
-            return false;
+            if (find_symbol(root->child[0]->id) != NULL)
+            {
+                add_semantic_error(3, root->line);
+                return NULL;
+            }
+            else
+            {
+                add_symbol(root->child[0]->id, type);
+                return type;
+            }
         }
         else
         {
-            add_symbol(root->child[0]->id, type);
-            return true;
+            if (find_symbol_in(stru, root->child[0]->id) != NULL)
+            {
+                add_semantic_error(15, root->line);
+                return NULL;
+            }
+            else
+            {
+                add_symbol_to(stru, root->child[0]->id, type);
+                return type;
+            }
         }
     }
     else if (compareName(root, 4, "VarDec", "LB", "INT", "RB"))
     {
-        return VarDec(root->child[0], createArray(type, root->child[2]->int_val), NULL);
+        return VarDec(root->child[0], createArray(type, root->child[2]->int_val), stru);
     }
     else
-        return false;
+        return NULL;
 }
-bool FunDec(TreeNode *root, Type type)
+bool FunDec(TreeNode *root, enum FunctionType functiontype, Type ret)
 {
-    
+    StructureField field = NULL;
     if (compareName(root, 4, "ID", "LP", "VarList", "RP"))
     {
-        ; // 插入符号表，判断合法性
+        VarList(root->child[2], NULL, field);
     }
-    else if (strcmp(root->child[2]->name, "RP") == 0)
+    else
+        ;
+    Type type = createFunction(ret, functiontype, field);
+    Type oldtype = find_symbol(root->child[0]->id);
+    if (oldtype == NULL)
     {
-        ; // 插入符号表，判断合法性
+        add_symbol(root->child[0]->id, type);
+        return true;
+    }
+    else if (oldtype->content.func.functiontype == FUNCTION_DEFINITION && functiontype == FUNCTION_DEFINITION)
+    {
+        add_semantic_error(4, root->line); // 重定义
+        return false;
+    }
+    else if (oldtype->content.func.functiontype == FUNCTION_DECLARATION)
+    {
+        if (!compareType(oldtype, type))
+        {
+            add_semantic_error(19, root->line);
+            return false;
+        }
+        oldtype->content.func.functiontype = functiontype;
+        return true;
     }
     else
-        return false;
+    {
+        assert(0);
+    }
 }
-bool VarList(TreeNode *root, Type type)
+bool VarList(TreeNode *root, Type type, StructureField *field) // 不必返回类型，只需检查合法性，记录参数名称
 {
-    if (strcmp(root->child[0]->name, "ParamDec") == 0)
-        return ParamDec(root->child[0], type) && VarList(root->child[2], type);
+    // varlist返回structurefield，利用id和返回值创建type，插入符号表
+    if (compareName(root, 1, "ParamDec"))
+        return ParamDec(root->child[0], field);
     else
-        return false;
+        return ParamDec(root->child[0], field) && VarList(root->child[2], type, field);
 }
 // 函数参数项
 bool ParamDec(TreeNode *root, StructureField *field)
 {
-    Type new_type = Specifier(root->child[0]);
-    if (new_type == NULL)
+    Type type = Specifier(root->child[0]);
+    if (type == NULL)
         return false;
-    return VarDec(root->child[1], new_type, field);
+    Type vartype = VarDec(root->child[1], type, NULL);
+    if (vartype == NULL)
+        return false;
+    addNode(field, vartype, root->child[1]->id);
+    return true;
 }
 // 函数体
 bool CompSt(TreeNode *root, Type rettype) // rettype是函数返回值类型
