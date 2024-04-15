@@ -102,7 +102,7 @@ ParamDec: Specifier VarDec {NNAC($$, "ParamDec", @$.first_line, 2, $1, $2)}
 
 //Statements
 
-CompSt: LC DefList StmtList RC { NNAC($$, "CompSt", @$.first_line, 4, $1, $2,$3,$4)}
+CompSt: LC   StmtList RC { NNAC($$, "CompSt", @$.first_line, 4, $1, $2,$3,$4)}
     | LC error RC
     ;
 StmtList: Stmt StmtList {NNAC($$, "StmtList", @$.first_line, 2, $1, $2)}

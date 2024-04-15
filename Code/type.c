@@ -53,7 +53,7 @@ Type getFunctionRet(Type type)
 // 比较两个类型是否相同
 int compareType(Type a, Type b)
 {
-    if(a==NULL||b==NULL)
+    if (a == NULL || b == NULL)
         return 0;
     if (a->kind != b->kind)
         return 0;
@@ -82,14 +82,16 @@ int compareType(Type a, Type b)
         assert(0);
     }
 }
-bool compareArgs(StructureField a, StructureField b){
-    while(a&&b){
-        if(!compareType(a->type,b->type))
+bool compareArgs(StructureField a, StructureField b)
+{
+    while (a && b)
+    {
+        if (!compareType(a->type, b->type))
             return false;
-        a=a->next;
-        b=b->next;
+        a = a->next;
+        b = b->next;
     }
-    return a==b;
+    return a == b;
 }
 void addNode(StructureField *head, Type type, char *name)
 {
@@ -134,13 +136,16 @@ Type find_symbol(char *name)
     }
     return NULL;
 }
-StructureField get_all_symbol(){
+StructureField get_all_symbol()
+{
     StructureField head = NULL;
-    for(int i=0;i<=N;i++){
+    for (int i = 0; i <= N; i++)
+    {
         StructureField p = hash_table[i];
-        while(p){
-            addNode(&head,p->type,p->name);
-            p=p->next;
+        while (p)
+        {
+            addNode(&head, p->type, p->name);
+            p = p->next;
         }
     }
     return head;
