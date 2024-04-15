@@ -1,6 +1,6 @@
 #include "type.h"
 #define N 0x3ff
-TypeNode *hash_table[N + 1];
+StructureField *hash_table[N + 1];
 // 创建类型
 Type createBasic(enum ValueType basic)
 {
@@ -17,16 +17,18 @@ Type createArray(Type elem, int size)
     type->content.array.size = size;
     return type;
 }
-Type createStructure(char *name, TypeNode head)
+Type createStructure(char *name, StructureField head)
 {
     Type type = (Type)malloc(sizeof(struct Type_));
     type->kind = STRUCTURE;
     type->content.stru.name = name;
-    type->content.stru.table = malloc(sizeof(TypeNode) * (N + 1));
-    memset(type->content.stru.table, 0, sizeof(TypeNode) * (N + 1));
-    TypeNode p = head;
-    while(p){
-        if(find_symbol_in(type, p->name)){
+    type->content.stru.table = malloc(sizeof(StructureField) * (N + 1));
+    memset(type->content.stru.table, 0, sizeof(StructureField) * (N + 1));
+    StructureField p = head;
+    while (p)
+    {
+        if (find_symbol_in(type, p->name))
+        {
             return NULL;
         }
         add_symbol_to(type, p->name, p->type);
@@ -34,7 +36,7 @@ Type createStructure(char *name, TypeNode head)
     }
     return type;
 }
-Type createFunction(Type ret, enum FunctionType functiontype, TypeNode head)
+Type createFunction(Type ret, enum FunctionType functiontype, StructureField head)
 {
     Type type = (Type)malloc(sizeof(struct Type_));
     type->kind = FUNCTION;
@@ -63,8 +65,8 @@ int compareType(Type a, Type b)
     case FUNCTION:
         if (!compareType(a->content.func.ret, b->content.func.ret))
             return 0;
-        TypeNode p1 = a->content.func.tail;
-        TypeNode p2 = b->content.func.tail;
+        StructureField p1 = a->content.func.tail;
+        StructureField p2 = b->content.func.tail;
         while (p1 && p2)
         {
             if (!compareType(p1->type, p2->type))
@@ -77,14 +79,15 @@ int compareType(Type a, Type b)
         assert(0);
     }
 }
-void addNode(TypeNode *head, Type type, char *name){
-    TypeNode p = (TypeNode)malloc(sizeof(TypeNode));
+void addNode(StructureField *head, Type type, char *name)
+{
+    StructureField p = (StructureField)malloc(sizeof(StructureField));
     p->type = type;
     p->next = *head;
     p->name = name;
     *head = p;
 }
-//符号表
+// 符号表
 
 unsigned int hash_pjw(char *name)
 {
@@ -100,7 +103,7 @@ unsigned int hash_pjw(char *name)
 void add_symbol(char *name, Type type)
 {
     unsigned int val = hash_pjw(name);
-    TypeNode p = (TypeNode)malloc(sizeof(TypeNode));
+    StructureField p = (StructureField)malloc(sizeof(StructureField));
     p->type = type;
     p->next = hash_table[val];
     hash_table[val] = p;
@@ -108,10 +111,11 @@ void add_symbol(char *name, Type type)
 Type find_symbol(char *name)
 {
     unsigned int val = hash_pjw(name);
-    TypeNode p = hash_table[val];
+    StructureField p = hash_table[val];
     while (p)
     {
-        if (strcmp(p->name, name) == 0){
+        if (strcmp(p->name, name) == 0)
+        {
             return p->type;
         }
         p = p->next;
@@ -120,18 +124,18 @@ Type find_symbol(char *name)
 }
 void add_symbol_to(Type stru, char *name, Type type)
 {
-    TypeNode *table = stru->content.stru.table;
+    StructureField *table = stru->content.stru.table;
     unsigned int val = hash_pjw(name);
-    TypeNode p = (TypeNode)malloc(sizeof(TypeNode));
+    StructureField p = (StructureField)malloc(sizeof(StructureField));
     p->type = type;
     p->next = table[val];
     table[val] = p;
 }
 Type find_symbol_in(Type stru, char *name)
 {
-    TypeNode *table = stru->content.stru.table;
+    StructureField *table = stru->content.stru.table;
     unsigned int val = hash_pjw(name);
-    TypeNode p = table[val];
+    StructureField p = table[val];
     while (p)
     {
         if (strcmp(p->name, name) == 0)
