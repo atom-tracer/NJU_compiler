@@ -1,0 +1,28 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/Code/parser",
+            "args": [
+                "../Test/test_2/1.cmm"
+                ], // 这里可以添加程序运行时需要的参数
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/Code",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            //"preLaunchTask": "build", // 在调试前执行build任务
+            "miDebuggerPath": "/usr/bin/gdb"
+        }
+    ]
+}

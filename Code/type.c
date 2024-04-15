@@ -1,6 +1,6 @@
 #include "type.h"
 #define N 0x3ff
-StructureField *hash_table[N + 1];
+StructureField hash_table[N + 1];
 // 转化为右值
 void change_to_right(Type *type)
 {
@@ -68,12 +68,12 @@ Type createStructure(char *name, StructureField head)
     }
     return type;
 }
-Type createFunction(Type ret, enum FunctionType functiontype, StructureField *head)
+Type createFunction(Type ret, enum FunctionType functiontype, StructureField head)
 {
     Type type = (Type)malloc(sizeof(struct Type_));
     type->kind = FUNCTION;
     type->content.func.ret = ret;
-    turn_to_right(&type->content.func.ret); // 函数的返回值是右值
+    change_to_right(&type->content.func.ret); // 函数的返回值是右值
     type->content.func.functiontype = functiontype;
     type->content.func.tail = head;
     type->is_left = true;

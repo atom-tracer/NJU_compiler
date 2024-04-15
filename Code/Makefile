@@ -35,25 +35,9 @@ syntax-c: $(YFILE)
 .PHONY: clean test
 test:
 
-	./parser ../Test/test_1/inputs/C-1.cmm > ../Test/test_1/myoutput/C-1.txt || true
-	diff ../Test/test_1/myoutput/C-1.txt ../Test/test_1/expects/C-1.exp > ../Test/test_1/myoutput/C-1_diff.txt || true
-
-	./parser ../Test/test_1/inputs/C-2.cmm > ../Test/test_1/myoutput/C-2.txt || true
-	diff ../Test/test_1/myoutput/C-2.txt ../Test/test_1/expects/C-2.exp > ../Test/test_1/myoutput/C-2_diff.txt || true
-
-	./parser ../Test/test_1/inputs/D-1.cmm > ../Test/test_1/myoutput/D-1.txt || true
-	diff ../Test/test_1/myoutput/D-1.txt ../Test/test_1/expects/D-1.exp > ../Test/test_1/myoutput/D-1_diff.txt || true
-
-	./parser ../Test/test_1/inputs/D-2.cmm > ../Test/test_1/myoutput/D-2.txt || true
-	diff ../Test/test_1/myoutput/D-2.txt ../Test/test_1/expects/D-2.exp > ../Test/test_1/myoutput/D-2_diff.txt || true
-
-	./parser ../Test/test_1/inputs/D-3.cmm > ../Test/test_1/myoutput/D-3.txt || true
-	diff ../Test/test_1/myoutput/D-3.txt ../Test/test_1/expects/D-3.exp > ../Test/test_1/myoutput/D-3_diff.txt || true
-
-	./parser ../Test/test_1/inputs/E3-1.cmm > ../Test/test_1/myoutput/E3-1.txt || true
-	diff ../Test/test_1/myoutput/E3-1.txt ../Test/test_1/expects/E3-1.exp > ../Test/test_1/myoutput/E3-1_diff.txt || true
-
-	./parser ../Test/test_1/inputs/myinput.cmm > ../Test/test_1/myoutput/myinput.txt || true
+	./parser ../Test/test_2/1.cmm
+	./parser ../Test/test_2/2.cmm
+	./parser ../Test/test_2/3.cmm
 
 clean:
 	rm -f parser lex.yy.c syntax.tab.c syntax.tab.h syntax.output
