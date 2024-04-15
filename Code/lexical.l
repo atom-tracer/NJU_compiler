@@ -155,7 +155,9 @@ int main(int argc, char** argv) {
     yyrestart(yyin);
     yyparse();
     //yylex();
-    if(!my_is_error)
-        print_tree(root,0);
+    // if(!my_is_error)
+    //     print_tree(root,0);
+    assert(!my_is_error);
+    semantic_analysis(root);
     return 0; 
 } 
