@@ -126,14 +126,15 @@ bool VarDec(TreeNode *root, Type type, StructureField *field)
     }
     else if (compareName(root, 4, "VarDec", "LB", "INT", "RB"))
     {
-        return VarDec(root->child[0], createArray(type, root->child[2]->int_val));
+        return VarDec(root->child[0], createArray(type, root->child[2]->int_val), NULL);
     }
     else
         return false;
 }
 bool FunDec(TreeNode *root, Type type)
 {
-    if (strcmp(root->child[2]->name, "VarList") == 0)
+    
+    if (compareName(root, 4, "ID", "LP", "VarList", "RP"))
     {
         ; // 插入符号表，判断合法性
     }
