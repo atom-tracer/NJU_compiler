@@ -13,3 +13,6 @@ enum FunctionType
     FUNCTION_DEFINITION = 1,
     FUNCTION_DECLARATION = 0
 };
+
+void summit_semantic_error();
+void add_semantic_error(int error_type, int line);

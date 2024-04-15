@@ -40,6 +40,7 @@ Type createFunction(Type ret, enum FunctionType functiontype, StructureField hea
 {
     Type type = (Type)malloc(sizeof(struct Type_));
     type->kind = FUNCTION;
+    type->content.func.isused = false;
     type->content.func.ret = ret;
     type->content.func.functiontype = functiontype;
     type->content.func.tail = head;
@@ -52,6 +53,8 @@ Type getFunctionRet(Type type)
 // 比较两个类型是否相同
 int compareType(Type a, Type b)
 {
+    if(a==NULL||b==NULL)
+        return 0;
     if (a->kind != b->kind)
         return 0;
     switch (a->kind)
@@ -78,6 +81,15 @@ int compareType(Type a, Type b)
     default:
         assert(0);
     }
+}
+bool compareArgs(StructureField a, StructureField b){
+    while(a&&b){
+        if(!compareType(a->type,b->type))
+            return false;
+        a=a->next;
+        b=b->next;
+    }
+    return a==b;
 }
 void addNode(StructureField *head, Type type, char *name)
 {
@@ -121,6 +133,17 @@ Type find_symbol(char *name)
         p = p->next;
     }
     return NULL;
+}
+StructureField get_all_symbol(){
+    StructureField head = NULL;
+    for(int i=0;i<=N;i++){
+        StructureField p = hash_table[i];
+        while(p){
+            addNode(&head,p->type,p->name);
+            p=p->next;
+        }
+    }
+    return head;
 }
 void add_symbol_to(Type stru, char *name, Type type)
 {

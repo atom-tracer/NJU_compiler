@@ -21,5 +21,5 @@ bool DefList(TreeNode *root, Type type);
 bool Def(TreeNode *root, Type type);
 bool DecList(TreeNode *root, Type type);
 bool Dec(TreeNode *root, Type type);
-bool Exp(TreeNode *root, Type type);
-bool Args(TreeNode *root, Type type);
+Type Exp(TreeNode *root);
+bool Args(TreeNode *root, StructureField* field);//field为返回的参数列表
