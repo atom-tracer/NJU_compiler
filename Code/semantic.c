@@ -36,6 +36,7 @@ bool ExtDef(TreeNode *root)
     else if (strcmp(root->child[1]->name, "SEMI") == 0)
         return true;
     else if (strcmp(root->child[1]->name, "FunDec") == 0) // 函数定义/声明
+    // 先findsymbol，查看其是否为定义
         return FunDec(root->child[1], type) && CompSt(root->child[2], type);
     else
         return false;
