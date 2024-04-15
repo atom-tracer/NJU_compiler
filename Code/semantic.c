@@ -156,7 +156,7 @@ bool FunDec(TreeNode *root, enum FunctionType functiontype, Type ret)
     }
     else
         ;
-    Type type = createFunction(ret, functiontype, field);
+    Type type = createFunction(ret, functiontype, *field);
     Type oldtype = find_symbol(root->child[0]->id);
     if (oldtype == NULL)
     {
@@ -462,10 +462,10 @@ Type Exp(TreeNode *root)
             add_semantic_error(11, root->line);
             return NULL;
         }
-        StructureField field = NULL;
+        StructureField *field = NULL;
         if (!Args(root->child[2], field))
             return NULL;
-        if (!compareArgs(type->content.func.tail, field))
+        if (!compareArgs(type->content.func.tail, *field))
         {
             add_semantic_error(9, root->line);
             return NULL;

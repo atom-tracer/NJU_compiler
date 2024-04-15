@@ -149,6 +149,7 @@ unsigned int hash_pjw(char *name)
 }
 void add_symbol(char *name, Type type)
 {
+    printf("name:%s\n", name);
     unsigned int val = hash_pjw(name);
     StructureField p = (StructureField)malloc(sizeof(StructureField));
     p->type = type;

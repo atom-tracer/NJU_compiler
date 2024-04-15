@@ -2076,10 +2076,14 @@ int main(int argc, char** argv) {
     //yylex();
     // if(!my_is_error)
     //     print_tree(root,0);
+    printf("start semantic analysis\n");
     assert(!my_is_error);
+
     Program(root);
+    printf("semantic analysis success\n");
     //输出语义错误
     summit_semantic_error();
+    printf("end semantic analysis\n");
     return 0; 
 } 
 
