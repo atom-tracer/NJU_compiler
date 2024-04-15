@@ -153,6 +153,7 @@ void add_symbol(char *name, Type type)
     StructureField p = (StructureField)malloc(sizeof(StructureField));
     p->type = type;
     p->next = hash_table[val];
+    p->name = name;
     hash_table[val] = p;
 }
 Type find_symbol(char *name)
@@ -189,6 +190,7 @@ void add_symbol_to(Type stru, char *name, Type type)
     unsigned int val = hash_pjw(name);
     StructureField p = (StructureField)malloc(sizeof(StructureField));
     p->type = type;
+    p->name = name;
     p->next = table[val];
     table[val] = p;
 }

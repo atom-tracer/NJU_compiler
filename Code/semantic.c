@@ -364,7 +364,7 @@ Type Exp(TreeNode *root)
         return Exp(root->child[1]);
     // 直接确定类型
     if (compareName(root, 1, "INT") || compareName(root, 1, "FLOAT")){
-        Type type = createBasic(root->child[0]->type_val);
+        Type type = createBasic(strcmp(root->child[0]->name, "INT") == 0 ? INT_TYPE : FLOAT_TYPE);
         type->is_left = false;
         return type;
     }
