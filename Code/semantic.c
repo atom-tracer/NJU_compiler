@@ -64,9 +64,31 @@ bool ExtDecList(TreeNode *root, Type type)//变量定义
         return VarDec(root->child[0], type, field) && ExtDecList(root->child[2], type);
 }
 
-bool StructSpecifier(TreeNode *root);
-bool OptTag(TreeNode *root, Type type);
-bool Tag(TreeNode *root);
+Type StructSpecifier(TreeNode *root){
+    if(compareName(root, 5, "STRUCT", "Tag", "LC", "DefList", "RC")){
+        StructureField field = NULL;
+        if(!DefList(root->child[3], field))
+            return NULL;
+        Type type = createStructure(Tag(root->child[1]), field);
+        add_symbol(Tag(root->child[1]), type);//存储结构体类型
+        return type;
+    }
+    if(compareName(root, 2, "STRUCT", "Tag")){
+        Type type = find_symbol(Tag(root->child[1]));
+        if(type==NULL||type->kind!=STRUCTURE)
+            return NULL;
+        return type;
+    }
+}
+char* OptTag(TreeNode *root, Type type){
+    if(strcmp(root->child[0]->name,"ID")==0){
+        return root->child[0]->id;
+    }
+    return NULL;
+}
+char* Tag(TreeNode *root){
+    return root->child[0]->id;
+}
 Type VarDec(TreeNode *root, Type type, StructureField *field)
 {
     Type new_type = type;
