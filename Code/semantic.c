@@ -237,32 +237,32 @@ bool Stmt(TreeNode *root, Type rettype)
     }
 }
 // 变量定义
-bool DefList(TreeNode *root, StructureField *field)
+bool DefList(TreeNode *root, Type stru)
 { // 可能用于结构体定义以及普通变量定义
     if (root->child_num == 0)
         return true;
-    return Def(root->child[0], field) && DefList(root->child[1], field);
+    return Def(root->child[0], stru) && DefList(root->child[1], stru);
 }
 // 单个定义语句；
-bool Def(TreeNode *root, StructureField *field)
+bool Def(TreeNode *root, Type stru)
 {
     Type type = Specifier(root->child[0]);
     if (type == NULL)
         return false;
-    return DecList(root->child[1], type, field);
+    return DecList(root->child[1], type, stru);
 }
 // 声明列表
-bool DecList(TreeNode *root, Type type, StructureField *field)
+bool DecList(TreeNode *root, Type type, Type stru)
 {
     if (compareName(root, 1, "Dec"))
-        return Dec(root->child[0], type, field);
+        return Dec(root->child[0], type, stru);
     if (compareName(root, 3, "Dec", "COMMA", "DecList"))
-        return Dec(root->child[0], type, field) && DecList(root->child[2], type, field);
+        return Dec(root->child[0], type, stru) && DecList(root->child[2], type, stru);
 }
 // 声明单项
-bool Dec(TreeNode *root, Type type, StructureField *field)
+bool Dec(TreeNode *root, Type type, Type stru)
 {
-    Type var = VarDec(root->child[0], type, field);
+    Type var = VarDec(root->child[0], type, stru);
     if (var == NULL)
         return false;
     if (compareName(root, 1, "VarDec"))
