@@ -2,22 +2,16 @@
 extern int var_list[], fun_list[];
 bool Program(TreeNode *root)
 {
-    if (my_is_error)
-        return false;
     return ExtDefList(root->child[0]);
 }
 bool ExtDefList(TreeNode *root)
 {
-    if (my_is_error)
-        return false;
     if (root->child_num == 0)
         return true;
     return ExtDef(root->child[0]) && ExtDefList(root->child[1]);
 }
 Type Specifier(TreeNode *root)
 {
-    if (my_is_error)
-        return NULL;
     if (strcmp(root->child[0]->name, "TYPE") == 0)
     {
         if (root->child[0]->type == INT_TYPE)
@@ -34,8 +28,6 @@ Type Specifier(TreeNode *root)
 }
 bool ExtDef(TreeNode *root)
 {
-    if (my_is_error)
-        return false;
     Type type = Specifier(root->child[0]); // 继承属性，确定类型
     if (type == NULL)
         return false;
@@ -50,8 +42,6 @@ bool ExtDef(TreeNode *root)
 }
 bool ExtDecList(TreeNode *root, Type type)
 {
-    if (my_is_error)
-        return false;
     if (root->child_num == 1)
         return VarDec(root->child[0], type);
     else if (root->child_num == 3)
@@ -63,8 +53,6 @@ bool OptTag(TreeNode *root, Type type);
 bool Tag(TreeNode *root);
 Type VarDec(TreeNode *root, Type type)
 {
-    if (my_is_error)
-        return false;
     Type new_type = type;
     if (strcmp(root->child[0]->name, "ID") == 0)
     {
@@ -86,8 +74,6 @@ Type VarDec(TreeNode *root, Type type)
 }
 bool FunDec(TreeNode *root, Type type)
 {
-    if (my_is_error)
-        return false;
     if (strcmp(root->child[2]->name, "VarList") == 0)
     {
         ; // 插入符号表，判断合法性
@@ -101,13 +87,10 @@ bool FunDec(TreeNode *root, Type type)
 }
 bool VarList(TreeNode *root, Type type)
 {
-    if (my_is_error)
-        return false;
     if (strcmp(root->child[0]->name, "ParamDec") == 0)
         return ParamDec(root->child[0], type) && VarList(root->child[2], type);
     else
         return false;
-
 }
 bool ParamDec(TreeNode *root, Type type);
 bool CompSt(TreeNode *root, Type type);
