@@ -12,7 +12,6 @@ bool compareName(TreeNode*root,int num,...){
     va_end(args);
     return true;
 }
-extern int var_list[], fun_list[];
 bool Program(TreeNode *root)
 {
     return ExtDefList(root->child[0]);
@@ -129,6 +128,7 @@ Type Exp(TreeNode *root)
                 add_semantic_error(7,root->line);
                 return NULL;
             }
+            change_to_right(&type1);//转换为右值
             return type1;
         }
     }
@@ -149,14 +149,15 @@ Type Exp(TreeNode *root)
     }
     //负号
     if(compareName(root, 2, "MINUS", "Exp")){
-        Type type = Exp(root->child[1]);
-        if(type==NULL)
+        Type type1 = Exp(root->child[1]);
+        if(type1==NULL)
             return NULL;
-        if(type->kind!=BASIC){
+        if(type1->kind!=BASIC){
             add_semantic_error(7,root->line);
             return NULL;
         }
-        return type;
+        change_to_right(&type1);//转换为右值
+        return type1;
         float a = 1.0;
     }
     //数组解析
@@ -206,7 +207,6 @@ Type Exp(TreeNode *root)
             add_semantic_error(9,root->line);
             return NULL;
         }
-        type->content.func.isused = true;
         return getFunctionRet(type);
     }
     //有参函数调用
@@ -227,19 +227,19 @@ Type Exp(TreeNode *root)
             add_semantic_error(9,root->line);
             return NULL;
         }
-        type->content.func.isused = true;
         return getFunctionRet(type);
     }
     //not操作
     if(compareName(root, 2, "NOT", "Exp")){
-        Type type = Exp(root->child[1]);
-        if(type==NULL)
+        Type type1 = Exp(root->child[1]);
+        if(type1==NULL)
             return NULL;
-        if(type->kind!=BASIC){
+        if(type1->kind!=BASIC){
             add_semantic_error(7,root->line);
             return NULL;
         }
-        return type;
+        change_to_right(&type1);//转换为右值
+        return type1;
     }
     //赋值操作
     if(compareName(root, 3, "Exp", "ASSIGNOP", "Exp")){
@@ -251,7 +251,10 @@ Type Exp(TreeNode *root)
             add_semantic_error(5,root->line);
             return NULL;
         }
-        
+        if(!type1->is_left){//不是左值
+            add_semantic_error(6,root->line);
+            return NULL;
+        }
         return type1;
     }
     assign(0);

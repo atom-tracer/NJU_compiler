@@ -23,6 +23,7 @@ struct StructureField_
 struct Type_
 {
     enum TypeKind kind;
+    bool is_left;
     union
     {
         enum ValueType basic; // 基本元素类型
@@ -36,7 +37,6 @@ struct Type_
             StructureField tail;
             Type ret;
             enum FunctionType functiontype; // 函数类型（定义或声明）
-            bool isused;                     // 是否被调用过
         } func;                             // 函数
         struct
         {
@@ -53,6 +53,7 @@ Type createArray(Type elem, int size);
 // 结构体类型也应该被加入到符号表(类型名，类型)，在之后使用该类型时，通过查找符号表获得类型信息type，用于将变量加入到符号表
 Type createStructure(char *name, StructureField head);
 Type createFunction(Type ret, enum FunctionType functiontype, StructureField head);
+void change_to_right(Type* type);
 Type getFunctionRet(Type type);
 int compareType(Type a, Type b);
 bool compareArgs(StructureField a, StructureField b);//比较函数参数列表
