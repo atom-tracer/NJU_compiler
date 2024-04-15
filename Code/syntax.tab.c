@@ -566,12 +566,12 @@ static const yytype_int8 yytranslate[] =
 static const yytype_uint8 yyrline[] =
 {
        0,    57,    57,    58,    60,    61,    62,    64,    65,    66,
-      67,    69,    70,    75,    76,    78,    79,    81,    82,    84,
-      89,    90,    92,    93,    95,    96,    98,   103,   104,   106,
-     107,   109,   110,   111,   112,   113,   114,   115,   116,   117,
-     122,   123,   125,   127,   128,   130,   131,   132,   137,   138,
-     139,   140,   141,   142,   143,   144,   145,   146,   147,   148,
-     149,   150,   151,   152,   153,   154,   155,   157,   158
+      67,    70,    71,    76,    77,    79,    80,    82,    83,    85,
+      90,    91,    93,    94,    96,    97,    99,   104,   105,   107,
+     108,   110,   111,   112,   113,   114,   115,   116,   117,   118,
+     123,   124,   126,   128,   129,   131,   132,   133,   138,   139,
+     140,   141,   142,   143,   144,   145,   146,   147,   148,   149,
+     150,   151,   152,   153,   154,   155,   156,   158,   159
 };
 #endif
 
@@ -1411,313 +1411,313 @@ yyreduce:
     break;
 
   case 11: /* ExtDecList: VarDec  */
-#line 69 "./syntax.y"
+#line 70 "./syntax.y"
                    {NNAC((yyval.val), "ExtDecList", (yyloc).first_line, 1, (yyvsp[0].val))}
 #line 1417 "./syntax.tab.c"
     break;
 
   case 12: /* ExtDecList: VarDec COMMA ExtDecList  */
-#line 70 "./syntax.y"
+#line 71 "./syntax.y"
                               { NNAC((yyval.val), "ExtDecList", (yyloc).first_line, 3, (yyvsp[-2].val), (yyvsp[-1].val),(yyvsp[0].val))}
 #line 1423 "./syntax.tab.c"
     break;
 
   case 13: /* Specifier: TYPE  */
-#line 75 "./syntax.y"
+#line 76 "./syntax.y"
                 {NNAC((yyval.val), "Specifier", (yyloc).first_line, 1, (yyvsp[0].val))}
 #line 1429 "./syntax.tab.c"
     break;
 
   case 14: /* Specifier: StructSpecifier  */
-#line 76 "./syntax.y"
+#line 77 "./syntax.y"
                       {NNAC((yyval.val), "Specifier", (yyloc).first_line, 1, (yyvsp[0].val))}
 #line 1435 "./syntax.tab.c"
     break;
 
   case 15: /* StructSpecifier: STRUCT OptTag LC DefList RC  */
-#line 78 "./syntax.y"
+#line 79 "./syntax.y"
                                              { NNAC((yyval.val), "StructSpecifier", (yyloc).first_line, 5, (yyvsp[-4].val), (yyvsp[-3].val),(yyvsp[-2].val),(yyvsp[-1].val),(yyvsp[0].val))}
 #line 1441 "./syntax.tab.c"
     break;
 
   case 16: /* StructSpecifier: STRUCT Tag  */
-#line 79 "./syntax.y"
+#line 80 "./syntax.y"
                  {NNAC((yyval.val), "StructSpecifier", (yyloc).first_line, 2, (yyvsp[-1].val), (yyvsp[0].val))}
 #line 1447 "./syntax.tab.c"
     break;
 
   case 17: /* OptTag: ID  */
-#line 81 "./syntax.y"
+#line 82 "./syntax.y"
            {NNAC((yyval.val), "OptTag", (yyloc).first_line, 1, (yyvsp[0].val))}
 #line 1453 "./syntax.tab.c"
     break;
 
   case 18: /* OptTag: %empty  */
-#line 82 "./syntax.y"
+#line 83 "./syntax.y"
       {(yyval.val)=new_node("OptTag",node_grammar);}
 #line 1459 "./syntax.tab.c"
     break;
 
   case 19: /* Tag: ID  */
-#line 84 "./syntax.y"
+#line 85 "./syntax.y"
         {NNAC((yyval.val), "Tag", (yyloc).first_line, 1, (yyvsp[0].val))}
 #line 1465 "./syntax.tab.c"
     break;
 
   case 20: /* VarDec: ID  */
-#line 89 "./syntax.y"
+#line 90 "./syntax.y"
            { NNAC((yyval.val), "VarDec", (yyloc).first_line, 1, (yyvsp[0].val))}
 #line 1471 "./syntax.tab.c"
     break;
 
   case 21: /* VarDec: VarDec LB INT RB  */
-#line 90 "./syntax.y"
+#line 91 "./syntax.y"
                        {NNAC((yyval.val), "VarDec", (yyloc).first_line, 4, (yyvsp[-3].val), (yyvsp[-2].val),(yyvsp[-1].val),(yyvsp[0].val))}
 #line 1477 "./syntax.tab.c"
     break;
 
   case 22: /* FunDec: ID LP VarList RP  */
-#line 92 "./syntax.y"
+#line 93 "./syntax.y"
                          { NNAC((yyval.val), "FunDec", (yyloc).first_line, 4, (yyvsp[-3].val), (yyvsp[-2].val),(yyvsp[-1].val),(yyvsp[0].val))}
 #line 1483 "./syntax.tab.c"
     break;
 
   case 23: /* FunDec: ID LP RP  */
-#line 93 "./syntax.y"
+#line 94 "./syntax.y"
                {NNAC((yyval.val), "FunDec", (yyloc).first_line, 3, (yyvsp[-2].val), (yyvsp[-1].val),(yyvsp[0].val))}
 #line 1489 "./syntax.tab.c"
     break;
 
   case 24: /* VarList: ParamDec COMMA VarList  */
-#line 95 "./syntax.y"
+#line 96 "./syntax.y"
                                 {NNAC((yyval.val), "VarList", (yyloc).first_line, 3, (yyvsp[-2].val), (yyvsp[-1].val),(yyvsp[0].val))}
 #line 1495 "./syntax.tab.c"
     break;
 
   case 25: /* VarList: ParamDec  */
-#line 96 "./syntax.y"
+#line 97 "./syntax.y"
                {NNAC((yyval.val), "VarList", (yyloc).first_line, 1, (yyvsp[0].val))}
 #line 1501 "./syntax.tab.c"
     break;
 
   case 26: /* ParamDec: Specifier VarDec  */
-#line 98 "./syntax.y"
+#line 99 "./syntax.y"
                            {NNAC((yyval.val), "ParamDec", (yyloc).first_line, 2, (yyvsp[-1].val), (yyvsp[0].val))}
 #line 1507 "./syntax.tab.c"
     break;
 
   case 27: /* CompSt: LC DefList StmtList RC  */
-#line 103 "./syntax.y"
+#line 104 "./syntax.y"
                                { NNAC((yyval.val), "CompSt", (yyloc).first_line, 4, (yyvsp[-3].val), (yyvsp[-2].val),(yyvsp[-1].val),(yyvsp[0].val))}
 #line 1513 "./syntax.tab.c"
     break;
 
   case 29: /* StmtList: Stmt StmtList  */
-#line 106 "./syntax.y"
+#line 107 "./syntax.y"
                         {NNAC((yyval.val), "StmtList", (yyloc).first_line, 2, (yyvsp[-1].val), (yyvsp[0].val))}
 #line 1519 "./syntax.tab.c"
     break;
 
   case 30: /* StmtList: %empty  */
-#line 107 "./syntax.y"
+#line 108 "./syntax.y"
       {(yyval.val)=new_node("StmtList",node_grammar);}
 #line 1525 "./syntax.tab.c"
     break;
 
   case 31: /* Stmt: Exp SEMI  */
-#line 109 "./syntax.y"
+#line 110 "./syntax.y"
                {NNAC((yyval.val), "Stmt", (yyloc).first_line, 2, (yyvsp[-1].val), (yyvsp[0].val))}
 #line 1531 "./syntax.tab.c"
     break;
 
   case 32: /* Stmt: CompSt  */
-#line 110 "./syntax.y"
+#line 111 "./syntax.y"
              {NNAC((yyval.val), "Stmt", (yyloc).first_line, 1, (yyvsp[0].val))}
 #line 1537 "./syntax.tab.c"
     break;
 
   case 33: /* Stmt: RETURN Exp SEMI  */
-#line 111 "./syntax.y"
+#line 112 "./syntax.y"
                       {NNAC((yyval.val), "Stmt", (yyloc).first_line, 3, (yyvsp[-2].val), (yyvsp[-1].val),(yyvsp[0].val))}
 #line 1543 "./syntax.tab.c"
     break;
 
   case 34: /* Stmt: IF LP Exp RP Stmt  */
-#line 112 "./syntax.y"
+#line 113 "./syntax.y"
                                               {NNAC((yyval.val), "Stmt", (yyloc).first_line, 5, (yyvsp[-4].val), (yyvsp[-3].val),(yyvsp[-2].val),(yyvsp[-1].val), (yyvsp[0].val))}
 #line 1549 "./syntax.tab.c"
     break;
 
   case 35: /* Stmt: IF LP Exp RP Stmt ELSE Stmt  */
-#line 113 "./syntax.y"
+#line 114 "./syntax.y"
                                   { NNAC((yyval.val), "Stmt", (yyloc).first_line, 7, (yyvsp[-6].val), (yyvsp[-5].val),(yyvsp[-4].val),(yyvsp[-3].val), (yyvsp[-2].val), (yyvsp[-1].val),(yyvsp[0].val))}
 #line 1555 "./syntax.tab.c"
     break;
 
   case 36: /* Stmt: WHILE LP Exp RP Stmt  */
-#line 114 "./syntax.y"
+#line 115 "./syntax.y"
                            { NNAC((yyval.val), "Stmt", (yyloc).first_line, 5, (yyvsp[-4].val), (yyvsp[-3].val),(yyvsp[-2].val),(yyvsp[-1].val), (yyvsp[0].val))}
 #line 1561 "./syntax.tab.c"
     break;
 
   case 40: /* DefList: Def DefList  */
-#line 122 "./syntax.y"
+#line 123 "./syntax.y"
                      {NNAC((yyval.val), "DefList", (yyloc).first_line, 2, (yyvsp[-1].val), (yyvsp[0].val))}
 #line 1567 "./syntax.tab.c"
     break;
 
   case 41: /* DefList: %empty  */
-#line 123 "./syntax.y"
+#line 124 "./syntax.y"
       {(yyval.val)=new_node("DefList",node_grammar);}
 #line 1573 "./syntax.tab.c"
     break;
 
   case 42: /* Def: Specifier DecList SEMI  */
-#line 125 "./syntax.y"
+#line 126 "./syntax.y"
                             { NNAC((yyval.val), "Def", (yyloc).first_line, 3, (yyvsp[-2].val), (yyvsp[-1].val),(yyvsp[0].val))}
 #line 1579 "./syntax.tab.c"
     break;
 
   case 43: /* DecList: Dec  */
-#line 127 "./syntax.y"
+#line 128 "./syntax.y"
              { NNAC((yyval.val), "DecList", (yyloc).first_line, 1, (yyvsp[0].val))}
 #line 1585 "./syntax.tab.c"
     break;
 
   case 44: /* DecList: Dec COMMA DecList  */
-#line 128 "./syntax.y"
+#line 129 "./syntax.y"
                         { NNAC((yyval.val), "DecList", (yyloc).first_line, 3, (yyvsp[-2].val), (yyvsp[-1].val),(yyvsp[0].val))}
 #line 1591 "./syntax.tab.c"
     break;
 
   case 45: /* Dec: VarDec  */
-#line 130 "./syntax.y"
+#line 131 "./syntax.y"
             {NNAC((yyval.val), "Dec", (yyloc).first_line, 1, (yyvsp[0].val))}
 #line 1597 "./syntax.tab.c"
     break;
 
   case 46: /* Dec: VarDec ASSIGNOP Exp  */
-#line 131 "./syntax.y"
+#line 132 "./syntax.y"
                           { NNAC((yyval.val), "Dec", (yyloc).first_line, 3, (yyvsp[-2].val), (yyvsp[-1].val),(yyvsp[0].val))}
 #line 1603 "./syntax.tab.c"
     break;
 
   case 48: /* Exp: Exp ASSIGNOP Exp  */
-#line 137 "./syntax.y"
+#line 138 "./syntax.y"
                       { NNAC((yyval.val), "Exp", (yyloc).first_line, 3, (yyvsp[-2].val), (yyvsp[-1].val),(yyvsp[0].val))}
 #line 1609 "./syntax.tab.c"
     break;
 
   case 49: /* Exp: Exp AND Exp  */
-#line 138 "./syntax.y"
+#line 139 "./syntax.y"
                   { NNAC((yyval.val), "Exp", (yyloc).first_line, 3, (yyvsp[-2].val), (yyvsp[-1].val),(yyvsp[0].val))}
 #line 1615 "./syntax.tab.c"
     break;
 
   case 50: /* Exp: Exp OR Exp  */
-#line 139 "./syntax.y"
+#line 140 "./syntax.y"
                  { NNAC((yyval.val), "Exp", (yyloc).first_line, 3, (yyvsp[-2].val), (yyvsp[-1].val),(yyvsp[0].val))}
 #line 1621 "./syntax.tab.c"
     break;
 
   case 51: /* Exp: Exp RELOP Exp  */
-#line 140 "./syntax.y"
+#line 141 "./syntax.y"
                     { NNAC((yyval.val), "Exp", (yyloc).first_line, 3, (yyvsp[-2].val), (yyvsp[-1].val),(yyvsp[0].val))}
 #line 1627 "./syntax.tab.c"
     break;
 
   case 52: /* Exp: Exp PLUS Exp  */
-#line 141 "./syntax.y"
+#line 142 "./syntax.y"
                    { NNAC((yyval.val), "Exp", (yyloc).first_line, 3, (yyvsp[-2].val), (yyvsp[-1].val),(yyvsp[0].val))}
 #line 1633 "./syntax.tab.c"
     break;
 
   case 53: /* Exp: Exp MINUS Exp  */
-#line 142 "./syntax.y"
+#line 143 "./syntax.y"
                     { NNAC((yyval.val), "Exp", (yyloc).first_line, 3, (yyvsp[-2].val), (yyvsp[-1].val),(yyvsp[0].val))}
 #line 1639 "./syntax.tab.c"
     break;
 
   case 54: /* Exp: Exp STAR Exp  */
-#line 143 "./syntax.y"
+#line 144 "./syntax.y"
                    { NNAC((yyval.val), "Exp", (yyloc).first_line, 3, (yyvsp[-2].val), (yyvsp[-1].val),(yyvsp[0].val))}
 #line 1645 "./syntax.tab.c"
     break;
 
   case 55: /* Exp: Exp DIV Exp  */
-#line 144 "./syntax.y"
+#line 145 "./syntax.y"
                   { NNAC((yyval.val), "Exp", (yyloc).first_line, 3, (yyvsp[-2].val), (yyvsp[-1].val),(yyvsp[0].val))}
 #line 1651 "./syntax.tab.c"
     break;
 
   case 56: /* Exp: LP Exp RP  */
-#line 145 "./syntax.y"
+#line 146 "./syntax.y"
                 { NNAC((yyval.val), "Exp", (yyloc).first_line, 3, (yyvsp[-2].val), (yyvsp[-1].val),(yyvsp[0].val))}
 #line 1657 "./syntax.tab.c"
     break;
 
   case 57: /* Exp: MINUS Exp  */
-#line 146 "./syntax.y"
+#line 147 "./syntax.y"
                           { NNAC((yyval.val), "Exp", (yyloc).first_line, 2, (yyvsp[-1].val), (yyvsp[0].val))}
 #line 1663 "./syntax.tab.c"
     break;
 
   case 58: /* Exp: NOT Exp  */
-#line 147 "./syntax.y"
+#line 148 "./syntax.y"
               { NNAC((yyval.val), "Exp", (yyloc).first_line, 2, (yyvsp[-1].val), (yyvsp[0].val))}
 #line 1669 "./syntax.tab.c"
     break;
 
   case 59: /* Exp: ID LP Args RP  */
-#line 148 "./syntax.y"
+#line 149 "./syntax.y"
                     { NNAC((yyval.val), "Exp", (yyloc).first_line, 4, (yyvsp[-3].val), (yyvsp[-2].val),(yyvsp[-1].val),(yyvsp[0].val))}
 #line 1675 "./syntax.tab.c"
     break;
 
   case 60: /* Exp: ID LP RP  */
-#line 149 "./syntax.y"
+#line 150 "./syntax.y"
                { NNAC((yyval.val), "Exp", (yyloc).first_line, 3, (yyvsp[-2].val), (yyvsp[-1].val),(yyvsp[0].val))}
 #line 1681 "./syntax.tab.c"
     break;
 
   case 61: /* Exp: Exp LB Exp RB  */
-#line 150 "./syntax.y"
+#line 151 "./syntax.y"
                     { NNAC((yyval.val), "Exp", (yyloc).first_line, 4, (yyvsp[-3].val), (yyvsp[-2].val),(yyvsp[-1].val),(yyvsp[0].val))}
 #line 1687 "./syntax.tab.c"
     break;
 
   case 62: /* Exp: Exp DOT ID  */
-#line 151 "./syntax.y"
+#line 152 "./syntax.y"
                  { NNAC((yyval.val), "Exp", (yyloc).first_line, 3, (yyvsp[-2].val), (yyvsp[-1].val),(yyvsp[0].val))}
 #line 1693 "./syntax.tab.c"
     break;
 
   case 63: /* Exp: ID  */
-#line 152 "./syntax.y"
+#line 153 "./syntax.y"
          { NNAC((yyval.val), "Exp", (yyloc).first_line, 1, (yyvsp[0].val))}
 #line 1699 "./syntax.tab.c"
     break;
 
   case 64: /* Exp: INT  */
-#line 153 "./syntax.y"
+#line 154 "./syntax.y"
           { NNAC((yyval.val), "Exp", (yyloc).first_line, 1, (yyvsp[0].val))}
 #line 1705 "./syntax.tab.c"
     break;
 
   case 65: /* Exp: FLOAT  */
-#line 154 "./syntax.y"
+#line 155 "./syntax.y"
             { NNAC((yyval.val), "Exp", (yyloc).first_line, 1, (yyvsp[0].val))}
 #line 1711 "./syntax.tab.c"
     break;
 
   case 67: /* Args: Exp COMMA Args  */
-#line 157 "./syntax.y"
+#line 158 "./syntax.y"
                      { NNAC((yyval.val), "Args", (yyloc).first_line, 3, (yyvsp[-2].val), (yyvsp[-1].val),(yyvsp[0].val))}
 #line 1717 "./syntax.tab.c"
     break;
 
   case 68: /* Args: Exp  */
-#line 158 "./syntax.y"
+#line 159 "./syntax.y"
           { NNAC((yyval.val), "Args", (yyloc).first_line, 1, (yyvsp[0].val))}
 #line 1723 "./syntax.tab.c"
     break;
@@ -1921,7 +1921,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 160 "./syntax.y"
+#line 161 "./syntax.y"
 
 
 // int main() {
