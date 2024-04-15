@@ -159,6 +159,7 @@ int main(int argc, char** argv) {
     // if(!my_is_error)
     //     print_tree(root,0);
     assert(!my_is_error);
+
     Program(root);
     //输出语义错误
     summit_semantic_error();
