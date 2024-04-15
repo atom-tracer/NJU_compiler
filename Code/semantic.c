@@ -28,9 +28,9 @@ Type Specifier(TreeNode *root)
 {
     if (compareName(root, 1, "TYPE"))
     {
-        if (root->child[0]->type == INT_TYPE)
+        if (root->child[0]->type_val == INT_TYPE)
             return createBasic(INT_TYPE);
-        else if (root->child[0]->type == FLOAT_TYPE)
+        else if (root->child[0]->type_val == FLOAT_TYPE)
             return createBasic(FLOAT_TYPE);
         else
             return NULL;
@@ -363,8 +363,11 @@ Type Exp(TreeNode *root)
     if (compareName(root, 3, "LP", "Exp", "RP"))
         return Exp(root->child[1]);
     // 直接确定类型
-    if (compareName(root, 1, "INT") || compareName(root, 1, "FLOAT"))
-        return createBasic(root->child[0]->type);
+    if (compareName(root, 1, "INT") || compareName(root, 1, "FLOAT")){
+        Type type = createBasic(root->child[0]->type_val);
+        type->is_left = false;
+        return type;
+    }
     // 变量
     if (compareName(root, 1, "ID"))
     {

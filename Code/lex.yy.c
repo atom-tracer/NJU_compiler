@@ -946,71 +946,72 @@ YY_RULE_SETUP
     if(debug_printf)
         printf("TYPE:%s\n",yytext);
     TreeNode* node=new_node("TYPE",node_type);
-    node->type_val=strcmp(yytext,"int")+1;
-    if(node_type!=1)
-        node->type_val=2;
+    if(strcmp(yytext,"int")==0)
+        node->type_val=INT_TYPE;
+    else 
+        node->type_val=FLOAT_TYPE;
     yylval.val=node;
     return TYPE;
     }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 121 "./lexical.l"
+#line 122 "./lexical.l"
 { TOKEN_ACTION(LP)}
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 122 "./lexical.l"
+#line 123 "./lexical.l"
 { TOKEN_ACTION(RP)}
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 123 "./lexical.l"
+#line 124 "./lexical.l"
 { TOKEN_ACTION(LB) }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 124 "./lexical.l"
+#line 125 "./lexical.l"
 { TOKEN_ACTION(RB)}
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 125 "./lexical.l"
+#line 126 "./lexical.l"
 { TOKEN_ACTION(LC)}
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 126 "./lexical.l"
+#line 127 "./lexical.l"
 { TOKEN_ACTION(RC)}
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 127 "./lexical.l"
+#line 128 "./lexical.l"
 { TOKEN_ACTION(STRUCT)}
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 128 "./lexical.l"
+#line 129 "./lexical.l"
 { TOKEN_ACTION(RETURN);}
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 129 "./lexical.l"
+#line 130 "./lexical.l"
 { TOKEN_ACTION(IF)}
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 130 "./lexical.l"
+#line 131 "./lexical.l"
 { TOKEN_ACTION(ELSE)}
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 131 "./lexical.l"
+#line 132 "./lexical.l"
 { TOKEN_ACTION(WHILE)}
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 132 "./lexical.l"
+#line 133 "./lexical.l"
 {
     if(debug_printf)
         printf("ID:%s\n",yytext);
@@ -1022,26 +1023,26 @@ YY_RULE_SETUP
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 140 "./lexical.l"
+#line 141 "./lexical.l"
 { if(debug_printf)printf("SPACE\n");}
 	YY_BREAK
 case 31:
 /* rule 31 can match eol */
 YY_RULE_SETUP
-#line 141 "./lexical.l"
+#line 142 "./lexical.l"
 { yycolumn = 1; }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 142 "./lexical.l"
+#line 143 "./lexical.l"
 { printf("Error type A at Line %d: Mysterious characters \'%s\'\n", yylineno, yytext); my_is_error=1; } 
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 144 "./lexical.l"
+#line 145 "./lexical.l"
 ECHO;
 	YY_BREAK
-#line 1045 "./lex.yy.c"
+#line 1046 "./lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2058,7 +2059,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 144 "./lexical.l"
+#line 145 "./lexical.l"
 
 
 int main(int argc, char** argv) { 

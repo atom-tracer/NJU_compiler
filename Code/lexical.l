@@ -112,9 +112,10 @@ ID [a-zA-Z_][a-zA-Z0-9_]*
     if(debug_printf)
         printf("TYPE:%s\n",yytext);
     TreeNode* node=new_node("TYPE",node_type);
-    node->type_val=strcmp(yytext,"int")+1;
-    if(node_type!=1)
-        node->type_val=2;
+    if(strcmp(yytext,"int")==0)
+        node->type_val=INT_TYPE;
+    else 
+        node->type_val=FLOAT_TYPE;
     yylval.val=node;
     return TYPE;
     }
