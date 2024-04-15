@@ -8,7 +8,7 @@ extern int my_is_error;
 enum ValueType
 {
     INT_TYPE = 1,
-    FLOAT_TYPE = 0
+    FLOAT_TYPE = 2
 };
 enum FunctionType
 {

@@ -58,7 +58,8 @@ bool ExtDef(TreeNode *root)
 }
 bool ExtDecList(TreeNode *root, Type type) // 变量定义
 {
-    StructureField *field = NULL; // 对于变量定义，这个符号表没有用
+    StructureField *field = malloc(sizeof(StructureField));
+    *field = NULL;
     if (root->child_num == 1)
         return VarDec(root->child[0], type, NULL) != NULL;
     else if (root->child_num == 3)
@@ -149,7 +150,8 @@ Type VarDec(TreeNode *root, Type type, Type stru)
 }
 bool FunDec(TreeNode *root, enum FunctionType functiontype, Type ret)
 {
-    StructureField *field = NULL;
+    StructureField *field = malloc(sizeof(StructureField));
+    *field = NULL;
     if (compareName(root, 4, "ID", "LP", "VarList", "RP"))
     {
         VarList(root->child[2], NULL, field);
@@ -462,7 +464,8 @@ Type Exp(TreeNode *root)
             add_semantic_error(11, root->line);
             return NULL;
         }
-        StructureField *field = NULL;
+        StructureField *field = malloc(sizeof(StructureField));
+        *field = NULL;
         if (!Args(root->child[2], field))
             return NULL;
         if (!compareArgs(type->content.func.tail, *field))

@@ -23,7 +23,7 @@ void summit_semantic_error()
     }
     for (int i = 0; i < semantic_error_num; i++)
     {
-        printf("Error type %d at Line %d: testtest.\n", semantic_error_type[i], semantic_error_line[i]);
+        printf("Error type %d at Line %d: test.\n", semantic_error_type[i], semantic_error_line[i]);
     }
 }
 void add_semantic_error(int error_type, int line)

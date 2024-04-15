@@ -157,7 +157,7 @@ int main(int argc, char** argv) {
     yyparse();
     //yylex();
     // if(!my_is_error)
-    //     print_tree(root,0);
+    print_tree(root,0);
     assert(!my_is_error);
 
     Program(root);
