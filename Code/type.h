@@ -36,6 +36,7 @@ struct Type_
             StructureField tail;
             Type ret;
             enum FunctionType functiontype; // 函数类型（定义或声明）
+            bool isused;                     // 是否被调用过
         } func;                             // 函数
         struct
         {
@@ -54,11 +55,14 @@ Type createStructure(char *name, StructureField head);
 Type createFunction(Type ret, enum FunctionType functiontype, StructureField head);
 Type getFunctionRet(Type type);
 int compareType(Type a, Type b);
+bool compareArgs(StructureField a, StructureField b);//比较函数参数列表
 // 这里提供了一个向链表中添加元素的函数，第一个参数是链表头指针的地址（即使是NULL）！！！
 void addNode(StructureField *head, Type type, char *name); // 没有名称就输入NULL（名称是给结构体域用的）
 // 符号表
 void add_symbol(char *name, Type type);
 Type find_symbol(char *name);
+StructureField get_all_symbol();
 // 结构体域符号操作
 void add_symbol_to(Type stru, char *name, Type type);
 Type find_symbol_in(Type stru, char *name);
+
