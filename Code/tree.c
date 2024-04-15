@@ -51,14 +51,3 @@ TreeNode *new_node(char *name, int type)
     node->child_num = 0;
     return node;
 }
-bool semantic_analysis(TreeNode *node)
-{
-    bool state = true;
-    if (node == NULL)
-        return true;
-
-    for(int i=0;i<node->child_num;i++)
-        state = state && semantic_analysis(node->child[i]);
-
-    return state;
-}

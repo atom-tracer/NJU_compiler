@@ -158,7 +158,7 @@ int main(int argc, char** argv) {
     // if(!my_is_error)
     //     print_tree(root,0);
     assert(!my_is_error);
-    semantic_analysis(root);
+    Program(root);
     //输出语义错误
     summit_semantic_error();
     return 0; 

@@ -37,4 +37,3 @@ void print_tree(struct TreeNode *root, int level);
 void print_node(struct TreeNode *node, int level);
 void insert_child(struct TreeNode *parent, struct TreeNode *child);
 TreeNode *new_node(char *name, int type);
-bool semantic_analysis(TreeNode *node);
