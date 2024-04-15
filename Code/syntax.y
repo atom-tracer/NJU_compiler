@@ -64,7 +64,7 @@ ExtDefList: ExtDef ExtDefList {NNAC($$, "ExtDefList", @$.first_line, 2, $1, $2)}
 ExtDef: Specifier ExtDecList SEMI {NNAC($$, "ExtDef", @$.first_line, 3, $1, $2,$3)}
     | Specifier SEMI {NNAC($$, "ExtDef", @$.first_line, 2, $1, $2);}
     | Specifier FunDec CompSt {NNAC($$, "ExtDef", @$.first_line, 3, $1, $2,$3)}
-    | Specifier FunDec SEMI {NNAC($$, "ExtDef", @$.first_line, 3, $1, $2,$3)}//TODO:函数声明，应该要加上FunDec
+    | Specifier FunDec SEMI {NNAC($$, "ExtDef", @$.first_line, 3, $1, $2,$3)}
     | Specifier FunDec error
     ;
 
@@ -102,7 +102,7 @@ ParamDec: Specifier VarDec {NNAC($$, "ParamDec", @$.first_line, 2, $1, $2)}
 
 //Statements
 
-CompSt: LC   StmtList RC { NNAC($$, "CompSt", @$.first_line, 4, $1, $2,$3,$4)}
+CompSt: LC DefList StmtList RC { NNAC($$, "CompSt", @$.first_line, 4, $1, $2,$3,$4)}
     | LC error RC
     ;
 StmtList: Stmt StmtList {NNAC($$, "StmtList", @$.first_line, 2, $1, $2)}

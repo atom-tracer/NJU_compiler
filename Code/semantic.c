@@ -58,45 +58,48 @@ bool ExtDef(TreeNode *root)
 }
 bool ExtDecList(TreeNode *root, Type type) // 变量定义
 {
-    StructureField field = NULL; // 对于变量定义，这个符号表没有用
+    StructureField *field = NULL; // 对于变量定义，这个符号表没有用
     if (root->child_num == 1)
-        return VarDec(root->child[0], type, field);
+        return VarDec(root->child[0], type, NULL) != NULL;
     else if (root->child_num == 3)
-        return VarDec(root->child[0], type, field) && ExtDecList(root->child[2], type);
+        return (VarDec(root->child[0], type, NULL) != NULL) && ExtDecList(root->child[2], type);
 }
 
-bool StructSpecifier(TreeNode *root)
+Type StructSpecifier(TreeNode *root)
 {
     if (compareName(root, 2, "STRUCT", "Tag"))
     {
-        Type type = createStructure(NULL, NULL);
-        return DefList(root->child[1], type) && Tag(root);
+        Type type = find_symbol(Tag(root->child[1]));
+        if (type == NULL)
+        {
+            add_semantic_error(17, root->line); // 未定义的结构体
+            return NULL;
+        }
+        return type;
     }
-    else if (compareName(root, 5, "STRUCT", "Tag", "LC", "DefList", "RC"))
+    else if (compareName(root, 5, "STRUCT", "OptTag", "LC", "DefList", "RC"))
     {
-        Type type = find_symbol(root->child[1]->id);
+        char *anotag = OptTag(root->child[1]);
+        Type type = find_symbol(anotag);
         if (type != NULL)
         {
             add_semantic_error(16, root->line);
-            return false;
+            return NULL;
         }
         else
         {
-            add_symbol(root->child[1]->id, createStructure(root->child[1]->id, NULL));
-            return true;
+            Type strutype = createStructure(anotag, NULL);
+            if (anotag != NULL)
+                add_symbol(anotag, strutype);
+            return strutype;
         }
     }
-    else if (compareName(root, 2, "STRUCT", "LC"))
-    {
-        Type type = createStructure(NULL, NULL);
-        return DefList(root->child[1], type) && Tag(root);
-    }
     else
-        return false;
+        return NULL;
 }
-char *OptTag(TreeNode *root, Type type)
+char *OptTag(TreeNode *root)
 {
-    if (strcmp(root->child[0]->name, "ID") == 0)
+    if (compareName(root, 1, "ID"))
     {
         return root->child[0]->id;
     }
@@ -106,7 +109,7 @@ char *Tag(TreeNode *root)
 {
     return root->child[0]->id;
 }
-Type VarDec(TreeNode *root, Type type, Type stru) // field可能有用
+Type VarDec(TreeNode *root, Type type, Type stru)
 {
     if (compareName(root, 1, "ID"))
     {
@@ -146,7 +149,7 @@ Type VarDec(TreeNode *root, Type type, Type stru) // field可能有用
 }
 bool FunDec(TreeNode *root, enum FunctionType functiontype, Type ret)
 {
-    StructureField field = NULL;
+    StructureField *field = NULL;
     if (compareName(root, 4, "ID", "LP", "VarList", "RP"))
     {
         VarList(root->child[2], NULL, field);
@@ -180,9 +183,8 @@ bool FunDec(TreeNode *root, enum FunctionType functiontype, Type ret)
         assert(0);
     }
 }
-bool VarList(TreeNode *root, Type type, StructureField *field) // 不必返回类型，只需检查合法性，记录参数名称
+bool VarList(TreeNode *root, Type type, StructureField *field)
 {
-    // varlist返回structurefield，利用id和返回值创建type，插入符号表
     if (compareName(root, 1, "ParamDec"))
         return ParamDec(root->child[0], field);
     else
@@ -201,10 +203,9 @@ bool ParamDec(TreeNode *root, StructureField *field)
     return true;
 }
 // 函数体
-bool CompSt(TreeNode *root, Type rettype) // rettype是函数返回值类型
+bool CompSt(TreeNode *root, Type ret) // rettype是函数返回值类型
 {
-    StructureField *field = NULL; // 对于函数，这个符号表没有用
-    return DefList(root->child[1], field) && StmtList(root->child[2], rettype);
+    return DefList(root->child[1], NULL) && StmtList(root->child[2], ret);
 }
 // 语句列表
 bool StmtList(TreeNode *root, Type rettype)
@@ -215,7 +216,7 @@ bool StmtList(TreeNode *root, Type rettype)
         return Stmt(root->child[0], rettype) && StmtList(root->child[1], rettype);
 }
 // 语句
-bool Stmt(TreeNode *root, Type rettype)
+bool Stmt(TreeNode *root, Type ret)
 {
     if (compareName(root, 2, "Exp", "SEMI"))
     {
@@ -226,14 +227,14 @@ bool Stmt(TreeNode *root, Type rettype)
     }
     if (compareName(root, 1, "CompSt"))
     {
-        return CompSt(root->child[0], rettype);
+        return CompSt(root->child[0], ret);
     }
     if (compareName(root, 3, "RETURN", "Exp", "SEMI"))
     {
         Type exp = Exp(root->child[1]);
         if (exp == NULL)
             return false;
-        if (!compareType(exp, rettype)) // 返回值类型不匹配
+        if (!compareType(exp, ret)) // 返回值类型不匹配
         {
             add_semantic_error(8, root->line);
             return false;
@@ -250,7 +251,7 @@ bool Stmt(TreeNode *root, Type rettype)
             add_semantic_error(7, root->line);
             return false;
         }
-        return Stmt(root->child[4], rettype);
+        return Stmt(root->child[4], ret);
     }
     if (compareName(root, 7, "IF", "LP", "Exp", "RP", "Stmt", "ELSE", "Stmt"))
     {
@@ -262,7 +263,7 @@ bool Stmt(TreeNode *root, Type rettype)
             add_semantic_error(7, root->line);
             return false;
         }
-        return Stmt(root->child[4], rettype) && Stmt(root->child[6], rettype);
+        return Stmt(root->child[4], ret) && Stmt(root->child[6], ret);
     }
     if (compareName(root, 5, "WHILE", "LP", "Exp", "RP", "Stmt"))
     {
@@ -274,7 +275,7 @@ bool Stmt(TreeNode *root, Type rettype)
             add_semantic_error(7, root->line);
             return false;
         }
-        return Stmt(root->child[4], rettype);
+        return Stmt(root->child[4], ret);
     }
 }
 // 变量定义
@@ -333,7 +334,7 @@ bool Dec(TreeNode *root, Type type, Type stru)
 Type Exp(TreeNode *root)
 {
     // 三元运算符
-    char **basic3Operator = {"PLUS", "MINUS", "STAR", "DIV", "RELOP", "AND", "OR"};
+    char *basic3Operator[] = {"PLUS", "MINUS", "STAR", "DIV", "RELOP", "AND", "OR"};
     for (int i = 0; i < 7; i++)
     {
         char *op = basic3Operator[i];
@@ -504,7 +505,7 @@ Type Exp(TreeNode *root)
         }
         return type1;
     }
-    assign(0);
+    assert(0);
 }
 // 调用函数的形参列表
 bool Args(TreeNode *root, StructureField *field)
@@ -526,5 +527,6 @@ bool Args(TreeNode *root, StructureField *field)
         addNode(field, exp_type, NULL);
         return Args(root->child[2], field);
     }
-    assert(0);
+    else
+        assert(0);
 }
