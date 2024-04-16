@@ -90,6 +90,7 @@ Type StructSpecifier(TreeNode *root)
         else
         {
             Type strutype = createStructure(anotag, NULL);
+            DefList(root->child[3], strutype);
             if (anotag != NULL)
                 add_symbol(anotag, strutype);
             return strutype;
