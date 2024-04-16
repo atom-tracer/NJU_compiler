@@ -1,1 +1,1 @@
-Error type 2 at Line 12: test.
+Error type 2 at Line 12: Undefined function.

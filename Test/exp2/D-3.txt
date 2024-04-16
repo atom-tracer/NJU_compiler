@@ -1,1 +1,1 @@
-Error type 9 at Line 74: test.
+Error type 9 at Line 74: Function is not applicable for arguments.

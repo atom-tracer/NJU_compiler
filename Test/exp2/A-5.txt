@@ -1,1 +1,1 @@
-Error type 5 at Line 26: test.
+Error type 5 at Line 26: Type mismatched for assignment.

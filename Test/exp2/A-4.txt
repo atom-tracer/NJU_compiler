@@ -1,1 +1,1 @@
-Error type 4 at Line 14: test.
+Error type 4 at Line 14: Redefined function.

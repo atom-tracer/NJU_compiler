@@ -1,2 +1,2 @@
-Error type 18 at Line 56: test.
-Error type 19 at Line 58: test.
+Error type 18 at Line 56: Declared function, but undefined.
+Error type 19 at Line 58: Inconsistent declaration of function.

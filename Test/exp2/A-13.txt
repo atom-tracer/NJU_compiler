@@ -1,1 +1,1 @@
-Error type 13 at Line 37: test.
+Error type 13 at Line 37: is not a structure.

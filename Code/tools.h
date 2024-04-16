@@ -18,3 +18,4 @@ enum FunctionType
 
 void summit_semantic_error();
 void add_semantic_error(int error_type, int line);
+void print_semantic_error(int errortype, int line);

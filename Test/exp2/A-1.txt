@@ -1,1 +1,1 @@
-Error type 1 at Line 15: test.
+Error type 1 at Line 15: Undefined variable.

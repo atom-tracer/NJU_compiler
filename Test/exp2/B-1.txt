@@ -1,4 +1,4 @@
-Error type 15 at Line 2: test.
-Error type 8 at Line 16: test.
-Error type 4 at Line 19: test.
-Error type 6 at Line 27: test.
+Error type 15 at Line 2: Redefined field.
+Error type 8 at Line 16: Type mismatched for return.
+Error type 4 at Line 19: Redefined function.
+Error type 6 at Line 27: The left-hand side of an assignment must be a variable.

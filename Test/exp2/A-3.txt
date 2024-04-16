@@ -1,1 +1,1 @@
-Error type 3 at Line 12: test.
+Error type 3 at Line 12: Redefined variable.

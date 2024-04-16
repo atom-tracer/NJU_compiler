@@ -1,1 +1,1 @@
-Error type 17 at Line 7: test.
+Error type 17 at Line 7: Undefined structure.

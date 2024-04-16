@@ -1,1 +1,1 @@
-Error type 7 at Line 13: test.
+Error type 7 at Line 13: Type mismatched for operands.

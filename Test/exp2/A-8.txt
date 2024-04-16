@@ -1,1 +1,1 @@
-Error type 8 at Line 25: test.
+Error type 8 at Line 25: Type mismatched for return.

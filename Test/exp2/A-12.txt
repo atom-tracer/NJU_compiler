@@ -1,1 +1,1 @@
-Error type 12 at Line 37: test.
+Error type 12 at Line 37: is not an integer.
