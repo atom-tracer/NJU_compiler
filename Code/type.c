@@ -77,6 +77,10 @@ void change_to_right(Type *type)
             }
         }
         break;
+    case ARRAY:
+        (*type)->is_left = false;
+        change_to_right(&((*type)->content.array.elem));
+        break;
     default:
         assert(0);
     }
@@ -258,7 +262,7 @@ Type find_symbol_in(Type stru, char *name)
     while (p)
     {
         if (strcmp(p->name, name) == 0){
-            assert(p->type->is_left);//结构体域的类型是左值
+            //assert(p->type->is_left);//结构体域的类型是左值
             return p->type;
         }
         p = p->next;

@@ -1,5 +1,4 @@
 #include "tools.h"
-int my_is_error;
 
 int semantic_error_num = 0;
 int semantic_error_type[1000];
