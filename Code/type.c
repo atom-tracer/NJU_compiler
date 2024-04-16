@@ -1,6 +1,17 @@
 #include "type.h"
 #define N 0x3ff
 StructureField hash_table[N + 1];
+StructureField deepcopy_field(StructureField field)
+{
+    if (field == NULL)
+        return NULL;
+    StructureField p = (StructureField)malloc(sizeof(struct StructureField_));
+    p->name = malloc(strlen(field->name) + 1);
+    strcpy(p->name, field->name);
+    p->type = deepcopy(field->type);
+    p->next = deepcopy_field(field->next);
+    return p;
+}
 // 深拷贝
 Type deepcopy(Type type){
     if(type==NULL)
@@ -18,14 +29,34 @@ Type deepcopy(Type type){
         t->content.array.size = type->content.array.size;
         break;
     case STRUCTURE:
-        
+        t->kind = STRUCTURE;
+        t->content.stru.name = malloc(strlen(type->content.stru.name) + 1);
+        strcpy(t->content.stru.name, type->content.stru.name);
+        t->content.stru.table = malloc(sizeof(StructureField) * (N + 1));
+        memset(t->content.stru.table, 0, sizeof(StructureField) * (N + 1));
+        for (int i = 0; i <= N; i++)
+        {
+            StructureField p = type->content.stru.table[i];
+            while (p)
+            {
+                add_symbol_to(t, p->name, deepcopy(p->type));
+                p = p->next;
+            }
+        }
+        break;
+    case FUNCTION:
+        t->kind = FUNCTION;
+        t->content.func.ret = deepcopy(type->content.func.ret);
+        t->content.func.functiontype = type->content.func.functiontype;
+        t->content.func.tail = deepcopy_field(type->content.func.tail);
+        break;
     }
+    return t;
 }
 // 转化为右值
 void change_to_right(Type *type)
 {
-    Type t = malloc(sizeof(struct Type_));
-    memcpy(t, *type, sizeof(struct Type_));
+    Type t = deepcopy(*type);
     *type = t;
     if (type == NULL)
         return;
@@ -41,9 +72,6 @@ void change_to_right(Type *type)
             StructureField p = (*type)->content.stru.table[i];
             while (p)
             {
-                Type temp = malloc(sizeof(struct Type_));
-                memcpy(temp, p->type, sizeof(struct Type_));
-                p->type = temp;
                 change_to_right(&(p->type));
                 p = p->next;
             }
