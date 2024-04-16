@@ -1,2 +1,2 @@
-Error type 3 at Line 15: test.
-Error type 19 at Line 15: test.
+Error type 18 at Line 56: test.
+Error type 19 at Line 58: test.

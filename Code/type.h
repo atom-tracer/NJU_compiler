@@ -47,6 +47,7 @@ struct Type_
 
     } content;
 };
+Type deepcopy(Type type);
 Type createBasic(enum ValueType basic);
 Type createArray(Type elem, int size);
 // 如果存在域名重复定义（错误15），则返回NULL

@@ -1,6 +1,26 @@
 #include "type.h"
 #define N 0x3ff
 StructureField hash_table[N + 1];
+// 深拷贝
+Type deepcopy(Type type){
+    if(type==NULL)
+        return NULL;
+    Type t = malloc(sizeof(struct Type_));
+    switch (type->kind)
+    {
+    case BASIC:
+        t->kind = BASIC;
+        t->content.basic = type->content.basic;
+        break;
+    case ARRAY:
+        t->kind = ARRAY;
+        t->content.array.elem = deepcopy(type->content.array.elem);
+        t->content.array.size = type->content.array.size;
+        break;
+    case STRUCTURE:
+        
+    }
+}
 // 转化为右值
 void change_to_right(Type *type)
 {
@@ -21,6 +41,9 @@ void change_to_right(Type *type)
             StructureField p = (*type)->content.stru.table[i];
             while (p)
             {
+                Type temp = malloc(sizeof(struct Type_));
+                memcpy(temp, p->type, sizeof(struct Type_));
+                p->type = temp;
                 change_to_right(&(p->type));
                 p = p->next;
             }
@@ -158,6 +181,8 @@ void add_symbol(char *name, Type type)
 }
 Type find_symbol(char *name)
 {
+    if(name==NULL)
+        return NULL;
     unsigned int val = hash_pjw(name);
     StructureField p = hash_table[val];
     while (p)
@@ -190,19 +215,24 @@ void add_symbol_to(Type stru, char *name, Type type)
     unsigned int val = hash_pjw(name);
     StructureField p = (StructureField)malloc(sizeof(StructureField));
     p->type = type;
+    p->type->is_left = true;
     p->name = name;
     p->next = table[val];
     table[val] = p;
 }
 Type find_symbol_in(Type stru, char *name)
 {
+    if(name==NULL||stru==NULL||stru->kind!=STRUCTURE)
+        return NULL;
     StructureField *table = stru->content.stru.table;
     unsigned int val = hash_pjw(name);
     StructureField p = table[val];
     while (p)
     {
-        if (strcmp(p->name, name) == 0)
+        if (strcmp(p->name, name) == 0){
+            assert(p->type->is_left);//结构体域的类型是左值
             return p->type;
+        }
         p = p->next;
     }
     return NULL;

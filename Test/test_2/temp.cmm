@@ -1,0 +1,7 @@
+struct {
+    int i;
+}test;
+int main(){
+    test.i=1;
+    return 0;
+}

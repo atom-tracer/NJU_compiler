@@ -14,8 +14,9 @@ bool compareName(TreeNode *root, int num, ...)
     va_end(args);
     return true;
 }
-//最后检查是否有函数没定义
-bool check_func_definition(){
+// 最后检查是否有函数没定义
+bool check_func_definition()
+{
     StructureField field = get_all_symbol();
     while (field)
     {
@@ -29,13 +30,19 @@ bool check_func_definition(){
 }
 bool Program(TreeNode *root)
 {
-    return ExtDefList(root->child[0])&&check_func_definition();
+    bool state=true;
+    state = ExtDefList(root->child[0]) && state;
+    state = check_func_definition() && state;
+    return state;
 }
 bool ExtDefList(TreeNode *root)
 {
+    bool state = true;
     if (root->child_num == 0)
         return true;
-    return ExtDef(root->child[0]) && ExtDefList(root->child[1]);
+    state = ExtDef(root->child[0]) && state;
+    state = ExtDefList(root->child[1]) && state;
+    return state;
 }
 Type Specifier(TreeNode *root)
 {
@@ -62,8 +69,12 @@ bool ExtDef(TreeNode *root)
         return true;
     else if (compareName(root, 3, "Specifier", "ExtDecList", "SEMI")) // 变量定义
         return ExtDecList(root->child[1], type);
-    else if (compareName(root, 3, "Specifier", "FunDec", "CompSt")) // 函数定义
-        return FunDec(root->child[1], FUNCTION_DEFINITION, type) && CompSt(root->child[2], type);
+    else if (compareName(root, 3, "Specifier", "FunDec", "CompSt")){ // 函数定义
+        bool state = true;
+        state = FunDec(root->child[1], FUNCTION_DEFINITION, type) && state;
+        state = CompSt(root->child[2], type) && state;
+        return state;
+    }
     else if (compareName(root, 3, "Specifier", "FunDec", "SEMI")) // 函数声明
         return FunDec(root->child[1], FUNCTION_DECLARATION, type);
     else
@@ -75,8 +86,12 @@ bool ExtDecList(TreeNode *root, Type type) // 变量定义
     *field = NULL;
     if (root->child_num == 1)
         return VarDec(root->child[0], type, NULL) != NULL;
-    else if (root->child_num == 3)
-        return (VarDec(root->child[0], type, NULL) != NULL) && ExtDecList(root->child[2], type);
+    else if (root->child_num == 3){
+        bool state = true;
+        state = VarDec(root->child[0], type, NULL) != NULL && state;
+        state = ExtDecList(root->child[2], type) && state;
+        return state;
+    }
 }
 
 Type StructSpecifier(TreeNode *root)
@@ -128,20 +143,21 @@ Type VarDec(TreeNode *root, Type type, Type stru)
 {
     if (compareName(root, 1, "ID"))
     {
-        if (stru == NULL)
+        if (stru == NULL || stru->kind == FUNCTION)
         {
-            if (find_symbol(root->child[0]->id) != NULL)
-            {
+            if (find_symbol(root->child[0]->id) != NULL && (stru == NULL || stru->content.func.functiontype == FUNCTION_DEFINITION))
+            {//对于函数声明，不应该加入符号表
                 add_semantic_error(3, root->line);
                 return NULL;
             }
             else
             {
-                add_symbol(root->child[0]->id, type);
+                if (stru == NULL || stru->content.func.functiontype == FUNCTION_DEFINITION) // 函数声明不加入符号表
+                    add_symbol(root->child[0]->id, type);
                 return type;
             }
         }
-        else
+        else if (stru->kind == STRUCTURE)
         {
             if (find_symbol_in(stru, root->child[0]->id) != NULL)
             {
@@ -168,7 +184,7 @@ bool FunDec(TreeNode *root, enum FunctionType functiontype, Type ret)
     *field = NULL;
     if (compareName(root, 4, "ID", "LP", "VarList", "RP"))
     {
-        VarList(root->child[2], NULL, field);
+        VarList(root->child[2], createFunction(ret, functiontype, NULL), field);
     }
     else
         ;
@@ -185,35 +201,35 @@ bool FunDec(TreeNode *root, enum FunctionType functiontype, Type ret)
         add_semantic_error(4, root->line); // 重定义
         return false;
     }
-    else if (oldtype->content.func.functiontype == FUNCTION_DECLARATION)
+    else
     {
         if (!compareType(oldtype, type))
         {
             add_semantic_error(19, root->line);
             return false;
         }
-        oldtype->content.func.functiontype = functiontype;
+        oldtype->content.func.functiontype = functiontype>oldtype->content.func.functiontype?functiontype:oldtype->content.func.functiontype;
         return true;
-    }
-    else
-    {
-        assert(0);
     }
 }
 bool VarList(TreeNode *root, Type type, StructureField *field)
 {
     if (compareName(root, 1, "ParamDec"))
-        return ParamDec(root->child[0], field);
-    else
-        return ParamDec(root->child[0], field) && VarList(root->child[2], type, field);
+        return ParamDec(root->child[0], type, field);
+    else{
+        bool state = true;
+        state = ParamDec(root->child[0], type, field) && state;
+        state = VarList(root->child[2], type, field) && state;
+        return state;
+    }
 }
 // 函数参数项
-bool ParamDec(TreeNode *root, StructureField *field)
+bool ParamDec(TreeNode *root, Type func, StructureField *field)
 {
     Type type = Specifier(root->child[0]);
     if (type == NULL)
         return false;
-    Type vartype = VarDec(root->child[1], type, NULL);
+    Type vartype = VarDec(root->child[1], type, func);
     if (vartype == NULL)
         return false;
     addNode(field, vartype, root->child[1]->id);
@@ -222,15 +238,22 @@ bool ParamDec(TreeNode *root, StructureField *field)
 // 函数体
 bool CompSt(TreeNode *root, Type ret) // rettype是函数返回值类型
 {
-    return DefList(root->child[1], NULL) && StmtList(root->child[2], ret);
+    bool state = true;
+    state = DefList(root->child[1], NULL) && state;
+    state = StmtList(root->child[2], ret) && state;
+    return state;
 }
 // 语句列表
 bool StmtList(TreeNode *root, Type rettype)
 {
     if (root->child_num == 0)
         return true;
-    if (compareName(root, 2, "Stmt", "StmtList"))
-        return Stmt(root->child[0], rettype) && StmtList(root->child[1], rettype);
+    if (compareName(root, 2, "Stmt", "StmtList")){
+        bool state = true;
+        state = Stmt(root->child[0], rettype) && state;
+        state = StmtList(root->child[1], rettype) && state;
+        return state;
+    }
 }
 // 语句
 bool Stmt(TreeNode *root, Type ret)
@@ -280,7 +303,10 @@ bool Stmt(TreeNode *root, Type ret)
             add_semantic_error(7, root->line);
             return false;
         }
-        return Stmt(root->child[4], ret) && Stmt(root->child[6], ret);
+        bool state = true;
+        state = Stmt(root->child[4], ret) && state;
+        state = Stmt(root->child[6], ret) && state;
+        return state;
     }
     if (compareName(root, 5, "WHILE", "LP", "Exp", "RP", "Stmt"))
     {
@@ -300,7 +326,10 @@ bool DefList(TreeNode *root, Type stru)
 { // 可能用于结构体定义以及普通变量定义
     if (root->child_num == 0)
         return true;
-    return Def(root->child[0], stru) && DefList(root->child[1], stru);
+    bool state = true;
+    state = Def(root->child[0], stru) && state;
+    state = DefList(root->child[1], stru) && state;
+    return state;
 }
 // 单个定义语句；
 bool Def(TreeNode *root, Type stru)
@@ -315,8 +344,12 @@ bool DecList(TreeNode *root, Type type, Type stru)
 {
     if (compareName(root, 1, "Dec"))
         return Dec(root->child[0], type, stru);
-    if (compareName(root, 3, "Dec", "COMMA", "DecList"))
-        return Dec(root->child[0], type, stru) && DecList(root->child[2], type, stru);
+    if (compareName(root, 3, "Dec", "COMMA", "DecList")){
+        bool state = true;
+        state = Dec(root->child[0], type, stru) && state;
+        state = DecList(root->child[2], type, stru) && state;
+        return state;
+    }
 }
 // 声明单项
 bool Dec(TreeNode *root, Type type, Type stru)
@@ -336,6 +369,11 @@ bool Dec(TreeNode *root, Type type, Type stru)
         if (!compareType(var, exp))
         {
             add_semantic_error(5, root->line);
+            return false;
+        }
+        if (stru != NULL)
+        { // 结构体内部变量赋值
+            add_semantic_error(15, root->line);
             return false;
         }
         if (!var->is_left)
@@ -374,7 +412,8 @@ Type Exp(TreeNode *root)
     if (compareName(root, 3, "LP", "Exp", "RP"))
         return Exp(root->child[1]);
     // 直接确定类型
-    if (compareName(root, 1, "INT") || compareName(root, 1, "FLOAT")){
+    if (compareName(root, 1, "INT") || compareName(root, 1, "FLOAT"))
+    {
         Type type = createBasic(strcmp(root->child[0]->name, "INT") == 0 ? INT_TYPE : FLOAT_TYPE);
         type->is_left = false;
         return type;

@@ -14,7 +14,7 @@ char *Tag(TreeNode *root);
 Type VarDec(TreeNode *root, Type type, Type stru);
 bool FunDec(TreeNode *root, enum FunctionType functiontype, Type ret);
 bool VarList(TreeNode *root, Type type, StructureField *field);
-bool ParamDec(TreeNode *root, StructureField *field);
+bool ParamDec(TreeNode *root, Type func, StructureField *field);
 bool CompSt(TreeNode *root, Type type);
 bool StmtList(TreeNode *root, Type type);
 bool Stmt(TreeNode *root, Type type);
