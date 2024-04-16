@@ -14,9 +14,22 @@ bool compareName(TreeNode *root, int num, ...)
     va_end(args);
     return true;
 }
+//最后检查是否有函数没定义
+bool check_func_definition(){
+    StructureField field = get_all_symbol();
+    while (field)
+    {
+        if (field->type->kind == FUNCTION && field->type->content.func.functiontype == FUNCTION_DECLARATION)
+        {
+            add_semantic_error(18, field->type->content.func.line);
+            return false;
+        }
+        field = field->next;
+    }
+}
 bool Program(TreeNode *root)
 {
-    return ExtDefList(root->child[0]);
+    return ExtDefList(root->child[0])&&check_func_definition();
 }
 bool ExtDefList(TreeNode *root)
 {
@@ -160,6 +173,7 @@ bool FunDec(TreeNode *root, enum FunctionType functiontype, Type ret)
     else
         ;
     Type type = createFunction(ret, functiontype, *field);
+    type->content.func.line = root->line;
     Type oldtype = find_symbol(root->child[0]->id);
     if (oldtype == NULL)
     {
@@ -348,10 +362,6 @@ Type Exp(TreeNode *root)
             if (type1 == NULL || type2 == NULL)
                 return NULL;
             if (!compareType(type1, type2) || type1->kind != BASIC || type2->kind != BASIC || i > 4 && (type1->content.basic != INT_TYPE || type2->content.basic != INT_TYPE))
-            { // 类型不同或不是基本类型
-                add_semantic_error(7, root->line);
-                return NULL;
-            }
             { // 类型不同或不是基本类型
                 add_semantic_error(7, root->line);
                 return NULL;

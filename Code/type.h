@@ -37,6 +37,7 @@ struct Type_
             StructureField tail;
             Type ret;
             enum FunctionType functiontype; // 函数类型（定义或声明）
+            int line;//函数定义的行数(用于定义缺失的输出)
         } func;                             // 函数
         struct
         {
