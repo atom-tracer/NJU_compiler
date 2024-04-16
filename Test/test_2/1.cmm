@@ -1,6 +1,0 @@
-int main(){
-    struct Node {
-        int a[5];
-    }node;
-    node.a[2]=1;
-}
