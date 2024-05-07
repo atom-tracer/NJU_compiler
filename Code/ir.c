@@ -260,7 +260,7 @@ bool StmtList(TreeNode *root, Type rettype)
     }
 }
 // 语句
-char *Stmt(TreeNode *root, StructureField *sym_table) // TODO
+char *translate_Stmt(TreeNode *root, StructureField *sym_table)
 {
     if (compareName(root, 2, "Exp", "SEMI"))
     {
@@ -356,26 +356,6 @@ char *translate_Cond(TreeNode *root, char *label_true, char *label_false)
     }
     else
         ; // TODO:other cases
-}
-char *translate_Args(TreeNode *root, StructureField *field)
-{
-    if (compareName(root, 1, "Exp"))
-    {
-        char *t1 = new_temp();
-        char *code1 = Exp(root->child[0], t1);
-        field->next = malloc(sizeof(StructureField));
-        field->next->type = createBasic(INT_TYPE);
-    }
-    else if (compareName(root, 3, "Exp", "COMMA", "Args"))
-    {
-        Type exp_type = Exp(root->child[0]);
-        if (exp_type == NULL)
-            return NULL;
-        addNode(field, exp_type, NULL);
-        return translate_Args(root->child[2], field);
-    }
-    else
-        assert(0);
 }
 // 变量定义
 bool DefList(TreeNode *root, Type stru)
@@ -621,25 +601,26 @@ Type Exp(TreeNode *root)
     assert(0);
 }
 // 调用函数的形参列表
-bool Args(TreeNode *root, StructureField *field)
+char *translate_Args(TreeNode *root, StructureField *field)
 {
     if (compareName(root, 1, "Exp")) // 参数列表末尾
     {
+        char *t1 = new_temp();
+        char *code1 = Exp(root->child[0], t1);
         Type exp_type = Exp(root->child[0]);
-        if (exp_type == NULL) // 存在表达式类型错误
-            return false;
         addNode(field, exp_type, NULL);
-        return true;
+        return code1;
     }
     // 参数列表非末尾
     else if (compareName(root, 3, "Exp", "COMMA", "Args"))
     {
+        char *t1 = new_temp();
+        char *code1 = Exp(root->child[0], t1);
         Type exp_type = Exp(root->child[0]);
-        if (exp_type == NULL)
-            return false;
         addNode(field, exp_type, NULL);
-        return Args(root->child[2], field);
+        char *code2 = translate_Args(root->child[2], field);
+        char *ret = malloc(strlen(code1) + strlen(code2) + 10);
+        sprintf(ret, "%s%s", code1, code2);
+        return ret;
     }
-    else
-        assert(0);
 }
