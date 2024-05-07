@@ -483,15 +483,38 @@ char *translate_Exp(TreeNode *root, char *place)
     {
         
     }
-    //TODO 无参函数调用
+    // 无参函数调用
     if (compareName(root, 3, "ID", "LP", "RP"))
     {
-        
+        if(strcmp(root->child[0]->id,"read")){
+            res=malloc(strlen(place)+30);
+            sprintf(res,"%s := read()",place);
+        }
+        else{
+            res=malloc(strlen(place)+strlen(root->child[0]->id)+30);
+            sprintf(res,"%s := CALL %s",place,root->child[0]->id);
+        }
     }
-    //TODO 有参函数调用
+    // 有参函数调用
     if (compareName(root, 4, "ID", "LP", "Args", "RP"))
     {
-        
+        StructureField arglist = NULL;
+        char*code1=translate_Args(Args, &arglist);
+        if(strcmp(root->child[0]->id,"write")){
+            assert(arglist=NULL);
+            res=malloc(strlen(code1)+strlen(place)+strlen(arglist->name)+30);
+            res=sprintf(res,"%s\nWRITE %s\n%s := #0",code1,arglist->name,place);
+        }
+        else{
+            char*code2=malloc(300);
+            while(arglist){
+                char*t=malloc(30+strlen(arglist->name));
+                sprintf(t,"ARG %s\n",arglist->name);
+                strcat(code2,t);
+            }
+            res=malloc(strlen(code1)+strlen(code2)+strlen(place)+srelen(root->child[0]->id)+30);
+            sprintf(res,"%s\n%s%s := CALL %s",code1,code2,place,root->child[0]->id);
+        }
     }
     
     // 赋值操作
