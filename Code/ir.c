@@ -260,69 +260,62 @@ bool StmtList(TreeNode *root, Type rettype)
     }
 }
 // 语句
-bool Stmt(TreeNode *root, Type ret)
+char *Stmt(TreeNode *root, StructureField *sym_table) // TODO
 {
     if (compareName(root, 2, "Exp", "SEMI"))
     {
-        Type exp = Exp(root->child[0]);
-        if (exp == NULL)
-            return false;
-        return true;
+        return Exp(root->child[0], NULL);
     }
     if (compareName(root, 1, "CompSt"))
     {
-        return CompSt(root->child[0], ret);
+        return CompSt(root->child[0]);
     }
     if (compareName(root, 3, "RETURN", "Exp", "SEMI"))
     {
         Type exp = Exp(root->child[1]);
-        if (exp == NULL)
-            return false;
-        if (!compareType(exp, ret)) // 返回值类型不匹配
-        {
-            add_semantic_error(8, root->line);
-            return false;
-        }
-        return true;
+        char *t1 = new_temp();
+        char *code1 = Exp(root->child[1], t1);
+        code1 = realloc(code1, strlen(code1) + strlen(t1) + 10);
+        char *code2 = "RETURN ";
+        char *ret = malloc(strlen(code1) + strlen(code2) + strlen(t1) + 10);
+        strcpy(ret, code1);
+        strcat(ret, code2);
+        strcat(ret, t1);
+        strcat(ret, ";\n");
+        return ret;
     }
     if (compareName(root, 5, "IF", "LP", "Exp", "RP", "Stmt"))
     {
-        Type exp = Exp(root->child[2]);
-        if (exp == NULL)
-            return false;
-        if (exp->kind != BASIC || exp->content.basic != INT_TYPE)
-        {
-            add_semantic_error(7, root->line);
-            return false;
-        }
-        return Stmt(root->child[4], ret);
+        char *label1 = new_label();
+        char *label2 = new_label();
+        char *code1 = translate_Cond(root->child[0], label1, label2, sym_table);
+        char *code2 = Stmt(root->child[4], sym_table);
+        char *ret = malloc(strlen(code1) + strlen(label1) + strlen(code2) + strlen(label2) + 10);
+        sprintf(ret, "%sLABEL: %s:\n%sLABEL: %s:\n", code1, label1, code2, label2);
+        return ret;
     }
     if (compareName(root, 7, "IF", "LP", "Exp", "RP", "Stmt", "ELSE", "Stmt"))
     {
-        Type exp = Exp(root->child[2]);
-        if (exp == NULL)
-            return false;
-        if (exp->kind != BASIC || exp->content.basic != INT_TYPE)
-        {
-            add_semantic_error(7, root->line);
-            return false;
-        }
-        bool state = true;
-        state = Stmt(root->child[4], ret) && state;
-        state = Stmt(root->child[6], ret) && state;
-        return state;
+        char *label1 = new_label();
+        char *label2 = new_label();
+        char *label3 = new_label();
+        char *code1 = translate_Cond(root->child[0], label1, label2, sym_table);
+        char *code2 = Stmt(root->child[4], sym_table);
+        char *code3 = Stmt(root->child[6], sym_table);
+        char *ret = malloc(strlen(code1) + strlen(label1) + strlen(code2) + strlen(label2) + strlen(code3) + strlen(label3) + 30);
+        sprintf(ret, "%sLABEL: %s:\n%sGOTO %s\nLABEL: %s:\n%sLABEL %s:\n", code1, label1, code2, label3, label2, code3, label3);
+        return ret;
     }
     if (compareName(root, 5, "WHILE", "LP", "Exp", "RP", "Stmt"))
     {
-        Type exp = Exp(root->child[2]);
-        if (exp == NULL)
-            return false;
-        if (exp->kind != BASIC || exp->content.basic != INT_TYPE)
-        {
-            add_semantic_error(7, root->line);
-            return false;
-        }
-        return Stmt(root->child[4], ret);
+        char *label1 = new_label();
+        char *label2 = new_label();
+        char *label3 = new_label();
+        char *code1 = translate_Cond(root->child[0], label2, label3, sym_table);
+        char *code2 = Stmt(root->child[4], sym_table);
+        char *ret = malloc(strlen(label1) + strlen(code1) + strlen(label2) + strlen(code2) + strlen(label1) + strlen(label3) + 30);
+        sprintf(ret, "LABEL %s:\n%sLABEL %s:\n%sGOTO %s\nLABEL %s:\n", label1, code1, label2, code2, label1, label3);
+        return ret;
     }
 }
 // 变量定义
