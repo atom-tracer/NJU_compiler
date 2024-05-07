@@ -145,44 +145,18 @@ char *Tag(TreeNode *root)
 {
     return root->child[0]->id;
 }
-Type VarDec(TreeNode *root, Type type, Type stru)
+char* VarDec(TreeNode *root, Type type)
 {
+    char*res;
     if (compareName(root, 1, "ID"))
     {
-        if (stru == NULL || stru->kind == FUNCTION)
-        {
-            if (find_symbol(root->child[0]->id) != NULL && (stru == NULL || stru->content.func.functiontype == FUNCTION_DEFINITION))
-            { // 对于函数声明，不应该加入符号表
-                add_semantic_error(3, root->line);
-                return NULL;
-            }
-            else
-            {
-                if (stru == NULL || stru->content.func.functiontype == FUNCTION_DEFINITION) // 函数声明不加入符号表
-                    add_symbol(root->child[0]->id, type);
-                return type;
-            }
-        }
-        else if (stru->kind == STRUCTURE)
-        {
-            if (find_symbol_in(stru, root->child[0]->id) != NULL)
-            {
-                add_semantic_error(15, root->line);
-                return NULL;
-            }
-            else
-            {
-                add_symbol_to(stru, root->child[0]->id, type);
-                return type;
-            }
-        }
+        if(type->kind==STRUCTURE)
     }
     else if (compareName(root, 4, "VarDec", "LB", "INT", "RB"))
     {
-        return VarDec(root->child[0], createArray(type, root->child[2]->int_val), stru);
+        res = VarDec(root->child[0], createArray(type, root->child[2]->int_val));
     }
-    else
-        return NULL;
+    return res;
 }
 bool FunDec(TreeNode *root, enum FunctionType functiontype, Type ret)
 {
@@ -359,68 +333,58 @@ char *translate_Cond(TreeNode *root, char *label_true, char *label_false)
         ; // TODO:other cases
 }
 // 变量定义
-bool DefList(TreeNode *root, Type stru)
+char* DefList(TreeNode *root, bool isstru)
 { // 可能用于结构体定义以及普通变量定义
     if (root->child_num == 0)
-        return true;
-    bool state = true;
-    state = Def(root->child[0], stru) && state;
-    state = DefList(root->child[1], stru) && state;
-    return state;
+        return "";
+    char* code1=Def(root->child[0]);
+    char*code2=DefList(root->child[1], isstru);
+    if(isstru)
+        return "";
+    else{
+        char* res = malloc(strlen(code1) + strlen(code2) + 10);
+        if(strlen(code2)==0)
+            sprintf(res, "%s", code1);
+        else
+            sprintf(res, "%s\n%s", code1, code2);
+        return res;
+    }
+
 }
 // 单个定义语句；
-bool Def(TreeNode *root, Type stru)
+char* Def(TreeNode *root)
 {
     Type type = Specifier(root->child[0]);
-    if (type == NULL)
-        return false;
-    return DecList(root->child[1], type, stru);
+    return DecList(root->child[1], node_type);
 }
 // 声明列表
-bool DecList(TreeNode *root, Type type, Type stru)
+char* DecList(TreeNode *root, Type type)
 {
     if (compareName(root, 1, "Dec"))
-        return Dec(root->child[0], type, stru);
+        return Dec(root->child[0], type);
     if (compareName(root, 3, "Dec", "COMMA", "DecList"))
     {
-        bool state = true;
-        state = Dec(root->child[0], type, stru) && state;
-        state = DecList(root->child[2], type, stru) && state;
-        return state;
+        char* code1=Dec(root->child[0], type);
+        char* code2=DecList(root->child[2], type);
+        char* res = malloc(strlen(code1) + strlen(code2) + 10);
+        if(strlen(code2)==0)
+            sprintf(res, "%s", code1);
+        else
+            sprintf(res, "%s\n%s", code1, code2);
+        return res;
     }
 }
 // 声明单项
-bool Dec(TreeNode *root, Type type, Type stru)
+char* Dec(TreeNode *root, Type type)
 {
-    Type var = VarDec(root->child[0], type, stru);
-    if (var == NULL)
-        return false;
+    Type var = VarDec(root->child[0], type);
     if (compareName(root, 1, "VarDec"))
     {
-        return true;
+        
     }
     if (compareName(root, 3, "VarDec", "ASSIGNOP", "Exp"))
     {
-        Type exp = Exp(root->child[2]);
-        if (exp == NULL)
-            return false;
-        if (!compareType(var, exp))
-        {
-            add_semantic_error(5, root->line);
-            return false;
-        }
-        if (stru != NULL)
-        { // 结构体内部变量赋值
-            add_semantic_error(15, root->line);
-            return false;
-        }
-        if (!var->is_left)
-        { // 变量定义不应该有右值
-            assert(0);
-            add_semantic_error(6, root->line);
-            return false;
-        }
-        return true;
+        
     }
 }
 // 表达式
@@ -600,4 +564,20 @@ char *new_temp()
     char *temp = malloc(20);
     sprintf(temp, "t%d", temp_cnt++);
     return temp;
+}
+char *get_relop(TreeNode *root)
+{
+    if (root->relop_val == 1)
+        return ">";
+    else if (root->relop_val == 2)
+        return "<";
+    else if (root->relop_val == 3)
+        return ">=";
+    else if (root->relop_val == 4)
+        return "<=";
+    else if (root->relop_val == 5)
+        return "==";
+    else if (root->relop_val == 6)
+        return "!=";
+    assert(0);
 }
