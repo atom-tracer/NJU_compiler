@@ -409,26 +409,23 @@ char *Exp(TreeNode *root, char *place)
     }
     // 括号
     if (compareName(root, 3, "LP", "Exp", "RP"))
-        return Exp(root->child[1]);
+        return Exp(root->child[1], place);
     // 直接确定类型
     if (compareName(root, 1, "INT"))
     {
-
+        int val = root->child[0]->int_val;
+        sprintf(res,"place := #%d",val);
     }
     if (compareName(root, 1, "FLOAT"))
     {
-
+        float val = root->child[0]->float_val;
+        sprintf(res,"place := #%f",val);
     }
     // 变量
     if (compareName(root, 1, "ID"))
     {
         Type type = find_symbol(root->child[0]->id);
-        if (type == NULL)
-        {
-            add_semantic_error(1, root->line);
-            return NULL;
-        }
-        return type;
+        sprintf(res,"%s := %s",place,root->child[0]->id);
     }
     // 负号
     if (compareName(root, 2, "MINUS", "Exp"))

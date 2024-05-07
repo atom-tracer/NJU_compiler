@@ -386,7 +386,7 @@ bool Dec(TreeNode *root, Type type, Type stru)
     }
 }
 // 表达式
-char* Exp(TreeNode *root, char *place)
+Type Exp(TreeNode *root)
 {
     // 三元运算符
     char *basic3Operator[] = {"PLUS", "MINUS", "STAR", "DIV", "RELOP", "AND", "OR"};
