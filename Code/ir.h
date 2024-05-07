@@ -22,10 +22,10 @@ bool DefList(TreeNode *root, Type type);
 bool Def(TreeNode *root, Type type);
 bool DecList(TreeNode *root, Type type, Type stru);
 bool Dec(TreeNode *root, Type type, Type stru);
-Type translate_Exp(TreeNode *root);
 bool Args(TreeNode *root, StructureField *field); // field为返回的参数列表
 char *new_label();
 char *new_temp();
+char* translate_Exp(TreeNode *root, char*place);
 char *translate_Cond(TreeNode *root, char *label_true, char *label_false);
 char *translate_Args(TreeNode *root, StructureField *field);
 char *get_relop(TreeNode *root);
