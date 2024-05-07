@@ -215,32 +215,34 @@ bool ParamDec(TreeNode *root, Type func, StructureField *field)
     return true;
 }
 // 函数体
-bool CompSt(TreeNode *root, Type ret) // rettype是函数返回值类型
+char *translate_CompSt(TreeNode *root) // rettype是函数返回值类型
 {
-    bool state = true;
-    state = DefList(root->child[1], NULL) && state;
-    state = StmtList(root->child[2], ret) && state;
-    return state;
+    char *code1 = translate_DefList(root->child[1]);
+    char *code2 = translate_StmtList(root->child[2]);
+    char *ret = malloc(strlen(code1) + strlen(code2) + 10);
+    sprintf(ret, "%s%s", code1, code2);
+    return ret;
 }
 // 语句列表
-bool StmtList(TreeNode *root, Type rettype)
+char *translate_StmtList(TreeNode *root)
 {
     if (root->child_num == 0)
-        return true;
-    if (compareName(root, 2, "Stmt", "StmtList"))
+        return NULL; // #TODO:会出问题吗？
+    else if (compareName(root, 2, "Stmt", "StmtList"))
     {
-        bool state = true;
-        state = Stmt(root->child[0], rettype) && state;
-        state = StmtList(root->child[1], rettype) && state;
-        return state;
+        char *code1 = translate_Stmt(root->child[0]);
+        char *code2 = translate_StmtList(root->child[1]);
+        char *ret = malloc(strlen(code1) + strlen(code2) + 10);
+        sprintf(ret, "%s%s", code1, code2);
+        return ret;
     }
 }
 // 语句
-char *translate_Stmt(TreeNode *root, StructureField *sym_table)
+char *translate_Stmt(TreeNode *root)
 {
     if (compareName(root, 2, "Exp", "SEMI"))
     {
-        return Exp(root->child[0], NULL);
+        return translate_Exp(root->child[0], NULL);
     }
     else if (compareName(root, 1, "CompSt"))
     {
@@ -248,24 +250,19 @@ char *translate_Stmt(TreeNode *root, StructureField *sym_table)
     }
     else if (compareName(root, 3, "RETURN", "Exp", "SEMI"))
     {
-        Type exp = Exp(root->child[1]);
         char *t1 = new_temp();
-        char *code1 = Exp(root->child[1], t1);
-        code1 = realloc(code1, strlen(code1) + strlen(t1) + 10);
-        char *code2 = "RETURN ";
-        char *ret = malloc(strlen(code1) + strlen(code2) + strlen(t1) + 10);
-        strcpy(ret, code1);
-        strcat(ret, code2);
-        strcat(ret, t1);
-        strcat(ret, ";\n");
-        return ret;
+        char *code1 = translate_Exp(root->child[1], t1);
+        char *code2 = malloc(strlen(t1) + 10);
+        sprintf(code2, "RETURN %s\n", t1);
+        char *ret = malloc(strlen(code1) + strlen(code2) + 10);
+        sprintf(ret, "%s%s", code1, code2);
     }
     else if (compareName(root, 5, "IF", "LP", "Exp", "RP", "Stmt"))
     {
         char *label1 = new_label();
         char *label2 = new_label();
         char *code1 = translate_Cond(root->child[0], label1, label2);
-        char *code2 = Stmt(root->child[4], sym_table);
+        char *code2 = translate_Stmt(root->child[4]);
         char *ret = malloc(strlen(code1) + strlen(label1) + strlen(code2) + strlen(label2) + 10);
         sprintf(ret, "%sLABEL: %s:\n%sLABEL: %s:\n", code1, label1, code2, label2);
         return ret;
@@ -276,8 +273,8 @@ char *translate_Stmt(TreeNode *root, StructureField *sym_table)
         char *label2 = new_label();
         char *label3 = new_label();
         char *code1 = translate_Cond(root->child[0], label1, label2);
-        char *code2 = Stmt(root->child[4], sym_table);
-        char *code3 = Stmt(root->child[6], sym_table);
+        char *code2 = translate_Stmt(root->child[4]);
+        char *code3 = translate_Stmt(root->child[6]);
         char *ret = malloc(strlen(code1) + strlen(label1) + strlen(code2) + strlen(label2) + strlen(code3) + strlen(label3) + 30);
         sprintf(ret, "%sLABEL: %s:\n%sGOTO %s\nLABEL: %s:\n%sLABEL %s:\n", code1, label1, code2, label3, label2, code3, label3);
         return ret;
@@ -288,7 +285,7 @@ char *translate_Stmt(TreeNode *root, StructureField *sym_table)
         char *label2 = new_label();
         char *label3 = new_label();
         char *code1 = translate_Cond(root->child[0], label2, label3);
-        char *code2 = Stmt(root->child[4], sym_table);
+        char *code2 = translate_Stmt(root->child[4]);
         char *ret = malloc(strlen(label1) + strlen(code1) + strlen(label2) + strlen(code2) + strlen(label1) + strlen(label3) + 30);
         sprintf(ret, "LABEL %s:\n%sLABEL %s:\n%sGOTO %s\nLABEL %s:\n", label1, code1, label2, code2, label1, label3);
         return ret;
