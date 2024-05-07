@@ -148,13 +148,28 @@ char* VarDec(TreeNode *root, Type type)
     char*res;
     if (compareName(root, 1, "ID"))
     {
-        if(type->kind==STRUCTURE)
+        if(type->kind==STRUCTURE||type->kind==ARRAY){
+            int size = size_of(type);
+            res = malloc(strlen(root->child[0]->id) + 30);
+            sprintf(res, "DEC %s %d", root->child[0]->id, size);
+        }
     }
     else if (compareName(root, 4, "VarDec", "LB", "INT", "RB"))
     {
         res = VarDec(root->child[0], createArray(type, root->child[2]->int_val));
     }
     return res;
+}
+char* VarDec_id(TreeNode *root){
+    if (compareName(root, 1, "ID"))
+    {
+        return root->child[0]->id;
+    }
+    else if (compareName(root, 4, "VarDec", "LB", "INT", "RB"))
+    {
+        return VarDec_id(root->child[0]);
+    }
+
 }
 bool FunDec(TreeNode *root, enum FunctionType functiontype, Type ret)
 {
@@ -375,15 +390,15 @@ char* DecList(TreeNode *root, Type type)
 // 声明单项
 char* Dec(TreeNode *root, Type type)
 {
-    Type var = VarDec(root->child[0], type);
-    if (compareName(root, 1, "VarDec"))
-    {
-        
-    }
+    char*code=VarDec(root->child[0], type);
+    char*res=code;
     if (compareName(root, 3, "VarDec", "ASSIGNOP", "Exp"))
     {
-        
+        char*code1 = translate_Exp(root->child[2], VarDec_id(root->child[0]));
+        res=malloc(strlen(code1) + strlen(code) + 10);
+        sprintf(res, "%s\n%s", code, code1);
     }
+    return res;
 }
 // 表达式
 char *translate_Exp(TreeNode *root, char *place)
