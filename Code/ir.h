@@ -22,7 +22,7 @@ bool DefList(TreeNode *root, Type type);
 bool Def(TreeNode *root, Type type);
 bool DecList(TreeNode *root, Type type, Type stru);
 bool Dec(TreeNode *root, Type type, Type stru);
-Type Exp(TreeNode *root);
+Type translate_Exp(TreeNode *root);
 bool Args(TreeNode *root, StructureField *field); // field为返回的参数列表
 char *new_label();
 char *new_temp();
