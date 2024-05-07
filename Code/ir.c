@@ -427,7 +427,7 @@ bool Dec(TreeNode *root, Type type, Type stru)
 // 表达式
 char *translate_Exp(TreeNode *root, char *place)
 {
-    char*res=NULL;
+    char *res = NULL;
     // 三元运算符
     char *basic3Operator[] = {"PLUS", "MINUS", "STAR", "DIV"};
     char *basic3OperatorCode[] = {"+", "-", "*", "/"};
@@ -452,91 +452,121 @@ char *translate_Exp(TreeNode *root, char *place)
     {
         int val = root->child[0]->int_val;
         res = malloc(30);
-        sprintf(res,"place := #%d",val);
+        sprintf(res, "place := #%d", val);
     }
     if (compareName(root, 1, "FLOAT"))
     {
         float val = root->child[0]->float_val;
         res = malloc(30);
-        sprintf(res,"place := #%f",val);
+        sprintf(res, "place := #%f", val);
     }
     // 变量
     if (compareName(root, 1, "ID"))
     {
-        sprintf(res,"%s := %s",root->child[0]->id);
+        sprintf(res, "%s := %s", root->child[0]->id);
     }
     // 负号
     if (compareName(root, 2, "MINUS", "Exp"))
     {
-        char*t1=new_temp();
-        char*code1=Exp(root->child[1],t1);
-        res=malloc(strlen(t1)+strlen(code1)+strlen(code1)+30);
-        sprintf(res,"%s\n%s := #0 - %s",code1,place,t1);
+        char *t1 = new_temp();
+        char *code1 = Exp(root->child[1], t1);
+        res = malloc(strlen(t1) + strlen(code1) + strlen(code1) + 30);
+        sprintf(res, "%s\n%s := #0 - %s", code1, place, t1);
     }
-    //TODO 数组解析
+    // 数组解析
     if (compareName(root, 4, "Exp", "LB", "Exp", "RB"))
     {
-        
+        char *t1 = new_temp();
+        char *t2 = new_temp();
+        char *t4 = new_temp();
+        char *code2 = Exp(root->child[2], t4);
+        char *id = root->child[0]->child[0]->id;
+        res = malloc(4 * strlen(t1) + 2 * strlen(t2) + strlen(place) + strlen(code2) + strlen(t4) + 50);
+        sprintf(res, "%s\n%s := &%s\n%s := %s * %s\n%s := %s + %s\n%s := *%s", code2, t1, id, t2, 4, t4, t1, t1, t2, place, t1);
     }
-    //TODO 结构体解析
+    // 结构体解析
     if (compareName(root, 3, "Exp", "DOT", "ID"))
     {
-        
+        int size = 0;
+        char *ar = root->child[2]->id;
+        char *id = root->child[0]->child[0]->id;
+        Type stru = find_symbol(id);
+        assert(stru != NULL && stru->kind == STRUCTURE);
+        StructureField p = stru->content.stru.table;
+        while (p)
+        {
+            if (strcmp(p->name, ar) == 0)
+            {
+                break;
+            }
+            size += size_of(p->type);
+            p = p->next;
+        }
+        assert(p != NULL);
+        char *t1 = new_temp();
+        res = malloc(4 * strlen(t1) + strlen(place) + strlen(id) + strlen(ar) + 50);
+        sprintf(res, "%s := &%s\n%s := %s + %s\n%s := *%s", t1, id, t1, t1, size, place, t1);
     }
     // 无参函数调用
     if (compareName(root, 3, "ID", "LP", "RP"))
     {
-        if(strcmp(root->child[0]->id,"read")){
-            res=malloc(strlen(place)+30);
-            sprintf(res,"%s := read()",place);
+        if (strcmp(root->child[0]->id, "read"))
+        {
+            res = malloc(strlen(place) + 30);
+            sprintf(res, "%s := read()", place);
         }
-        else{
-            res=malloc(strlen(place)+strlen(root->child[0]->id)+30);
-            sprintf(res,"%s := CALL %s",place,root->child[0]->id);
+        else
+        {
+            res = malloc(strlen(place) + strlen(root->child[0]->id) + 30);
+            sprintf(res, "%s := CALL %s", place, root->child[0]->id);
         }
     }
     // 有参函数调用
     if (compareName(root, 4, "ID", "LP", "Args", "RP"))
     {
         StructureField arglist = NULL;
-        char*code1=translate_Args(Args, &arglist);
-        if(strcmp(root->child[0]->id,"write")){
-            assert(arglist=NULL);
-            res=malloc(strlen(code1)+strlen(place)+strlen(arglist->name)+30);
-            res=sprintf(res,"%s\nWRITE %s\n%s := #0",code1,arglist->name,place);
+        char *code1 = translate_Args(Args, &arglist);
+        if (strcmp(root->child[0]->id, "write"))
+        {
+            assert(arglist = NULL);
+            res = malloc(strlen(code1) + strlen(place) + strlen(arglist->name) + 30);
+            res = sprintf(res, "%s\nWRITE %s\n%s := #0", code1, arglist->name, place);
         }
-        else{
-            char*code2=malloc(300);
-            while(arglist){
-                char*t=malloc(30+strlen(arglist->name));
-                sprintf(t,"ARG %s\n",arglist->name);
-                strcat(code2,t);
+        else
+        {
+            char *code2 = malloc(300);
+            while (arglist)
+            {
+                char *t = malloc(30 + strlen(arglist->name));
+                sprintf(t, "ARG %s\n", arglist->name);
+                strcat(code2, t);
             }
-            res=malloc(strlen(code1)+strlen(code2)+strlen(place)+srelen(root->child[0]->id)+30);
-            sprintf(res,"%s\n%s%s := CALL %s",code1,code2,place,root->child[0]->id);
+            res = malloc(strlen(code1) + strlen(code2) + strlen(place) + srelen(root->child[0]->id) + 30);
+            sprintf(res, "%s\n%s%s := CALL %s", code1, code2, place, root->child[0]->id);
         }
     }
-    
+
     // 赋值操作
     if (compareName(root, 3, "Exp", "ASSIGNOP", "Exp"))
     {
-        char*t1=new_temp();
-        char*code1 = Exp(root->child[0],NULL);
-        char*code2 = Exp(root->child[2],t1);
-        res=malloc(strlen(t1)+strlen(code1)+strlen(code2)+strlen(place)+30);
-        sprintf(res,"%s\n%s := %s\n%s := %s",code2,code1,t1,place,code1);
+        char *t1 = new_temp();
+        char *code1 = Exp(root->child[0], NULL);
+        char *code2 = Exp(root->child[2], t1);
+        res = malloc(strlen(t1) + strlen(code1) + strlen(code2) + strlen(place) + 30);
+        sprintf(res, "%s\n%s := %s\n%s := %s", code2, code1, t1, place, code1);
     }
-    //布尔表达式
-    if(compareName(root,3,"Exp","RELOP","Exp")||compareName(root,3,"Exp","AND","Exp")||compareName(root,3,"Exp","OR","Exp")||compareName(root,2,"NOT","Exp")){
-        char*label1=new_label();
-        char*label2=new_label();
-        char*code0=malloc(30+strlen(place));
-        sprintf(code0,"%s := #0",place);
-        char*code1=translate_Cond(root,label1,label2);
-        res=malloc(strlen(code0)+strlen(code1)+strlen(label1)+strlen(label2)+30);
-        sprintf(res,"%s\n%s\nLABEL %s\n%s := #1",code0,code1,label1,place);
+    // 布尔表达式
+    if (compareName(root, 3, "Exp", "RELOP", "Exp") || compareName(root, 3, "Exp", "AND", "Exp") || compareName(root, 3, "Exp", "OR", "Exp") || compareName(root, 2, "NOT", "Exp"))
+    {
+        char *label1 = new_label();
+        char *label2 = new_label();
+        char *code0 = malloc(30 + strlen(place));
+        sprintf(code0, "%s := #0", place);
+        char *code1 = translate_Cond(root, label1, label2);
+        res = malloc(strlen(code0) + strlen(code1) + strlen(label1) + strlen(label2) + 30);
+        sprintf(res, "%s\n%s\nLABEL %s\n%s := #1", code0, code1, label1, place);
     }
-    assert(res!=NULL);
+    assert(res != NULL);
     return res;
 }
 // 调用函数的形参列表
@@ -560,12 +590,14 @@ char *translate_Args(TreeNode *root, StructureField *field)
         return Args(root->child[2], field);
     }
 }
-char *new_label(){
+char *new_label()
+{
     char *label = malloc(20);
     sprintf(label, "label%d", label_cnt++);
     return label;
 }
-char *new_temp(){
+char *new_temp()
+{
     char *temp = malloc(20);
     sprintf(temp, "t%d", temp_cnt++);
     return temp;

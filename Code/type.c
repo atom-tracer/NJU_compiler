@@ -32,17 +32,18 @@ Type deepcopy(Type type){
         t->kind = STRUCTURE;
         t->content.stru.name = malloc(strlen(type->content.stru.name) + 1);
         strcpy(t->content.stru.name, type->content.stru.name);
-        t->content.stru.table = malloc(sizeof(StructureField) * (N + 1));
-        memset(t->content.stru.table, 0, sizeof(StructureField) * (N + 1));
-        for (int i = 0; i <= N; i++)
-        {
-            StructureField p = type->content.stru.table[i];
-            while (p)
-            {
-                add_symbol_to(t, p->name, deepcopy(p->type));
-                p = p->next;
-            }
-        }
+        // t->content.stru.table = malloc(sizeof(StructureField) * (N + 1));
+        // memset(t->content.stru.table, 0, sizeof(StructureField) * (N + 1));
+        // for (int i = 0; i <= N; i++)
+        // {
+        //     StructureField p = type->content.stru.table[i];
+        //     while (p)
+        //     {
+        //         add_symbol_to(t, p->name, deepcopy(p->type));
+        //         p = p->next;
+        //     }
+        // }
+        t->content.stru.table = deepcopy_field(type->content.stru.table);
         break;
     case FUNCTION:
         t->kind = FUNCTION;
@@ -67,14 +68,20 @@ void change_to_right(Type *type)
         break;
     case STRUCTURE:
         (*type)->is_left = false;
-        for (int i = 0; i <= N; i++)
+        // for (int i = 0; i <= N; i++)
+        // {
+        //     StructureField p = (*type)->content.stru.table[i];
+        //     while (p)
+        //     {
+        //         change_to_right(&(p->type));
+        //         p = p->next;
+        //     }
+        // }
+        StructureField p = (*type)->content.stru.table;
+        while (p)
         {
-            StructureField p = (*type)->content.stru.table[i];
-            while (p)
-            {
-                change_to_right(&(p->type));
-                p = p->next;
-            }
+            change_to_right(&(p->type));
+            p = p->next;
         }
         break;
     case ARRAY:
@@ -108,8 +115,8 @@ Type createStructure(char *name, StructureField head)
     Type type = (Type)malloc(sizeof(struct Type_));
     type->kind = STRUCTURE;
     type->content.stru.name = name;
-    type->content.stru.table = malloc(sizeof(StructureField) * (N + 1));
-    memset(type->content.stru.table, 0, sizeof(StructureField) * (N + 1));
+    // type->content.stru.table = malloc(sizeof(StructureField) * (N + 1));
+    // memset(type->content.stru.table, 0, sizeof(StructureField) * (N + 1));
     StructureField p = head;
     type->is_left = true;
     while (p)
@@ -243,29 +250,73 @@ StructureField get_all_symbol()
 }
 void add_symbol_to(Type stru, char *name, Type type)
 {
-    StructureField *table = stru->content.stru.table;
-    unsigned int val = hash_pjw(name);
+    // StructureField *table = stru->content.stru.table;
+    // unsigned int val = hash_pjw(name);
+    // StructureField p = (StructureField)malloc(sizeof(StructureField));
+    // p->type = type;
+    // p->type->is_left = true;
+    // p->name = name;
+    // p->next = table[val];
+    // table[val] = p;
     StructureField p = (StructureField)malloc(sizeof(StructureField));
     p->type = type;
-    p->type->is_left = true;
     p->name = name;
-    p->next = table[val];
-    table[val] = p;
+    p->type->is_left = true;
+    p->next = stru->content.stru.table;
+    stru->content.stru.table = p;
 }
 Type find_symbol_in(Type stru, char *name)
 {
+    // if(name==NULL||stru==NULL||stru->kind!=STRUCTURE)
+    //     return NULL;
+    // StructureField *table = stru->content.stru.table;
+    // unsigned int val = hash_pjw(name);
+    // StructureField p = table[val];
+    // while (p)
+    // {
+    //     if (strcmp(p->name, name) == 0){
+    //         //assert(p->type->is_left);//结构体域的类型是左值
+    //         return p->type;
+    //     }
+    //     p = p->next;
+    // }
+    // return NULL;
     if(name==NULL||stru==NULL||stru->kind!=STRUCTURE)
         return NULL;
-    StructureField *table = stru->content.stru.table;
-    unsigned int val = hash_pjw(name);
-    StructureField p = table[val];
+    StructureField p = stru->content.stru.table;
     while (p)
     {
-        if (strcmp(p->name, name) == 0){
+        if (strcmp(p->name, name) == 0)
+        {
             //assert(p->type->is_left);//结构体域的类型是左值
             return p->type;
         }
         p = p->next;
     }
     return NULL;
+}
+int size_of(Type type){
+    if(type==NULL)
+        return 0;
+    switch (type->kind)
+    {
+    case BASIC:
+        return 4;
+    case ARRAY:
+        return size_of(type->content.array.elem) * type->content.array.size;
+    case STRUCTURE:
+        int size = 0;
+        StructureField p = type->content.stru.table;
+        while (p)
+        {
+            size += size_of(p->type);
+            p = p->next;
+        }
+        return size;
+    case FUNCTION:
+        return 0;
+    default:
+        assert(0);
+    }
+    return 0;
 }

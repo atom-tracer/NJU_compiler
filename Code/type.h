@@ -41,7 +41,7 @@ struct Type_
         } func;                             // 函数
         struct
         {
-            StructureField *table;
+            StructureField table;
             char *name;
         } stru;
 
@@ -68,4 +68,5 @@ StructureField get_all_symbol();
 // 结构体域符号操作
 void add_symbol_to(Type stru, char *name, Type type);
 Type find_symbol_in(Type stru, char *name);
+int size_of(Type type);
 
