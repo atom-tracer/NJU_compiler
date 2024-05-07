@@ -423,8 +423,9 @@ bool Dec(TreeNode *root, Type type, Type stru)
     }
 }
 // 表达式
-Type Exp(TreeNode *root)
+char *Exp(TreeNode *root, char *place)
 {
+    char*res=NULL;
     // 三元运算符
     char *basic3Operator[] = {"PLUS", "MINUS", "STAR", "DIV", "RELOP", "AND", "OR"};
     for (int i = 0; i < 7; i++)
@@ -447,24 +448,23 @@ Type Exp(TreeNode *root)
     }
     // 括号
     if (compareName(root, 3, "LP", "Exp", "RP"))
-        return Exp(root->child[1]);
+        return Exp(root->child[1], place);
     // 直接确定类型
-    if (compareName(root, 1, "INT") || compareName(root, 1, "FLOAT"))
+    if (compareName(root, 1, "INT"))
     {
-        Type type = createBasic(strcmp(root->child[0]->name, "INT") == 0 ? INT_TYPE : FLOAT_TYPE);
-        type->is_left = false;
-        return type;
+        int val = root->child[0]->int_val;
+        sprintf(res,"place := #%d",val);
+    }
+    if (compareName(root, 1, "FLOAT"))
+    {
+        float val = root->child[0]->float_val;
+        sprintf(res,"place := #%f",val);
     }
     // 变量
     if (compareName(root, 1, "ID"))
     {
         Type type = find_symbol(root->child[0]->id);
-        if (type == NULL)
-        {
-            add_semantic_error(1, root->line);
-            return NULL;
-        }
-        return type;
+        sprintf(res,"%s := %s",place,root->child[0]->id);
     }
     // 负号
     if (compareName(root, 2, "MINUS", "Exp"))
@@ -598,7 +598,8 @@ Type Exp(TreeNode *root)
         }
         return type1;
     }
-    assert(0);
+    assert(res!=NULL);
+    return res;
 }
 // 调用函数的形参列表
 char *translate_Args(TreeNode *root, StructureField *field)
