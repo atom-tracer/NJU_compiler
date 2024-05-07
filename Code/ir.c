@@ -65,7 +65,6 @@ Type Specifier(TreeNode *root)
 }
 char *translate_ExtDef(TreeNode *root)
 {
-    Type type = Specifier(root->child[0]); // 继承属性，确定类型
     if (compareName(root, 2, "Specifier", "SEMI"))
         return NULL;                                                  // 结构体无需生成代码，而且没有全局变量
     else if (compareName(root, 3, "Specifier", "ExtDecList", "SEMI")) // 变量定义
@@ -74,28 +73,26 @@ char *translate_ExtDef(TreeNode *root)
     }
     else if (compareName(root, 3, "Specifier", "FunDec", "CompSt"))
     { // 函数定义
-        char *code1 = malloc(root->child[1]->);
-        state = FunDec(root->child[1], FUNCTION_DEFINITION, type) && state;
-        state = CompSt(root->child[2], type) && state;
-        return state;
+        char *code1 = translate_FunDec(root->child[1]);
+        char *code2 = translate_CompSt(root->child[2]);
+        char *ret = malloc(strlen(code1) + strlen(code2) + 10);
+        sprintf(ret, "%s%s", code1, code2);
+        return ret;
     }
-    else if (compareName(root, 3, "Specifier", "FunDec", "SEMI")) // 函数声明
-        return FunDec(root->child[1], FUNCTION_DECLARATION, type);
-    else
-        return false;
+    else if (compareName(root, 3, "Specifier", "FunDec", "SEMI")) // 不存在函数声明
+        return NULL;
 }
 char *translate_ExtDecList(TreeNode *root, Type type) // 变量定义
 {
-    StructureField *field = malloc(sizeof(StructureField));
-    *field = NULL;
     if (root->child_num == 1)
-        return VarDec(root->child[0], type, NULL) != NULL;
+        return translate_VarDec(root->child[0], type);
     else if (root->child_num == 3)
     {
-        bool state = true;
-        state = VarDec(root->child[0], type, NULL) != NULL && state;
-        state = ExtDecList(root->child[2], type) && state;
-        return state;
+        char *code1 = translate_VarDec(root->child[0], type);
+        char *code2 = translate_ExtDecList(root->child[2], type);
+        char *ret = malloc(strlen(code1) + strlen(code2) + 10);
+        sprintf(ret, "%s%s", code1, code2);
+        return ret;
     }
 }
 
@@ -144,12 +141,17 @@ char *Tag(TreeNode *root)
 {
     return root->child[0]->id;
 }
-char *VarDec(TreeNode *root, Type type)
+char *translate_VarDec(TreeNode *root, Type type)
 {
     char *res;
     if (compareName(root, 1, "ID"))
     {
-        if (type->kind == STRUCTURE)
+        if (type->kind == STRUCTURE || type->kind == ARRAY)
+        {
+            int size = size_of(type);
+            res = malloc(strlen(root->child[0]->id) + 30);
+            sprintf(res, "DEC %s %d\n", root->child[0]->id, size);
+        }
     }
     else if (compareName(root, 4, "VarDec", "LB", "INT", "RB"))
     {
@@ -157,38 +159,24 @@ char *VarDec(TreeNode *root, Type type)
     }
     return res;
 }
-bool FunDec(TreeNode *root, enum FunctionType functiontype, Type ret)
+char *VarDec_id(TreeNode *root)
 {
-    StructureField *field = malloc(sizeof(StructureField));
-    *field = NULL;
+    if (compareName(root, 1, "ID"))
+    {
+        return root->child[0]->id;
+    }
+    else if (compareName(root, 4, "VarDec", "LB", "INT", "RB"))
+    {
+        return VarDec_id(root->child[0]);
+    }
+}
+char *translate_FunDec(TreeNode *root)
+{
     if (compareName(root, 4, "ID", "LP", "VarList", "RP"))
     {
-        VarList(root->child[2], createFunction(ret, functiontype, NULL), field);
-    }
-    else
-        ;
-    Type type = createFunction(ret, functiontype, *field);
-    type->content.func.line = root->line;
-    Type oldtype = find_symbol(root->child[0]->id);
-    if (oldtype == NULL)
-    {
-        add_symbol(root->child[0]->id, type);
-        return true;
-    }
-    else if (oldtype->content.func.functiontype == FUNCTION_DEFINITION && functiontype == FUNCTION_DEFINITION)
-    {
-        add_semantic_error(4, root->line); // 重定义
-        return false;
-    }
-    else
-    {
-        if (!compareType(oldtype, type))
-        {
-            add_semantic_error(19, root->line);
-            return false;
-        }
-        oldtype->content.func.functiontype = functiontype > oldtype->content.func.functiontype ? functiontype : oldtype->content.func.functiontype;
-        return true;
+        char *code1 = malloc(strlen(root->child[0]->id) + 20);
+        sprintf(code1, "FUNCTION %s :\n", root->child[0]->id);
+        return code1;
     }
 }
 bool VarList(TreeNode *root, Type type, StructureField *field)
@@ -376,13 +364,15 @@ char *DecList(TreeNode *root, Type type)
 // 声明单项
 char *Dec(TreeNode *root, Type type)
 {
-    Type var = VarDec(root->child[0], type);
-    if (compareName(root, 1, "VarDec"))
-    {
-    }
+    char *code = VarDec(root->child[0], type);
+    char *res = code;
     if (compareName(root, 3, "VarDec", "ASSIGNOP", "Exp"))
     {
+        char *code1 = translate_Exp(root->child[2], VarDec_id(root->child[0]));
+        res = malloc(strlen(code1) + strlen(code) + 10);
+        sprintf(res, "%s\n%s", code, code1);
     }
+    return res;
 }
 // 表达式
 char *translate_Exp(TreeNode *root, char *place)
