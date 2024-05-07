@@ -451,6 +451,7 @@ char *translate_Exp(TreeNode *root, char *place)
         res = malloc(4 * strlen(t1) + strlen(place) + strlen(id) + strlen(ar) + 50);
         sprintf(res, "%s := &%s\n%s := %s + %s\n%s := *%s\n", t1, id, t1, t1, size, place, t1);
     }
+    //TODO赋值逻辑问题
     // 无参函数调用
     if (compareName(root, 3, "ID", "LP", "RP"))
     {
