@@ -266,11 +266,11 @@ char *Stmt(TreeNode *root, StructureField *sym_table) // TODO
     {
         return Exp(root->child[0], NULL);
     }
-    if (compareName(root, 1, "CompSt"))
+    else if (compareName(root, 1, "CompSt"))
     {
         return CompSt(root->child[0]);
     }
-    if (compareName(root, 3, "RETURN", "Exp", "SEMI"))
+    else if (compareName(root, 3, "RETURN", "Exp", "SEMI"))
     {
         Type exp = Exp(root->child[1]);
         char *t1 = new_temp();
@@ -284,39 +284,98 @@ char *Stmt(TreeNode *root, StructureField *sym_table) // TODO
         strcat(ret, ";\n");
         return ret;
     }
-    if (compareName(root, 5, "IF", "LP", "Exp", "RP", "Stmt"))
+    else if (compareName(root, 5, "IF", "LP", "Exp", "RP", "Stmt"))
     {
         char *label1 = new_label();
         char *label2 = new_label();
-        char *code1 = translate_Cond(root->child[0], label1, label2, sym_table);
+        char *code1 = translate_Cond(root->child[0], label1, label2);
         char *code2 = Stmt(root->child[4], sym_table);
         char *ret = malloc(strlen(code1) + strlen(label1) + strlen(code2) + strlen(label2) + 10);
         sprintf(ret, "%sLABEL: %s:\n%sLABEL: %s:\n", code1, label1, code2, label2);
         return ret;
     }
-    if (compareName(root, 7, "IF", "LP", "Exp", "RP", "Stmt", "ELSE", "Stmt"))
+    else if (compareName(root, 7, "IF", "LP", "Exp", "RP", "Stmt", "ELSE", "Stmt"))
     {
         char *label1 = new_label();
         char *label2 = new_label();
         char *label3 = new_label();
-        char *code1 = translate_Cond(root->child[0], label1, label2, sym_table);
+        char *code1 = translate_Cond(root->child[0], label1, label2);
         char *code2 = Stmt(root->child[4], sym_table);
         char *code3 = Stmt(root->child[6], sym_table);
         char *ret = malloc(strlen(code1) + strlen(label1) + strlen(code2) + strlen(label2) + strlen(code3) + strlen(label3) + 30);
         sprintf(ret, "%sLABEL: %s:\n%sGOTO %s\nLABEL: %s:\n%sLABEL %s:\n", code1, label1, code2, label3, label2, code3, label3);
         return ret;
     }
-    if (compareName(root, 5, "WHILE", "LP", "Exp", "RP", "Stmt"))
+    else if (compareName(root, 5, "WHILE", "LP", "Exp", "RP", "Stmt"))
     {
         char *label1 = new_label();
         char *label2 = new_label();
         char *label3 = new_label();
-        char *code1 = translate_Cond(root->child[0], label2, label3, sym_table);
+        char *code1 = translate_Cond(root->child[0], label2, label3);
         char *code2 = Stmt(root->child[4], sym_table);
         char *ret = malloc(strlen(label1) + strlen(code1) + strlen(label2) + strlen(code2) + strlen(label1) + strlen(label3) + 30);
         sprintf(ret, "LABEL %s:\n%sLABEL %s:\n%sGOTO %s\nLABEL %s:\n", label1, code1, label2, code2, label1, label3);
         return ret;
     }
+}
+char *translate_Cond(TreeNode *root, char *label_true, char *label_false)
+{
+    if (compareName(root, 3, "Exp", "RELOP", "Exp"))
+    {
+        char *t1 = new_temp();
+        char *t2 = new_temp();
+        char *code1 = Exp(root->child[0], t1);
+        char *code2 = Exp(root->child[2], t2);
+        char *op = get_relop(root->child[1]);
+        char *code3 = malloc(strlen(t1) + strlen(t2) + strlen(op) + strlen(label_true) + 20);
+        char *ret = malloc(strlen(code1) + strlen(code2) + strlen(code3) + strlen(label_false) + 20);
+        sprintf(ret, "%s%s%sGOTO %s\n", code1, code2, code3, label_false);
+        return ret;
+    }
+    else if (compareName(root, 2, "NOT", "Exp"))
+    {
+        return translate_Cond(root->child[1], label_false, label_true);
+    }
+    else if (compareName(root, 3, "Exp", "AND", "Exp"))
+    {
+        char *label1 = new_label();
+        char *code1 = translate_Cond(root->child[0], label1, label_false);
+        char *code2 = translate_Cond(root->child[2], label_true, label_false);
+        char *ret = malloc(strlen(code1) + strlen(label1) + strlen(code2) + 20);
+        sprintf(ret, "%sLABEL %s:\n%s", code1, label1, code2);
+        return ret;
+    }
+    else if (compareName(root, 3, "Exp", "OR", "Exp"))
+    {
+        char *label1 = new_label();
+        char *code1 = translate_Cond(root->child[0], label_true, label1);
+        char *code2 = translate_Cond(root->child[2], label_true, label_false);
+        char *ret = malloc(strlen(code1) + strlen(label1) + strlen(code2) + 20);
+        sprintf(ret, "%sLABEL %s:\n%s", code1, label1, code2);
+        return ret;
+    }
+    else
+        ; // TODO:other cases
+}
+char *translate_Args(TreeNode *root, StructureField *field)
+{
+    if (compareName(root, 1, "Exp"))
+    {
+        char *t1 = new_temp();
+        char *code1 = Exp(root->child[0], t1);
+        field->next = malloc(sizeof(StructureField));
+        field->next->type = createBasic(INT_TYPE);
+    }
+    else if (compareName(root, 3, "Exp", "COMMA", "Args"))
+    {
+        Type exp_type = Exp(root->child[0]);
+        if (exp_type == NULL)
+            return NULL;
+        addNode(field, exp_type, NULL);
+        return translate_Args(root->child[2], field);
+    }
+    else
+        assert(0);
 }
 // 变量定义
 bool DefList(TreeNode *root, Type stru)
