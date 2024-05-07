@@ -63,6 +63,8 @@ Type Specifier(TreeNode *root)
 bool ExtDef(TreeNode *root)
 {
     Type type = Specifier(root->child[0]); // 继承属性，确定类型
+    if (type == NULL)
+        return false;
     if (compareName(root, 2, "Specifier", "SEMI"))
         return true;
     else if (compareName(root, 3, "Specifier", "ExtDecList", "SEMI")) // 变量定义

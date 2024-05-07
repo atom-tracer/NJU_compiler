@@ -67,15 +67,14 @@ char *translate_ExtDef(TreeNode *root)
 {
     Type type = Specifier(root->child[0]); // 继承属性，确定类型
     if (compareName(root, 2, "Specifier", "SEMI"))
-        return NULL;
+        return NULL;                                                  // 结构体无需生成代码，而且没有全局变量
     else if (compareName(root, 3, "Specifier", "ExtDecList", "SEMI")) // 变量定义
     {
-        char *code1 = translate_ExtDecList(root->child[1], type);
-        return code1; // 无意义，因为没有全局变量
+        return NULL; // 结构体无需生成代码，而且没有全局变量
     }
     else if (compareName(root, 3, "Specifier", "FunDec", "CompSt"))
     { // 函数定义
-        bool state = true;
+        char *code1 = malloc(root->child[1]->);
         state = FunDec(root->child[1], FUNCTION_DEFINITION, type) && state;
         state = CompSt(root->child[2], type) && state;
         return state;
@@ -145,12 +144,12 @@ char *Tag(TreeNode *root)
 {
     return root->child[0]->id;
 }
-char* VarDec(TreeNode *root, Type type)
+char *VarDec(TreeNode *root, Type type)
 {
-    char*res;
+    char *res;
     if (compareName(root, 1, "ID"))
     {
-        if(type->kind==STRUCTURE)
+        if (type->kind == STRUCTURE)
     }
     else if (compareName(root, 4, "VarDec", "LB", "INT", "RB"))
     {
@@ -333,41 +332,41 @@ char *translate_Cond(TreeNode *root, char *label_true, char *label_false)
         ; // TODO:other cases
 }
 // 变量定义
-char* DefList(TreeNode *root, bool isstru)
+char *DefList(TreeNode *root, bool isstru)
 { // 可能用于结构体定义以及普通变量定义
     if (root->child_num == 0)
         return "";
-    char* code1=Def(root->child[0]);
-    char*code2=DefList(root->child[1], isstru);
-    if(isstru)
+    char *code1 = Def(root->child[0]);
+    char *code2 = DefList(root->child[1], isstru);
+    if (isstru)
         return "";
-    else{
-        char* res = malloc(strlen(code1) + strlen(code2) + 10);
-        if(strlen(code2)==0)
+    else
+    {
+        char *res = malloc(strlen(code1) + strlen(code2) + 10);
+        if (strlen(code2) == 0)
             sprintf(res, "%s", code1);
         else
             sprintf(res, "%s\n%s", code1, code2);
         return res;
     }
-
 }
 // 单个定义语句；
-char* Def(TreeNode *root)
+char *Def(TreeNode *root)
 {
     Type type = Specifier(root->child[0]);
     return DecList(root->child[1], node_type);
 }
 // 声明列表
-char* DecList(TreeNode *root, Type type)
+char *DecList(TreeNode *root, Type type)
 {
     if (compareName(root, 1, "Dec"))
         return Dec(root->child[0], type);
     if (compareName(root, 3, "Dec", "COMMA", "DecList"))
     {
-        char* code1=Dec(root->child[0], type);
-        char* code2=DecList(root->child[2], type);
-        char* res = malloc(strlen(code1) + strlen(code2) + 10);
-        if(strlen(code2)==0)
+        char *code1 = Dec(root->child[0], type);
+        char *code2 = DecList(root->child[2], type);
+        char *res = malloc(strlen(code1) + strlen(code2) + 10);
+        if (strlen(code2) == 0)
             sprintf(res, "%s", code1);
         else
             sprintf(res, "%s\n%s", code1, code2);
@@ -375,16 +374,14 @@ char* DecList(TreeNode *root, Type type)
     }
 }
 // 声明单项
-char* Dec(TreeNode *root, Type type)
+char *Dec(TreeNode *root, Type type)
 {
     Type var = VarDec(root->child[0], type);
     if (compareName(root, 1, "VarDec"))
     {
-        
     }
     if (compareName(root, 3, "VarDec", "ASSIGNOP", "Exp"))
     {
-        
     }
 }
 // 表达式
