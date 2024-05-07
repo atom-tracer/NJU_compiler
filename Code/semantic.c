@@ -30,7 +30,7 @@ bool check_func_definition()
 }
 bool Program(TreeNode *root)
 {
-    bool state=true;
+    bool state = true;
     state = ExtDefList(root->child[0]) && state;
     state = check_func_definition() && state;
     return state;
@@ -63,13 +63,12 @@ Type Specifier(TreeNode *root)
 bool ExtDef(TreeNode *root)
 {
     Type type = Specifier(root->child[0]); // 继承属性，确定类型
-    if (type == NULL)
-        return false;
     if (compareName(root, 2, "Specifier", "SEMI"))
         return true;
     else if (compareName(root, 3, "Specifier", "ExtDecList", "SEMI")) // 变量定义
         return ExtDecList(root->child[1], type);
-    else if (compareName(root, 3, "Specifier", "FunDec", "CompSt")){ // 函数定义
+    else if (compareName(root, 3, "Specifier", "FunDec", "CompSt"))
+    { // 函数定义
         bool state = true;
         state = FunDec(root->child[1], FUNCTION_DEFINITION, type) && state;
         state = CompSt(root->child[2], type) && state;
@@ -86,7 +85,8 @@ bool ExtDecList(TreeNode *root, Type type) // 变量定义
     *field = NULL;
     if (root->child_num == 1)
         return VarDec(root->child[0], type, NULL) != NULL;
-    else if (root->child_num == 3){
+    else if (root->child_num == 3)
+    {
         bool state = true;
         state = VarDec(root->child[0], type, NULL) != NULL && state;
         state = ExtDecList(root->child[2], type) && state;
@@ -146,7 +146,7 @@ Type VarDec(TreeNode *root, Type type, Type stru)
         if (stru == NULL || stru->kind == FUNCTION)
         {
             if (find_symbol(root->child[0]->id) != NULL && (stru == NULL || stru->content.func.functiontype == FUNCTION_DEFINITION))
-            {//对于函数声明，不应该加入符号表
+            { // 对于函数声明，不应该加入符号表
                 add_semantic_error(3, root->line);
                 return NULL;
             }
@@ -208,7 +208,7 @@ bool FunDec(TreeNode *root, enum FunctionType functiontype, Type ret)
             add_semantic_error(19, root->line);
             return false;
         }
-        oldtype->content.func.functiontype = functiontype>oldtype->content.func.functiontype?functiontype:oldtype->content.func.functiontype;
+        oldtype->content.func.functiontype = functiontype > oldtype->content.func.functiontype ? functiontype : oldtype->content.func.functiontype;
         return true;
     }
 }
@@ -216,7 +216,8 @@ bool VarList(TreeNode *root, Type type, StructureField *field)
 {
     if (compareName(root, 1, "ParamDec"))
         return ParamDec(root->child[0], type, field);
-    else{
+    else
+    {
         bool state = true;
         state = ParamDec(root->child[0], type, field) && state;
         state = VarList(root->child[2], type, field) && state;
@@ -248,7 +249,8 @@ bool StmtList(TreeNode *root, Type rettype)
 {
     if (root->child_num == 0)
         return true;
-    if (compareName(root, 2, "Stmt", "StmtList")){
+    if (compareName(root, 2, "Stmt", "StmtList"))
+    {
         bool state = true;
         state = Stmt(root->child[0], rettype) && state;
         state = StmtList(root->child[1], rettype) && state;
@@ -344,7 +346,8 @@ bool DecList(TreeNode *root, Type type, Type stru)
 {
     if (compareName(root, 1, "Dec"))
         return Dec(root->child[0], type, stru);
-    if (compareName(root, 3, "Dec", "COMMA", "DecList")){
+    if (compareName(root, 3, "Dec", "COMMA", "DecList"))
+    {
         bool state = true;
         state = Dec(root->child[0], type, stru) && state;
         state = DecList(root->child[2], type, stru) && state;

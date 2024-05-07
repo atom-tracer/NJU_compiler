@@ -37,14 +37,15 @@ bool Program(TreeNode *root)
     state = check_func_definition() && state;
     return state;
 }
-bool ExtDefList(TreeNode *root)
+char *translate_ExtDefList(TreeNode *root)
 {
-    bool state = true;
     if (root->child_num == 0)
-        return true;
-    state = ExtDef(root->child[0]) && state;
-    state = ExtDefList(root->child[1]) && state;
-    return state;
+        return NULL;
+    char *code1 = translate_ExtDef(root->child[0]);
+    char *code2 = translate_ExtDefList(root->child[1]);
+    char *ret = malloc(strlen(code1) + strlen(code2) + 10);
+    sprintf(ret, "%s%s", code1, code2);
+    return ret;
 }
 Type Specifier(TreeNode *root)
 {
@@ -62,15 +63,16 @@ Type Specifier(TreeNode *root)
     else
         return NULL;
 }
-bool ExtDef(TreeNode *root)
+char *translate_ExtDef(TreeNode *root)
 {
     Type type = Specifier(root->child[0]); // 继承属性，确定类型
-    if (type == NULL)
-        return false;
     if (compareName(root, 2, "Specifier", "SEMI"))
-        return true;
+        return NULL;
     else if (compareName(root, 3, "Specifier", "ExtDecList", "SEMI")) // 变量定义
-        return ExtDecList(root->child[1], type);
+    {
+        char *code1 = translate_ExtDecList(root->child[1], type);
+        return code1; // 无意义，因为没有全局变量
+    }
     else if (compareName(root, 3, "Specifier", "FunDec", "CompSt"))
     { // 函数定义
         bool state = true;
@@ -83,7 +85,7 @@ bool ExtDef(TreeNode *root)
     else
         return false;
 }
-bool ExtDecList(TreeNode *root, Type type) // 变量定义
+char *translate_ExtDecList(TreeNode *root, Type type) // 变量定义
 {
     StructureField *field = malloc(sizeof(StructureField));
     *field = NULL;
