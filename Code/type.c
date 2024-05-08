@@ -296,6 +296,8 @@ Type find_symbol_in(Type stru, char *name)
     return NULL;
 }
 int size_of(Type type){
+    int size = 0;
+    StructureField p;
     if(type==NULL)
         return 0;
     switch (type->kind)
@@ -305,8 +307,7 @@ int size_of(Type type){
     case ARRAY:
         return size_of(type->content.array.elem) * type->content.array.size;
     case STRUCTURE:
-        int size = 0;
-        StructureField p = type->content.stru.table;
+        p = type->content.stru.table;
         while (p)
         {
             size += size_of(p->type);
