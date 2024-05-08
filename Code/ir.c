@@ -30,12 +30,37 @@ bool check_func_definition()
         field = field->next;
     }
 }
-bool Program(TreeNode *root)
+char * translate_Program(TreeNode *root)
 {
-    bool state = true;
-    state = ExtDefList(root->child[0]) && state;
-    state = check_func_definition() && state;
-    return state;
+    //检查选做
+    StructureField field = get_all_symbol();
+    while (field)
+    {
+        //函数参数不能有数组
+        if (field->type->kind == FUNCTION)
+        {
+            StructureField p = field->type->content.func.tail;
+            while (p)
+            {
+                if (p->type->kind == ARRAY)
+                {
+                    return "Cannot translate: Code contains variables of multi-dimensional array type or parameters of array type.\n";
+                }
+                p = p->next;
+            }
+        }
+        //不能出现高维数组
+        if (field->type->kind == ARRAY)
+        {
+            Type p = field->type;
+            p=p->content.array.elem;
+            if (p->kind == ARRAY)
+            {
+                return "Cannot translate: Code contains variables of multi-dimensional array type or parameters of array type.\n";
+            }
+        }
+    }
+    return translate_ExtDefList(root->child[0]);
 }
 char *translate_ExtDefList(TreeNode *root)
 {
@@ -47,6 +72,7 @@ char *translate_ExtDefList(TreeNode *root)
     sprintf(ret, "%s%s", code1, code2);
     return ret;
 }
+//TODO
 Type Specifier(TreeNode *root)
 {
     if (compareName(root, 1, "TYPE"))
@@ -95,7 +121,7 @@ char *translate_ExtDecList(TreeNode *root, Type type) // 变量定义
         return ret;
     }
 }
-
+//TODO
 Type StructSpecifier(TreeNode *root)
 {
     if (compareName(root, 2, "STRUCT", "Tag"))
@@ -129,6 +155,7 @@ Type StructSpecifier(TreeNode *root)
     else
         return NULL;
 }
+//TODO
 char *OptTag(TreeNode *root)
 {
     if (compareName(root, 1, "ID"))
@@ -137,6 +164,7 @@ char *OptTag(TreeNode *root)
     }
     return NULL;
 }
+//TODO
 char *Tag(TreeNode *root)
 {
     return root->child[0]->id;
@@ -179,6 +207,7 @@ char *translate_FunDec(TreeNode *root)
         return code1;
     }
 }
+//TODO
 bool VarList(TreeNode *root, Type type, StructureField *field)
 {
     if (compareName(root, 1, "ParamDec"))
@@ -191,6 +220,7 @@ bool VarList(TreeNode *root, Type type, StructureField *field)
         return state;
     }
 }
+//TODO
 // 函数参数项
 bool ParamDec(TreeNode *root, Type func, StructureField *field)
 {
@@ -216,7 +246,7 @@ char *translate_CompSt(TreeNode *root) // rettype是函数返回值类型
 char *translate_StmtList(TreeNode *root)
 {
     if (root->child_num == 0)
-        return NULL; // #TODO:会出问题吗？
+        return NULL; 
     else if (compareName(root, 2, "Stmt", "StmtList"))
     {
         char *code1 = translate_Stmt(root->child[0]);
@@ -317,7 +347,7 @@ char *translate_Cond(TreeNode *root, char *label_true, char *label_false)
         return ret;
     }
     else
-        assert(0); // TODO:other cases
+        assert(0); 
 }
 // 变量定义
 char *translate_DefList(TreeNode *root, bool isstru)
