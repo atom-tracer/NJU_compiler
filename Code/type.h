@@ -64,6 +64,8 @@ bool compareArgs(StructureField a, StructureField b);//比较函数参数列表
 void addNode(StructureField *head, Type type, char *name); // 没有名称就输入NULL（名称是给结构体域用的）
 // 符号表
 void add_symbol(char *name, Type type);
+void add_symbol_var(char *name, Type type);
+bool find_symbol_var(char*name);
 Type find_symbol(char *name);
 StructureField get_all_symbol();
 // 结构体域符号操作

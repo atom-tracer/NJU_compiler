@@ -1,7 +1,6 @@
 #include "ir.h"
 int temp_cnt = 0;
 int label_cnt = 0;
-// sudo bash ./run.sh -r ../../../NJU_compiler/Code/parser -e extend1 -c
 //  比较文法
 static bool compareName(TreeNode *root, int num, ...)
 { // num必须从小到大遍历
@@ -194,6 +193,7 @@ char *translate_VarDec(TreeNode *root, Type type, bool isVarlist)
             assert(0);
     }
 }
+
 char *VarDec_id(TreeNode *root)
 {
     if (compareName(root, 1, "ID"))
@@ -502,7 +502,8 @@ char *translate_Exp(TreeNode *root, Variable *place)
             }
             else
             {
-                res = "";
+                res = malloc(strlen(getVar(t1)) + strlen(getVar(t2)) + strlen(code1) + strlen(code2) + 300);
+                sprintf(res, "%s%s", code1, code2);
             }
         }
     }
@@ -538,9 +539,12 @@ char *translate_Exp(TreeNode *root, Variable *place)
         {
             return "";
         }
-        if (find_symbol(root->child[0]->id)->kind == ARRAY || find_symbol(root->child[0]->id)->kind == STRUCTURE)
+        if ((find_symbol(root->child[0]->id)->kind == ARRAY || find_symbol(root->child[0]->id)->kind == STRUCTURE))
         {
-            sprintf(res, "%s := &%s\n", getVar(place), root->child[0]->id);
+            if (!find_symbol_var(root->child[0]->id))
+                sprintf(res, "%s := &%s\n", getVar(place), root->child[0]->id);
+            else
+                sprintf(res, "%s := %s\n", getVar(place), root->child[0]->id);
             place->is_pointer = true;
             place->is_sa = true;
         }
@@ -557,9 +561,10 @@ char *translate_Exp(TreeNode *root, Variable *place)
         res = malloc(strlen(getVar(t1)) + strlen(code1) + strlen(code1) + 300);
         if (place == NULL)
         {
-            return "";
+            sprintf(res, "%s\n", code1);
         }
-        sprintf(res, "%s%s := #0 - %s\n", code1, getVar(place), getVar(t1));
+        else
+            sprintf(res, "%s%s := #0 - %s\n", code1, getVar(place), getVar(t1));
     }
     // 数组解析
     if (compareName(root, 4, "Exp", "LB", "Exp", "RB"))
@@ -618,7 +623,7 @@ char *translate_Exp(TreeNode *root, Variable *place)
         {
             if (place == NULL)
             {
-                return "";
+                return "READ\n";
             }
             res = malloc(strlen(getVar(place)) + 300);
             sprintf(res, "READ %s\n", getVar(place));
@@ -714,15 +719,21 @@ char *translate_Exp(TreeNode *root, Variable *place)
     {
         if (place == NULL)
         {
-            return "";
+            char *code1 = translate_Exp(root->child[0], NULL);
+            char *code2 = translate_Exp(root->child[2], NULL);
+            res = malloc(strlen(code1) + strlen(code2) + 300);
+            sprintf(res, "%s%s", code1, code2);
         }
-        char *label1 = new_label();
-        char *label2 = new_label();
-        char *code0 = malloc(300 + strlen(getVar(place)));
-        sprintf(code0, "%s := #0\n", getVar(place));
-        char *code1 = translate_Cond(root, label1, label2);
-        res = malloc(strlen(code0) + strlen(code1) + strlen(label1) + strlen(label2) + strlen(getVar(place)) + 300);
-        sprintf(res, "%s%s\nLABEL %s :\n%s := #1\nLABEL %s :\n", code0, code1, label1, getVar(place), label2);
+        else
+        {
+            char *label1 = new_label();
+            char *label2 = new_label();
+            char *code0 = malloc(300 + strlen(getVar(place)));
+            sprintf(code0, "%s := #0\n", getVar(place));
+            char *code1 = translate_Cond(root, label1, label2);
+            res = malloc(strlen(code0) + strlen(code1) + strlen(label1) + strlen(label2) + strlen(getVar(place)) + 300);
+            sprintf(res, "%s%s\nLABEL %s :\n%s := #1\nLABEL %s :\n", code0, code1, label1, getVar(place), label2);
+        }
     }
     assert(res != NULL);
     return res;

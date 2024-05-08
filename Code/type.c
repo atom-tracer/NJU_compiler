@@ -1,6 +1,6 @@
 #include "type.h"
 #define N 0x3ff
-StructureField hash_table[N + 1];
+StructureField hash_table[N + 1],var_table[N+1];
 StructureField deepcopy_field(StructureField field)
 {
     if (field == NULL)
@@ -217,6 +217,30 @@ void add_symbol(char *name, Type type)
     p->next = hash_table[val];
     p->name = name;
     hash_table[val] = p;
+}
+void add_symbol_var(char *name, Type type){
+    add_symbol(name,type);
+    unsigned int val = hash_pjw(name);
+    StructureField p = (StructureField)malloc(sizeof(StructureField));
+    p->type = NULL;
+    p->next = var_table[val];
+    p->name = name;
+    var_table[val] = p;
+}
+bool find_symbol_var(char*name){
+    if(name==NULL)
+        return false;
+    unsigned int val = hash_pjw(name);
+    StructureField p = var_table[val];
+    while (p)
+    {
+        if (strcmp(p->name, name) == 0)
+        {
+            return true;
+        }
+        p = p->next;
+    }
+    return false;
 }
 Type find_symbol(char *name)
 {

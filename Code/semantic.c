@@ -164,8 +164,10 @@ Type VarDec(TreeNode *root, Type type, Type stru)
             }
             else
             {
-                if (stru == NULL || stru->content.func.functiontype == FUNCTION_DEFINITION) // 函数声明不加入符号表
+                if (stru == NULL) // 函数声明不加入符号表
                     add_symbol(root->child[0]->id, type);
+                else if(stru->content.func.functiontype == FUNCTION_DEFINITION)
+                    add_symbol_var(root->child[0]->id, type);
                 return type;
             }
         }
