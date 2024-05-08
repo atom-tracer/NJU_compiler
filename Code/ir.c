@@ -146,7 +146,7 @@ Type translate_StructSpecifier(TreeNode *root)
         else
         {
             Type strutype = createStructure(anotag, NULL);
-            translate_DefList(root->child[3], strutype);
+            translate_DefList(root->child[3], true);
             if (anotag != NULL)
                 add_symbol(anotag, strutype);
             return strutype;
@@ -383,7 +383,7 @@ char *translate_DefList(TreeNode *root, bool isstru)
 char *translate_Def(TreeNode *root)
 {
     Type type = translate_Specifier(root->child[0]);
-    return translate_DecList(root->child[1], node_type);
+    return translate_DecList(root->child[1],type);
 }
 // 声明列表
 char *translate_DecList(TreeNode *root, Type type)
