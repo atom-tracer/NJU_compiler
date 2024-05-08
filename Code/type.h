@@ -4,6 +4,7 @@
 #include "tree.h"
 #include "tools.h"
 #include <stdarg.h>
+#include <string.h>
 // 类型
 typedef struct Type_ *Type;
 typedef struct StructureField_ *StructureField;

@@ -164,6 +164,10 @@ int main(int argc, char** argv) {
     Program(root);
     //输出语义错误
     summit_semantic_error();
-    printf("%s",translate_Program(root));
+    //创建out1.ir文件
+    FILE *fp=fopen("out1.ir","w");
+    //输出中间代码
+    fprintf(fp,"%s",translate_Program(root));
+    fclose(fp);
     return 0; 
 } 
