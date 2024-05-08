@@ -275,6 +275,7 @@ char *translate_Stmt(TreeNode *root)
         sprintf(code2, "RETURN %s\n", getVar(t1));
         char *ret = malloc(strlen(code1) + strlen(code2) + 300);
         sprintf(ret, "%s%s", code1, code2);
+        return ret;
     }
     else if (compareName(root, 5, "IF", "LP", "Exp", "RP", "Stmt"))
     {
