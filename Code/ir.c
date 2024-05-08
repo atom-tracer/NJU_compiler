@@ -146,7 +146,7 @@ Type translate_StructSpecifier(TreeNode *root)
         else
         {
             Type strutype = createStructure(anotag, NULL);
-            translate_DefList(root->child[3], strutype);
+            translate_DefList(root->child[3], true);
             if (anotag != NULL)
                 add_symbol(anotag, strutype);
             return strutype;
@@ -383,7 +383,7 @@ char *translate_DefList(TreeNode *root, bool isstru)
 char *translate_Def(TreeNode *root)
 {
     Type type = translate_Specifier(root->child[0]);
-    return translate_DecList(root->child[1], node_type);
+    return translate_DecList(root->child[1],type);
 }
 // 声明列表
 char *translate_DecList(TreeNode *root, Type type)
@@ -406,7 +406,7 @@ char *translate_Dec(TreeNode *root, Type type)
     char *res = code;
     if (compareName(root, 3, "VarDec", "ASSIGNOP", "Exp"))
     {
-        char *code1 = translate_Exp(root->child[2], VarDec_id(root->child[0]));
+        char *code1 = translate_Exp(root->child[2], createVar(VarDec_id(root->child[0])));
         res = malloc(strlen(code1) + strlen(code) + 10);
         sprintf(res, "%s%s\n", code, code1);
     }
