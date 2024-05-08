@@ -80,10 +80,10 @@ Type translate_Specifier(TreeNode *root)
 char *translate_ExtDef(TreeNode *root)
 {
     if (compareName(root, 2, "Specifier", "SEMI"))
-        return NULL;                                                  // 结构体无需生成代码，而且没有全局变量
+        return "";                                                  // 结构体无需生成代码，而且没有全局变量
     else if (compareName(root, 3, "Specifier", "ExtDecList", "SEMI")) // 变量定义
     {
-        return NULL; // 结构体无需生成代码，而且没有全局变量
+        return ""; // 结构体无需生成代码，而且没有全局变量
     }
     else if (compareName(root, 3, "Specifier", "FunDec", "CompSt"))
     { // 函数定义
@@ -94,7 +94,7 @@ char *translate_ExtDef(TreeNode *root)
         return ret;
     }
     else if (compareName(root, 3, "Specifier", "FunDec", "SEMI")) // 不存在函数声明
-        return NULL;
+        return "";
 }
 char *translate_ExtDecList(TreeNode *root, Type type) // 变量定义
 {
