@@ -332,5 +332,9 @@ char* getVar(Variable*var){
     return temp;
 }
 Variable* createVar(char*name){
-    return (Variable*){name,false,false};
+    Variable* t = malloc(sizeof(struct Variable));
+    t->name = name;
+    t->is_pointer = false;
+    t->is_sa = false;
+    return t;
 }

@@ -3,8 +3,6 @@
 #include "tools.h"
 #include "type.h"
 #include <assert.h>
-bool compareName(TreeNode *root, int num, ...);
-bool check_func_definition();
 char *translate_Program(TreeNode *root);
 char *translate_ExtDefList(TreeNode *root);
 Type translate_Specifier(TreeNode *root);

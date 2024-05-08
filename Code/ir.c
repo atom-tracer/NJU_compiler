@@ -2,7 +2,7 @@
 int temp_cnt = 0;
 int label_cnt = 0;
 // 比较文法
-bool compareName(TreeNode *root, int num, ...)
+static bool compareName(TreeNode *root, int num, ...)
 { // num必须从小到大遍历
     if (!root || root->child_num != num)
         return false;
@@ -15,20 +15,6 @@ bool compareName(TreeNode *root, int num, ...)
     }
     va_end(args);
     return true;
-}
-// 最后检查是否有函数没定义
-bool check_func_definition()
-{
-    StructureField field = get_all_symbol();
-    while (field)
-    {
-        if (field->type->kind == FUNCTION && field->type->content.func.functiontype == FUNCTION_DECLARATION)
-        {
-            add_semantic_error(18, field->type->content.func.line);
-            return false;
-        }
-        field = field->next;
-    }
 }
 char *translate_Program(TreeNode *root)
 {
