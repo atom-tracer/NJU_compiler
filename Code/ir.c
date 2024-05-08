@@ -548,7 +548,7 @@ char *translate_Exp(TreeNode *root, Variable *place)
     //  无参函数调用
     if (compareName(root, 3, "ID", "LP", "RP"))
     {
-        if (strcmp(root->child[0]->id, "read"))
+        if (strcmp(root->child[0]->id, "read")==0)
         {
             if (place == NULL)
             {
@@ -578,7 +578,7 @@ char *translate_Exp(TreeNode *root, Variable *place)
         Variable **arglist = malloc(sizeof(Variable *) * 3000);
         char *code1 = translate_Args(root->child[2], arglist, &cnt);
         assert(cnt <= 3000);
-        if (strcmp(root->child[0]->id, "write"))
+        if (strcmp(root->child[0]->id, "write")==0)
         {
             assert(cnt == 1);
             if (place != NULL)

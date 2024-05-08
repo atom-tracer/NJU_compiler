@@ -1,30 +1,27 @@
 FUNCTION main :
-t0 := CALL read
+READ t0
 n := t0
 t1 := n
 t2 := #0
-IF t1 < t2 GOTO label0
+IF t1 > t2 GOTO label0
 GOTO label1
 LABEL: label0:
 t3 := #1
-ARG t3
-CALL write
+WRITE t3
 GOTO label2
 LABEL: label1:
 t4 := n
 t5 := #0
-IF t4 > t5 GOTO label3
+IF t4 < t5 GOTO label3
 GOTO label4
 LABEL: label3:
 t7 := #1
 t6 := #0 - t7
-ARG t6
-CALL write
+WRITE t6
 GOTO label5
 LABEL: label4:
 t8 := #0
-ARG t8
-CALL write
+WRITE t8
 LABEL label5:
 LABEL label2:
 t9 := #0
