@@ -8,7 +8,7 @@
             "request": "launch",
             "program": "${workspaceFolder}/Code/parser",
             "args": [
-                "../Test/test_3/1.cmm"
+                "../Test/test_3/5.cmm"
                 ], // 这里可以添加程序运行时需要的参数
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}/Code",

@@ -1,6 +1,9 @@
 #pragma once
 #include <assert.h>
 #include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+#include <stdlib.h>
 typedef int bool;
 #define true 1
 #define false 0
@@ -19,3 +22,5 @@ enum FunctionType
 void summit_semantic_error();
 void add_semantic_error(int error_type, int line);
 void print_semantic_error(int errortype, int line);
+char*removeline(char*str);
+char *removeEmptyLines(char *str);

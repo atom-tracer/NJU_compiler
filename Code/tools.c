@@ -95,3 +95,18 @@ void print_semantic_error(int errortype, int line)
         break;
     }
 }
+//去除空行
+char *removeEmptyLines(char *str) {
+    char *temp = malloc(strlen(str) + 1);
+    int j = 0;
+    for (int i = 0; i < strlen(str); i++) {
+        if (str[i] == '\n') {
+            if (i > 0 && str[i - 1] == '\n') {
+                continue;
+            }
+        }
+        temp[j++] = str[i];
+    }
+    temp[j] = '\0';
+    return temp;
+}

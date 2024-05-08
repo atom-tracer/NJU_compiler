@@ -2083,12 +2083,15 @@ int main(int argc, char** argv) {
     Program(root);
     //输出语义错误
     summit_semantic_error();
-    // //创建out1.ir文件
-    // FILE *fp=fopen("out1.ir","w");
-    // //输出中间代码
-    // fprintf(fp,"%s",translate_Program(root));
-    // fclose(fp);
-    printf("%s",translate_Program(root));
+    //创建out1.ir文件
+    char*res=removeEmptyLines(translate_Program(root));
+    if(strlen(res)==0)
+        return 0;
+    FILE *fp=fopen("./a.ir","w");
+    //输出中间代码
+    fprintf(fp,"%s",res);
+    fclose(fp);
+    //printf("%s",removeEmptyLines(translate_Program(root)));
     return 0; 
 } 
 

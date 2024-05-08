@@ -1,6 +1,7 @@
 #include "ir.h"
 int temp_cnt = 0;
 int label_cnt = 0;
+//sudo bash ./run.sh -r ../../../NJU_compiler/Code/parser -e extend1 -c
 // 比较文法
 static bool compareName(TreeNode *root, int num, ...)
 { // num必须从小到大遍历
@@ -366,10 +367,10 @@ char *translate_Cond(TreeNode *root, char *label_true, char *label_false)
     }
     else
     {
-        char *t1 = new_label();
+        Variable *t1 = createVar(new_temp());
         char *code1 = translate_Exp(root, t1);
-        char *code2 = malloc(strlen(t1) + strlen(label_true) + strlen(label_false) + 300);
-        sprintf(code2, "IF %s != #0 GOTO %s\n", t1, label_true);
+        char *code2 = malloc(strlen(getVar(t1)) + strlen(label_true) + strlen(label_false) + 300);
+        sprintf(code2, "IF %s != #0 GOTO %s\n", getVar(t1), label_true);
         char *ret = malloc(strlen(code1) + strlen(code2) + 300);
         sprintf(ret, "%s%sGOTO %s\n", code1, code2, label_false);
         return ret;
@@ -507,16 +508,17 @@ char *translate_Exp(TreeNode *root, Variable *place)
     {
         Variable *t1 = createVar(new_temp());
         Variable *t2 = createVar(new_temp());
+        Variable *t3 = createVar(new_temp());
         char *code1 = translate_Exp(root->child[0], t1);
         char *code2 = translate_Exp(root->child[2], t2);
-        Type element = find_symbol(root->child[0]->id)->content.array.elem;
+        Type element = find_symbol(root->child[0]->child[0]->id)->content.array.elem;
         int size = size_of(element);
         if (place == NULL)
         {
             return "";
         }
-        res = malloc(3 * strlen(getVar(t1)) + 3 * strlen(getVar(t2) + strlen(code1) + strlen(code2) + strlen(getVar(place)) + 300));
-        sprintf(res, "%s%s%s := %s * %d\n%s := %s + %s\n%s := %s\n", code1, code2, getVar(t2), getVar(t2), size, getVar(t1), getVar(t1), getVar(t2), getVar(place), getVar(t1));
+        res = malloc(3 * strlen(getVar(t1)) + 3 * strlen(getVar(t2)) + strlen(code1) + strlen(code2) + strlen(getVar(place)) + 300);
+        sprintf(res, "%s%s%s := %s * #%d\n%s := %s + %s\n%s := %s\n", code1, code2, getVar(t3), getVar(t2), size, getVar(t2), getVar(t1), getVar(t3), getVar(place), getVar(t2));
         place->is_pointer = true;
         if (element->kind == ARRAY || element->kind == STRUCTURE)
         {
@@ -527,8 +529,9 @@ char *translate_Exp(TreeNode *root, Variable *place)
     if (compareName(root, 3, "Exp", "DOT", "ID"))
     {
         Variable *t1 = createVar(new_temp());
+        Variable *t2 = createVar(new_temp());
         char *code1 = translate_Exp(root->child[0], t1);
-        Type stru = find_symbol(root->child[0]->id);
+        Type stru = find_symbol(root->child[0]->child[0]->id);
         int offset = 0;
         StructureField p = stru->content.stru.table;
         while (p)
@@ -543,7 +546,7 @@ char *translate_Exp(TreeNode *root, Variable *place)
             return "";
         }
         res = malloc(2 * strlen(getVar(t1)) + strlen(code1) + strlen(getVar(place) + 300));
-        sprintf(res, "%s%s := %s + %d\n%s := %s\n", code1, getVar(t1), getVar(t1), offset, getVar(place), getVar(t1));
+        sprintf(res, "%s%s := %s + #%d\n%s := %s\n", code1, getVar(t2), getVar(t1), offset, getVar(place), getVar(t2));
         place->is_pointer = true;
         if (p->type->kind == ARRAY || p->type->kind == STRUCTURE)
         {

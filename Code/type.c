@@ -262,8 +262,19 @@ void add_symbol_to(Type stru, char *name, Type type)
     p->type = type;
     p->name = name;
     p->type->is_left = true;
-    p->next = stru->content.stru.table;
-    stru->content.stru.table = p;
+    if (stru->content.stru.table == NULL)
+    {
+        stru->content.stru.table = p;
+        return;
+    }
+    else{
+        StructureField q = stru->content.stru.table;
+        while (q->next)
+        {
+            q = q->next;
+        }
+        q->next = p;
+    }
 }
 Type find_symbol_in(Type stru, char *name)
 {
