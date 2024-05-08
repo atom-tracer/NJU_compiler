@@ -286,8 +286,8 @@ char *translate_Cond(TreeNode *root, char *label_true, char *label_false)
     {
         char *t1 = new_temp();
         char *t2 = new_temp();
-        char *code1 = Exp(root->child[0], t1);
-        char *code2 = Exp(root->child[2], t2);
+        char *code1 = translate_Exp(root->child[0], t1);
+        char *code2 = translate_Exp(root->child[2], t2);
         char *op = get_relop(root->child[1]);
         char *code3 = malloc(strlen(t1) + strlen(t2) + strlen(op) + strlen(label_true) + 20);
         char *ret = malloc(strlen(code1) + strlen(code2) + strlen(code3) + strlen(label_false) + 20);
@@ -320,12 +320,12 @@ char *translate_Cond(TreeNode *root, char *label_true, char *label_false)
         assert(0); // TODO:other cases
 }
 // 变量定义
-char *DefList(TreeNode *root, bool isstru)
+char *translate_DefList(TreeNode *root, bool isstru)
 { // 可能用于结构体定义以及普通变量定义
     if (root->child_num == 0)
         return "";
-    char *code1 = Def(root->child[0]);
-    char *code2 = DefList(root->child[1], isstru);
+    char *code1 = translate_Def(root->child[0]);
+    char *code2 = translate_DefList(root->child[1], isstru);
     if (isstru)
         return "";
     else
@@ -336,27 +336,27 @@ char *DefList(TreeNode *root, bool isstru)
     }
 }
 // 单个定义语句；
-char *Def(TreeNode *root)
+char *translate_Def(TreeNode *root)
 {
-    Type type = Specifier(root->child[0]);
+    Type type = translate_Specifier(root->child[0]);
     return translate_DecList(root->child[1], node_type);
 }
 // 声明列表
-char *DecList(TreeNode *root, Type type)
+char *translate_DecList(TreeNode *root, Type type)
 {
     if (compareName(root, 1, "Dec"))
         return translate_Dec(root->child[0], type);
     if (compareName(root, 3, "Dec", "COMMA", "DecList"))
     {
-        char *code1 = Dec(root->child[0], type);
-        char *code2 = DecList(root->child[2], type);
+        char *code1 = translate_Dec(root->child[0], type);
+        char *code2 = translate_DecList(root->child[2], type);
         char *res = malloc(strlen(code1) + strlen(code2) + 10);
         sprintf(res, "%s%s\n", code1, code2);
         return res;
     }
 }
 // 声明单项
-char *Dec(TreeNode *root, Type type)
+char *translate_Dec(TreeNode *root, Type type)
 {
     char *code = translate_VarDec(root->child[0], type);
     char *res = code;
@@ -382,15 +382,15 @@ char *translate_Exp(TreeNode *root, Variable *place)
         {
             Variable *t1 = createVar(new_temp());
             Variable *t2 = createVar(new_temp());
-            char *code1 = Exp(root->child[0], t1);
-            char *code2 = Exp(root->child[2], t2);
+            char *code1 = translate_Exp(root->child[0], t1);
+            char *code2 = translate_Exp(root->child[2], t2);
             res = malloc(strlen(getVar(t1)) + strlen(getVar(t2)) + strlen(code1) + strlen(code2) + strlen(getVar(place)) + 30);
             sprintf(res, "%s%s%s := %s %s %s\n", code1, code2, getVar(place), getVar(t1), basic3OperatorCode[i], getVar(t2));
         }
     }
     // 括号
     if (compareName(root, 3, "LP", "Exp", "RP"))
-        return Exp(root->child[1], place);
+        return translate_Exp(root->child[1], place);
     // 直接确定类型
     if (compareName(root, 1, "INT"))
     {
@@ -417,7 +417,7 @@ char *translate_Exp(TreeNode *root, Variable *place)
     if (compareName(root, 2, "MINUS", "Exp"))
     {
         Variable *t1 = createVar(new_temp());
-        char *code1 = Exp(root->child[1], t1);
+        char *code1 = translate_Exp(root->child[1], t1);
         res = malloc(strlen(getVar(t1)) + strlen(code1) + strlen(code1) + 30);
         sprintf(res, "%s%s := #0 - %s\n", code1, getVar(place), getVar(t1));
     }
@@ -426,8 +426,8 @@ char *translate_Exp(TreeNode *root, Variable *place)
     {
         Variable *t1 = createVar(new_temp());
         Variable *t2 = createVar(new_temp());
-        char *code1 = Exp(root->child[0], t1);
-        char *code2 = Exp(root->child[2], t2);
+        char *code1 = translate_Exp(root->child[0], t1);
+        char *code2 = translate_Exp(root->child[2], t2);
         Type element = find_symbol(root->child[0]->id)->content.array.elem;
         int size = size_of(element);
         res = malloc(3*strlen(getVar(t1)) + 3*strlen(getVar(t2) + strlen(code1) + strlen(code2) + strlen(getVar(place)) + 30));
@@ -441,7 +441,7 @@ char *translate_Exp(TreeNode *root, Variable *place)
     if (compareName(root, 3, "Exp", "DOT", "ID"))
     {
         Variable *t1 = createVar(new_temp());
-        char *code1 = Exp(root->child[0], t1);
+        char *code1 = translate_Exp(root->child[0], t1);
         Type stru = find_symbol(root->child[0]->id);
         int offset = 0;
         StructureField p = stru->content.stru.table;
@@ -504,7 +504,7 @@ char *translate_Exp(TreeNode *root, Variable *place)
     {
         if(compareName(root->child[0],1,"ID")){
             Variable *t1 = createVar(new_temp());
-            char *code1 = Exp(root->child[2], t1);
+            char *code1 = translate_Exp(root->child[2], t1);
             char*id = root->child[0]->child[0]->id;
             res=malloc(strlen(getVar(t1))+strlen(code1)+strlen(getVar(place))+30);
             sprintf(res,"%s%s := %s\n%s := %s\n",code1,id,getVar(t1),getVar(place),id);
@@ -512,8 +512,8 @@ char *translate_Exp(TreeNode *root, Variable *place)
         else{
             Variable *t1 = createVar(new_temp());
             Variable *t2 = createVar(new_temp());
-            char *code1 = Exp(root->child[0], t1);
-            char *code2 = Exp(root->child[2], t2);
+            char *code1 = translate_Exp(root->child[0], t1);
+            char *code2 = translate_Exp(root->child[2], t2);
             res=malloc(strlen(getVar(t1))+strlen(getVar(t2))+strlen(code1)+strlen(code2)+strlen(getVar(place))+30);
             sprintf(res,"%s%s%s := %s\n%s := %s\n",code1,code2,getVar(t1),getVar(t2),getVar(place),getVar(t1));
         }
@@ -538,7 +538,7 @@ char *translate_Args(TreeNode *root, Variable **field, int *cnt)
     if (compareName(root, 1, "Exp")) // 参数列表末尾
     {
         Variable *t1 = createVar(new_temp());
-        char *code1 = Exp(root->child[0], t1);
+        char *code1 = translate_Exp(root->child[0], t1);
         field[(*cnt)++]=t1;
         return code1;
     }
@@ -546,7 +546,7 @@ char *translate_Args(TreeNode *root, Variable **field, int *cnt)
     else if (compareName(root, 3, "Exp", "COMMA", "Args"))
     {
         Variable *t1 = createVar(new_temp());
-        char *code1 = Exp(root->child[0], t1);
+        char *code1 = translate_Exp(root->child[0], t1);
         field[(*cnt)++]=t1;
         char*code2=translate_Args(root->child[2],field,cnt);
         char*res=malloc(strlen(code1)+strlen(code2)+10);
