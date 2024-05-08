@@ -890,12 +890,12 @@ YY_RULE_SETUP
     if(debug_printf)
         printf("RELOP\n");
     TreeNode* node=new_node("RELOP",node_relop); 
-    if(strcmp(yytext,">")) node->relop_val=1;
-    else if(strcmp(yytext,"<")) node->relop_val=2;
-    else if(strcmp(yytext,">=")) node->relop_val=3;
-    else if(strcmp(yytext,"<=")) node->relop_val=4;
-    else if(strcmp(yytext,"==")) node->relop_val=5;
-    else if(strcmp(yytext,"!=")) node->relop_val=6;
+    if(strcmp(yytext,">")==0) node->relop_val=1;
+    else if(strcmp(yytext,"<")==0) node->relop_val=2;
+    else if(strcmp(yytext,">=")==0) node->relop_val=3;
+    else if(strcmp(yytext,"<=")==0) node->relop_val=4;
+    else if(strcmp(yytext,"==")==0) node->relop_val=5;
+    else if(strcmp(yytext,"!=")==0) node->relop_val=6;
     else assert("error relop\n");
     yylval.val=node;
     return RELOP;}

@@ -80,10 +80,10 @@ Type translate_Specifier(TreeNode *root)
 char *translate_ExtDef(TreeNode *root)
 {
     if (compareName(root, 2, "Specifier", "SEMI"))
-        return NULL;                                                  // 结构体无需生成代码，而且没有全局变量
+        return "";                                                  // 结构体无需生成代码，而且没有全局变量
     else if (compareName(root, 3, "Specifier", "ExtDecList", "SEMI")) // 变量定义
     {
-        return NULL; // 结构体无需生成代码，而且没有全局变量
+        return ""; // 结构体无需生成代码，而且没有全局变量
     }
     else if (compareName(root, 3, "Specifier", "FunDec", "CompSt"))
     { // 函数定义
@@ -94,7 +94,7 @@ char *translate_ExtDef(TreeNode *root)
         return ret;
     }
     else if (compareName(root, 3, "Specifier", "FunDec", "SEMI")) // 不存在函数声明
-        return NULL;
+        return "";
 }
 char *translate_ExtDecList(TreeNode *root, Type type) // 变量定义
 {
@@ -553,7 +553,7 @@ char *translate_Exp(TreeNode *root, Variable *place)
     //  无参函数调用
     if (compareName(root, 3, "ID", "LP", "RP"))
     {
-        if (strcmp(root->child[0]->id, "read"))
+        if (strcmp(root->child[0]->id, "read")==0)
         {
             if (place == NULL)
             {
@@ -583,7 +583,7 @@ char *translate_Exp(TreeNode *root, Variable *place)
         Variable **arglist = malloc(sizeof(Variable *) * 3000);
         char *code1 = translate_Args(root->child[2], arglist, &cnt);
         assert(cnt <= 3000);
-        if (strcmp(root->child[0]->id, "write"))
+        if (strcmp(root->child[0]->id, "write")==0)
         {
             assert(cnt == 1);
             if (place != NULL)
