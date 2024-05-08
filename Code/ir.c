@@ -348,7 +348,15 @@ char *translate_Cond(TreeNode *root, char *label_true, char *label_false)
         return ret;
     }
     else
-        assert(0);
+    {
+        char *t1 = new_label();
+        char *code1 = translate_Exp(root, t1);
+        char *code2 = malloc(strlen(t1) + strlen(label_true) + strlen(label_false) + 30);
+        sprintf(code2, "IF %s != #0 GOTO %s\n", t1, label_true);
+        char *ret = malloc(strlen(code1) + strlen(code2) + 20);
+        sprintf(ret, "%s%sGOTO %s\n", code1, code2, label_false);
+        return ret;
+    }
 }
 // 变量定义
 char *translate_DefList(TreeNode *root, bool isstru)
@@ -564,10 +572,10 @@ char *translate_Exp(TreeNode *root, Variable *place)
                 res = malloc(strlen(getVar(t1)) + strlen(getVar(t2)) + strlen(code1) + strlen(code2) + strlen(getVar(place)) + 30);
                 sprintf(res, "%s%s%s := %s\n%s := %s\n", code1, code2, getVar(t1), getVar(t2), getVar(place), getVar(t1));
             }
-            else{
+            else
+            {
                 res = malloc(strlen(getVar(t1)) + strlen(getVar(t2)) + strlen(code1) + strlen(code2) + 30);
                 sprintf(res, "%s%s%s := %s\n", code1, code2, getVar(t1), getVar(t2));
-            
             }
         }
     }
