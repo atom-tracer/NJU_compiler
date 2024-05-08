@@ -69,4 +69,22 @@ StructureField get_all_symbol();
 void add_symbol_to(Type stru, char *name, Type type);
 Type find_symbol_in(Type stru, char *name);
 int size_of(Type type);
-
+//变量
+typedef struct Variable Variable;
+struct Variable{
+    char*name;
+    bool is_pointer;
+};
+char* getVar(Variable*var){
+    char*temp=malloc(strlen(var->name)+2);
+    if(var->is_pointer){
+        sprintf(temp,"*%s",var->name);
+    }
+    else{
+        sprintf(temp,"%s",var->name);
+    }
+    return temp;
+}
+Variable* createVar(char*name){
+    return (Variable*){name,false};
+}

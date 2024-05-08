@@ -28,5 +28,4 @@ char *new_temp();
 char* translate_Exp(TreeNode *root, char*place);
 char *translate_Cond(TreeNode *root, char *label_true, char *label_false);
 char *translate_Args(TreeNode *root, StructureField *field);
-
 char *get_relop(TreeNode *root);
