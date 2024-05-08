@@ -209,6 +209,16 @@ char *translate_FunDec(TreeNode *root)
         sprintf(ret, "FUNCTION %s :\n%s", root->child[0]->id, code2);
         return ret;
     }
+    else if (compareName(root, 3, "ID", "LP", "RP"))
+    {
+        char *code1 = malloc(strlen(root->child[0]->id) + 300);
+        sprintf(code1, "FUNCTION %s :\n", root->child[0]->id);
+        return code1;
+    }
+    else
+    {
+        assert(0);
+    }
 }
 
 char *translate_VarList(TreeNode *root)
