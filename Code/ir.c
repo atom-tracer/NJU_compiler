@@ -54,7 +54,7 @@ char *translate_Program(TreeNode *root)
 char *translate_ExtDefList(TreeNode *root)
 {
     if (root->child_num == 0)
-        return NULL;
+        return "";
     char *code1 = translate_ExtDef(root->child[0]);
     char *code2 = translate_ExtDefList(root->child[1]);
     char *ret = malloc(strlen(code1) + strlen(code2) + 300);
