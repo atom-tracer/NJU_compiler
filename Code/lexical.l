@@ -164,5 +164,6 @@ int main(int argc, char** argv) {
     Program(root);
     //输出语义错误
     summit_semantic_error();
+    printf("%s",translate_Program(root));
     return 0; 
 } 
