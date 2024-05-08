@@ -246,7 +246,7 @@ char *translate_CompSt(TreeNode *root) // rettype是函数返回值类型
 char *translate_StmtList(TreeNode *root)
 {
     if (root->child_num == 0)
-        return NULL;
+        return "";
     else if (compareName(root, 2, "Stmt", "StmtList"))
     {
         char *code1 = translate_Stmt(root->child[0]);
