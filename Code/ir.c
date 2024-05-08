@@ -80,7 +80,7 @@ Type translate_Specifier(TreeNode *root)
 char *translate_ExtDef(TreeNode *root)
 {
     if (compareName(root, 2, "Specifier", "SEMI"))
-        return "";                                                  // 结构体无需生成代码，而且没有全局变量
+        return "";                                                    // 结构体无需生成代码，而且没有全局变量
     else if (compareName(root, 3, "Specifier", "ExtDecList", "SEMI")) // 变量定义
     {
         return ""; // 结构体无需生成代码，而且没有全局变量
@@ -299,7 +299,7 @@ char *translate_Stmt(TreeNode *root)
         char *code1 = translate_Cond(root->child[2], label1, label2);
         char *code2 = translate_Stmt(root->child[4]);
         char *ret = malloc(strlen(code1) + strlen(label1) + strlen(code2) + strlen(label2) + 300);
-        sprintf(ret, "%sLABEL: %s:\n%sLABEL: %s:\n", code1, label1, code2, label2);
+        sprintf(ret, "%sLABEL %s :\n%sLABEL %s :\n", code1, label1, code2, label2);
         return ret;
     }
     else if (compareName(root, 7, "IF", "LP", "Exp", "RP", "Stmt", "ELSE", "Stmt"))
@@ -312,7 +312,7 @@ char *translate_Stmt(TreeNode *root)
         char *code3 = translate_Stmt(root->child[6]);
         // printf("%d\n", strlen(code1) + strlen(label1) + strlen(code2) + strlen(label2) + strlen(code3) + strlen(label3) + 300);
         char *ret = malloc(strlen(code1) + strlen(label1) + strlen(code2) + strlen(label2) + strlen(code3) + strlen(label3) + 300);
-        sprintf(ret, "%sLABEL: %s:\n%sGOTO %s\nLABEL: %s:\n%sLABEL %s:\n", code1, label1, code2, label3, label2, code3, label3);
+        sprintf(ret, "%sLABEL %s :\n%sGOTO %s\nLABEL %s :\n%sLABEL %s :\n", code1, label1, code2, label3, label2, code3, label3);
         return ret;
     }
     else if (compareName(root, 5, "WHILE", "LP", "Exp", "RP", "Stmt"))
@@ -323,7 +323,7 @@ char *translate_Stmt(TreeNode *root)
         char *code1 = translate_Cond(root->child[2], label2, label3);
         char *code2 = translate_Stmt(root->child[4]);
         char *ret = malloc(strlen(label1) + strlen(code1) + strlen(label2) + strlen(code2) + strlen(label1) + strlen(label3) + 300);
-        sprintf(ret, "LABEL %s:\n%sLABEL %s:\n%sGOTO %s\nLABEL %s:\n", label1, code1, label2, code2, label1, label3);
+        sprintf(ret, "LABEL %s :\n%sLABEL %s :\n%sGOTO %s\nLABEL %s :\n", label1, code1, label2, code2, label1, label3);
         return ret;
     }
 }
@@ -352,7 +352,7 @@ char *translate_Cond(TreeNode *root, char *label_true, char *label_false)
         char *code1 = translate_Cond(root->child[0], label1, label_false);
         char *code2 = translate_Cond(root->child[2], label_true, label_false);
         char *ret = malloc(strlen(code1) + strlen(label1) + strlen(code2) + 300);
-        sprintf(ret, "%sLABEL %s:\n%s", code1, label1, code2);
+        sprintf(ret, "%sLABEL %s :\n%s", code1, label1, code2);
         return ret;
     }
     else if (compareName(root, 3, "Exp", "OR", "Exp"))
@@ -361,7 +361,7 @@ char *translate_Cond(TreeNode *root, char *label_true, char *label_false)
         char *code1 = translate_Cond(root->child[0], label_true, label1);
         char *code2 = translate_Cond(root->child[2], label_true, label_false);
         char *ret = malloc(strlen(code1) + strlen(label1) + strlen(code2) + 300);
-        sprintf(ret, "%sLABEL %s:\n%s", code1, label1, code2);
+        sprintf(ret, "%sLABEL %s :\n%s", code1, label1, code2);
         return ret;
     }
     else
@@ -553,7 +553,7 @@ char *translate_Exp(TreeNode *root, Variable *place)
     //  无参函数调用
     if (compareName(root, 3, "ID", "LP", "RP"))
     {
-        if (strcmp(root->child[0]->id, "read")==0)
+        if (strcmp(root->child[0]->id, "read") == 0)
         {
             if (place == NULL)
             {
@@ -583,7 +583,7 @@ char *translate_Exp(TreeNode *root, Variable *place)
         Variable **arglist = malloc(sizeof(Variable *) * 3000);
         char *code1 = translate_Args(root->child[2], arglist, &cnt);
         assert(cnt <= 3000);
-        if (strcmp(root->child[0]->id, "write")==0)
+        if (strcmp(root->child[0]->id, "write") == 0)
         {
             assert(cnt == 1);
             if (place != NULL)
