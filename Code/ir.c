@@ -426,6 +426,59 @@ char *translate_Dec(TreeNode *root, Type type)
     }
     return res;
 }
+static Type Exp(TreeNode *root)
+{
+    // 变量
+    if (compareName(root, 1, "ID"))
+    {
+        Type type = find_symbol(root->child[0]->id);
+        if (type == NULL)
+        {
+            add_semantic_error(1, root->line);
+            return NULL;
+        }
+        return type;
+    }
+    // 数组解析
+    if (compareName(root, 4, "Exp", "LB", "Exp", "RB"))
+    {
+        Type type1 = Exp(root->child[0]);
+        Type type2 = Exp(root->child[2]);
+        if (type1 == NULL || type2 == NULL)
+            return NULL;
+        if (type1->kind != ARRAY)
+        { // 不是数组
+            add_semantic_error(10, root->line);
+            return NULL;
+        }
+        if (type2->kind != BASIC || type2->content.basic != INT_TYPE)
+        { // 下标不是整数
+            add_semantic_error(12, root->line);
+            return NULL;
+        }
+        return type1->content.array.elem;
+    }
+    // 结构体解析
+    if (compareName(root, 3, "Exp", "DOT", "ID"))
+    {
+        Type type = Exp(root->child[0]);
+        if (type == NULL)
+            return NULL;
+        if (type->kind != STRUCTURE)
+        {
+            add_semantic_error(13, root->line); // 不是结构体
+            return NULL;
+        }
+        Type field = find_symbol_in(type, root->child[2]->id);
+        if (field == NULL)
+        { // 域不存在
+            add_semantic_error(14, root->line);
+            return NULL;
+        }
+        return field;
+    }
+    assert(0);
+}
 // 表达式
 char *translate_Exp(TreeNode *root, Variable *place)
 {
@@ -449,7 +502,7 @@ char *translate_Exp(TreeNode *root, Variable *place)
             }
             else
             {
-                res="";
+                res = "";
             }
         }
     }
@@ -516,7 +569,7 @@ char *translate_Exp(TreeNode *root, Variable *place)
         Variable *t3 = createVar(new_temp());
         char *code1 = translate_Exp(root->child[0], t1);
         char *code2 = translate_Exp(root->child[2], t2);
-        Type element = find_symbol(root->child[0]->child[0]->id)->content.array.elem;
+        Type element = Exp(root->child[0])->content.array.elem;
         int size = size_of(element);
         if (place == NULL)
         {
@@ -536,7 +589,7 @@ char *translate_Exp(TreeNode *root, Variable *place)
         Variable *t1 = createVar(new_temp());
         Variable *t2 = createVar(new_temp());
         char *code1 = translate_Exp(root->child[0], t1);
-        Type stru = find_symbol(root->child[0]->child[0]->id);
+        Type stru = Exp(root->child[0]);
         int offset = 0;
         StructureField p = stru->content.stru.table;
         while (p)
@@ -550,7 +603,7 @@ char *translate_Exp(TreeNode *root, Variable *place)
         {
             return "";
         }
-        res = malloc(2 * strlen(getVar(t1)) + strlen(code1) + strlen(getVar(place) + 300));
+        res = malloc(2 * strlen(getVar(t1)) + strlen(code1) + strlen(getVar(place)) + 300);
         sprintf(res, "%s%s := %s + #%d\n%s := %s\n", code1, getVar(t2), getVar(t1), offset, getVar(place), getVar(t2));
         place->is_pointer = true;
         if (p->type->kind == ARRAY || p->type->kind == STRUCTURE)
@@ -593,7 +646,7 @@ char *translate_Exp(TreeNode *root, Variable *place)
             if (place != NULL)
             {
                 res = malloc(strlen(code1) + strlen(getVar(place)) + strlen(getVar(arglist[0])) + 300);
-                sprintf(res, "%sWRITE %s%s := #0\n", code1, getVar(arglist[0]), getVar(place));
+                sprintf(res, "%sWRITE %s\n%s := #0\n", code1, getVar(arglist[0]), getVar(place));
             }
             else
             {
