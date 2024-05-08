@@ -2077,7 +2077,7 @@ int main(int argc, char** argv) {
     yyparse();
     //yylex();
     // if(!my_is_error)
-    print_tree(root,0);
+    //print_tree(root,0);
     assert(!my_is_error);
 
     Program(root);
@@ -2087,7 +2087,7 @@ int main(int argc, char** argv) {
     char*res=removeEmptyLines(translate_Program(root));
     if(strlen(res)==0)
         return 0;
-    FILE *fp=fopen("./a.ir","w");
+    FILE *fp=fopen("./a.ir","w");//./workdir
     //输出中间代码
     fprintf(fp,"%s",res);
     fclose(fp);

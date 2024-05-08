@@ -1,8 +1,8 @@
 #include "ir.h"
 int temp_cnt = 0;
 int label_cnt = 0;
-//sudo bash ./run.sh -r ../../../NJU_compiler/Code/parser -e extend1 -c
-// 比较文法
+// sudo bash ./run.sh -r ../../../NJU_compiler/Code/parser -e extend1 -c
+//  比较文法
 static bool compareName(TreeNode *root, int num, ...)
 { // num必须从小到大遍历
     if (!root || root->child_num != num)
@@ -415,13 +415,14 @@ char *translate_DecList(TreeNode *root, Type type)
 // 声明单项
 char *translate_Dec(TreeNode *root, Type type)
 {
+    Variable *t1 = createVar(new_temp());
     char *code = translate_VarDec(root->child[0], type, false);
     char *res = code;
     if (compareName(root, 3, "VarDec", "ASSIGNOP", "Exp"))
     {
-        char *code1 = translate_Exp(root->child[2], createVar(VarDec_id(root->child[0])));
+        char *code1 = translate_Exp(root->child[2], t1);
         res = malloc(strlen(code1) + strlen(code) + 300);
-        sprintf(res, "%s%s\n", code, code1);
+        sprintf(res, "%s%s%s := %s\n", code, code1, VarDec_id(root->child[0]), getVar(t1));
     }
     return res;
 }
@@ -448,7 +449,7 @@ char *translate_Exp(TreeNode *root, Variable *place)
             }
             else
             {
-                assert(0);
+                res="";
             }
         }
     }
@@ -484,11 +485,15 @@ char *translate_Exp(TreeNode *root, Variable *place)
         {
             return "";
         }
-        sprintf(res, "%s := %s\n", getVar(place), root->child[0]->id);
         if (find_symbol(root->child[0]->id)->kind == ARRAY || find_symbol(root->child[0]->id)->kind == STRUCTURE)
         {
+            sprintf(res, "%s := &%s\n", getVar(place), root->child[0]->id);
             place->is_pointer = true;
             place->is_sa = true;
+        }
+        else
+        {
+            sprintf(res, "%s := %s\n", getVar(place), root->child[0]->id);
         }
     }
     // 负号
@@ -518,7 +523,7 @@ char *translate_Exp(TreeNode *root, Variable *place)
             return "";
         }
         res = malloc(3 * strlen(getVar(t1)) + 3 * strlen(getVar(t2)) + strlen(code1) + strlen(code2) + strlen(getVar(place)) + 300);
-        sprintf(res, "%s%s%s := %s * #%d\n%s := %s + %s\n%s := %s\n", code1, code2, getVar(t3), getVar(t2), size, getVar(t2), getVar(t1), getVar(t3), getVar(place), getVar(t2));
+        sprintf(res, "%s%s%s := %s * #%d\n%s := %s + %s\n%s := %s\n", code1, code2, getVar(t3), getVar(t2), size, getVar(t1), getVar(t1), getVar(t3), getVar(place), getVar(t1));
         place->is_pointer = true;
         if (element->kind == ARRAY || element->kind == STRUCTURE)
         {
@@ -567,16 +572,12 @@ char *translate_Exp(TreeNode *root, Variable *place)
         }
         else
         {
-            if (place != NULL)
+            if (place == NULL)
             {
-                res = malloc(strlen(getVar(place)) + strlen(root->child[0]->id) + 300);
-                sprintf(res, "%s := CALL %s\n", getVar(place), root->child[0]->id);
+                place = createVar(new_temp());
             }
-            else
-            {
-                res = malloc(strlen(root->child[0]->id) + 300);
-                sprintf(res, "CALL %s\n", root->child[0]->id);
-            }
+            res = malloc(strlen(getVar(place)) + strlen(root->child[0]->id) + 300);
+            sprintf(res, "%s := CALL %s\n", getVar(place), root->child[0]->id);
         }
     }
     // 有参函数调用
@@ -609,16 +610,12 @@ char *translate_Exp(TreeNode *root, Variable *place)
                 sprintf(t, "ARG %s\n", getVar(arglist[i]));
                 strcat(code2, t);
             }
-            if (place != NULL)
+            if (place == NULL)
             {
-                res = malloc(strlen(code1) + strlen(code2) + strlen(getVar(place)) + strlen(root->child[0]->id) + 300);
-                sprintf(res, "%s%s%s := CALL %s\n", code1, code2, getVar(place), root->child[0]->id);
+                place = createVar(new_temp());
             }
-            else
-            {
-                res = malloc(strlen(code1) + strlen(code2) + strlen(root->child[0]->id) + 300);
-                sprintf(res, "%s%sCALL %s\n", code1, code2, root->child[0]->id);
-            }
+            res = malloc(strlen(code1) + strlen(code2) + strlen(getVar(place)) + strlen(root->child[0]->id) + 300);
+            sprintf(res, "%s%s%s := CALL %s\n", code1, code2, getVar(place), root->child[0]->id);
         }
     }
 
@@ -664,7 +661,6 @@ char *translate_Exp(TreeNode *root, Variable *place)
     {
         if (place == NULL)
         {
-            assert(0);
             return "";
         }
         char *label1 = new_label();
@@ -673,7 +669,7 @@ char *translate_Exp(TreeNode *root, Variable *place)
         sprintf(code0, "%s := #0\n", getVar(place));
         char *code1 = translate_Cond(root, label1, label2);
         res = malloc(strlen(code0) + strlen(code1) + strlen(label1) + strlen(label2) + strlen(getVar(place)) + 300);
-        sprintf(res, "%s%s\nLABEL %s\n%s := #1\n", code0, code1, label1, getVar(place));
+        sprintf(res, "%s%s\nLABEL %s :\n%s := #1\nLABEL %s :\n", code0, code1, label1, getVar(place), label2);
     }
     assert(res != NULL);
     return res;
