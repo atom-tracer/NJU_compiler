@@ -173,7 +173,7 @@ char *translate_VarDec(TreeNode *root, Type type, bool isVarlist)
         if (compareName(root, 1, "ID"))
         {
             char *ret = malloc(strlen(root->child[0]->id) + 10);
-            sprintf(ret, "%s\n", root->child[0]->id);
+            sprintf(ret, "PARAM %s\n", root->child[0]->id);
             return ret;
         }
         else if (compareName(root, 4, "VarDec", "LB", "INT", "RB"))
