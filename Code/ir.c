@@ -319,7 +319,7 @@ char *translate_Cond(TreeNode *root, char *label_true, char *label_false)
         char *code2 = translate_Exp(root->child[2], t2);
         char *op = get_relop(root->child[1]);
         char *code3 = malloc(strlen(getVar(t1)) + strlen(getVar(t2)) + strlen(op) + strlen(label_true) + 20);
-        //TODO
+        sprintf(code3, "IF %s %s %s GOTO %s\n", t1, op, t2, label_true);
         char *ret = malloc(strlen(code1) + strlen(code2) + strlen(code3) + strlen(label_false) + 20);
         sprintf(ret, "%s%s%sGOTO %s\n", code1, code2, code3, label_false);
         return ret;
