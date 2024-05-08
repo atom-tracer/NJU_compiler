@@ -31,6 +31,15 @@ bool check_func_definition()
 }
 bool Program(TreeNode *root)
 {
+    //初始化添加库函数read write
+    Type type1 = createFunction(createBasic(INT_TYPE), FUNCTION_DEFINITION, NULL);
+    add_symbol("read", type1);
+    StructureField *field = malloc(sizeof(StructureField));
+    *field = NULL;
+    addNode(field, createBasic(INT_TYPE), NULL);
+    Type type2 = createFunction(createBasic(INT_TYPE), FUNCTION_DEFINITION, *field);
+    add_symbol("write", type2);
+    
     bool state = true;
     state = ExtDefList(root->child[0]) && state;
     state = check_func_definition() && state;

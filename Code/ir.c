@@ -47,6 +47,7 @@ char *translate_Program(TreeNode *root)
                 return "";
             }
         }
+        field = field->next;
     }
     return translate_ExtDefList(root->child[0]);
 }
@@ -319,7 +320,7 @@ char *translate_Cond(TreeNode *root, char *label_true, char *label_false)
         char *code2 = translate_Exp(root->child[2], t2);
         char *op = get_relop(root->child[1]);
         char *code3 = malloc(strlen(getVar(t1)) + strlen(getVar(t2)) + strlen(op) + strlen(label_true) + 20);
-        sprintf(code3, "IF %s %s %s GOTO %s\n", t1, op, t2, label_true);
+        sprintf(code3, "IF %s %s %s GOTO %s\n", getVar(t1), op, getVar(t2), label_true);
         char *ret = malloc(strlen(code1) + strlen(code2) + strlen(code3) + strlen(label_false) + 20);
         sprintf(ret, "%s%s%sGOTO %s\n", code1, code2, code3, label_false);
         return ret;
@@ -369,7 +370,7 @@ char *translate_DefList(TreeNode *root, bool isstru)
 char *translate_Def(TreeNode *root)
 {
     Type type = translate_Specifier(root->child[0]);
-    return translate_DecList(root->child[1],type);
+    return translate_DecList(root->child[1], type);
 }
 // 声明列表
 char *translate_DecList(TreeNode *root, Type type)
@@ -541,8 +542,16 @@ char *translate_Exp(TreeNode *root, Variable *place)
             Variable *t1 = createVar(new_temp());
             char *code1 = translate_Exp(root->child[2], t1);
             char *id = root->child[0]->child[0]->id;
-            res = malloc(strlen(getVar(t1)) + strlen(code1) + strlen(getVar(place)) + 30);
-            sprintf(res, "%s%s := %s\n%s := %s\n", code1, id, getVar(t1), getVar(place), id);
+            if (place != NULL)
+            {
+                res = malloc(strlen(getVar(t1)) + strlen(code1) + strlen(getVar(place)) + 30);
+                sprintf(res, "%s%s := %s\n%s := %s\n", code1, id, getVar(t1), getVar(place), id);
+            }
+            else
+            {
+                res = malloc(strlen(getVar(t1)) + strlen(code1) + strlen(id) + 30);
+                sprintf(res, "%s%s := %s\n", code1, id, getVar(t1));
+            }
         }
         else
         {
@@ -550,8 +559,16 @@ char *translate_Exp(TreeNode *root, Variable *place)
             Variable *t2 = createVar(new_temp());
             char *code1 = translate_Exp(root->child[0], t1);
             char *code2 = translate_Exp(root->child[2], t2);
-            res = malloc(strlen(getVar(t1)) + strlen(getVar(t2)) + strlen(code1) + strlen(code2) + strlen(getVar(place)) + 30);
-            sprintf(res, "%s%s%s := %s\n%s := %s\n", code1, code2, getVar(t1), getVar(t2), getVar(place), getVar(t1));
+            if (place != NULL)
+            {
+                res = malloc(strlen(getVar(t1)) + strlen(getVar(t2)) + strlen(code1) + strlen(code2) + strlen(getVar(place)) + 30);
+                sprintf(res, "%s%s%s := %s\n%s := %s\n", code1, code2, getVar(t1), getVar(t2), getVar(place), getVar(t1));
+            }
+            else{
+                res = malloc(strlen(getVar(t1)) + strlen(getVar(t2)) + strlen(code1) + strlen(code2) + 30);
+                sprintf(res, "%s%s%s := %s\n", code1, code2, getVar(t1), getVar(t2));
+            
+            }
         }
     }
     // 布尔表达式
