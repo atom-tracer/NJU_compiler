@@ -156,7 +156,6 @@ char *translate_Tag(TreeNode *root)
 }
 char *translate_VarDec(TreeNode *root, Type type, bool isVarlist)
 {
-    char *res;
     if (isVarlist)
     {
         if (compareName(root, 1, "ID"))
@@ -177,16 +176,22 @@ char *translate_VarDec(TreeNode *root, Type type, bool isVarlist)
             if (type->kind == STRUCTURE || type->kind == ARRAY)
             {
                 int size = size_of(type);
-                res = malloc(strlen(root->child[0]->id) + 300);
-                sprintf(res, "DEC %s %d\n", root->child[0]->id, size);
+                char *ret = malloc(strlen(root->child[0]->id) + 300);
+                sprintf(ret, "DEC %s %d\n", root->child[0]->id, size);
+                return ret;
+            }
+            else
+            {
+                return "";
             }
         }
         else if (compareName(root, 4, "VarDec", "LB", "INT", "RB"))
         {
-            res = translate_VarDec(root->child[0], createArray(type, root->child[2]->int_val), isVarlist);
+            return translate_VarDec(root->child[0], createArray(type, root->child[2]->int_val), isVarlist);
         }
+        else
+            assert(0);
     }
-    return res;
 }
 char *VarDec_id(TreeNode *root)
 {
@@ -382,7 +387,7 @@ char *translate_DefList(TreeNode *root, bool isstru)
     else
     {
         char *res = malloc(strlen(code1) + strlen(code2) + 300);
-        sprintf(res, "%s%s\n", code1, code2);
+        sprintf(res, "%s%s", code1, code2);
         return res;
     }
 }
