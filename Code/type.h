@@ -4,6 +4,7 @@
 #include "tree.h"
 #include "tools.h"
 #include <stdarg.h>
+#include <string.h>
 // 类型
 typedef struct Type_ *Type;
 typedef struct StructureField_ *StructureField;
@@ -76,16 +77,5 @@ struct Variable{
     bool is_pointer;
     bool is_sa;
 };
-char* getVar(Variable*var){
-    char*temp=malloc(strlen(var->name)+2);
-    if(var->is_pointer&&!var->is_sa){
-        sprintf(temp,"*%s",var->name);
-    }
-    else{
-        sprintf(temp,"%s",var->name);
-    }
-    return temp;
-}
-Variable* createVar(char*name){
-    return (Variable*){name,false,false};
-}
+char* getVar(Variable*var);
+Variable* createVar(char*name);
