@@ -35,9 +35,9 @@ syntax-c: $(YFILE)
 .PHONY: clean test
 
 test:
-	for file in ../Test/test_2/*.cmm; do \
+	for file in ../Test/lab3/*.cmm; do \
 		filename=$$(basename "$$file" .cmm); \
-		./parser "$$file" > ../Test/exp2/"$$filename".txt; \
+		./parser "$$file" > ../Test/exp_lab3/"$$filename".txt; \
 	done
 
 
