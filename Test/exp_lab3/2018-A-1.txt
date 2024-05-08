@@ -57,21 +57,21 @@ Program (1)
                 ASSIGNOP
                 Exp (6)
                   Exp (6)
-                    ID: a
-                  STAR
-                  Exp (6)
                     Exp (6)
                       ID: a
                     STAR
                     Exp (6)
-                      LP
+                      ID: a
+                  STAR
+                  Exp (6)
+                    LP
+                    Exp (6)
                       Exp (6)
-                        Exp (6)
-                          ID: a
-                        PLUS
-                        Exp (6)
-                          INT: 2
-                      RP
+                        ID: a
+                      PLUS
+                      Exp (6)
+                        INT: 2
+                    RP
               SEMI
             StmtList (7)
               Stmt (7)
@@ -119,32 +119,32 @@ Program (1)
                         Exp (10)
                           Exp (10)
                             Exp (10)
-                              ID: a
-                            PLUS
-                            Exp (10)
-                              ID: b
-                          MINUS
-                          Exp (10)
-                            Exp (10)
-                              ID: c
-                            STAR
-                            Exp (10)
                               Exp (10)
-                                INT: 3
+                                ID: a
                               PLUS
                               Exp (10)
-                                LP
+                                ID: b
+                            MINUS
+                            Exp (10)
+                              Exp (10)
+                                ID: c
+                              STAR
+                              Exp (10)
+                                INT: 3
+                          PLUS
+                          Exp (10)
+                            LP
+                            Exp (10)
+                              Exp (10)
                                 Exp (10)
-                                  Exp (10)
-                                    Exp (10)
-                                      ID: b
-                                    DIV
-                                    Exp (10)
-                                      ID: a
-                                  MINUS
-                                  Exp (10)
-                                    INT: 4
-                                RP
+                                  ID: b
+                                DIV
+                                Exp (10)
+                                  ID: a
+                              MINUS
+                              Exp (10)
+                                INT: 4
+                            RP
                       SEMI
                     StmtList (11)
                       Stmt (11)

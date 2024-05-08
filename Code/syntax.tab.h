@@ -73,8 +73,7 @@ extern int yydebug;
     ELSE = 283,
     WHILE = 284,
     ASSIGN = 285,
-    MUL = 286,
-    LOWER_THAN_ELSE = 287
+    LOWER_THAN_ELSE = 286
   };
 #endif
 
@@ -87,7 +86,7 @@ union YYSTYPE
 
     TreeNode* val;
 
-#line 91 "./syntax.tab.h" /* yacc.c:1909  */
+#line 90 "./syntax.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;
