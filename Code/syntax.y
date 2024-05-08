@@ -43,7 +43,7 @@
 %left AND
 %left RELOP
 %left PLUS MINUS
-%left MUL DIV
+%left STAR DIV
 %right NOT
 %left LP RP LB RB DOT
 

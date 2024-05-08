@@ -82,8 +82,7 @@ extern int yydebug;
     ELSE = 283,                    /* ELSE  */
     WHILE = 284,                   /* WHILE  */
     ASSIGN = 285,                  /* ASSIGN  */
-    MUL = 286,                     /* MUL  */
-    LOWER_THAN_ELSE = 287          /* LOWER_THAN_ELSE  */
+    LOWER_THAN_ELSE = 286          /* LOWER_THAN_ELSE  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -96,7 +95,7 @@ union YYSTYPE
 
     TreeNode* val;
 
-#line 100 "./syntax.tab.h"
+#line 99 "./syntax.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
