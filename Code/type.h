@@ -74,10 +74,11 @@ typedef struct Variable Variable;
 struct Variable{
     char*name;
     bool is_pointer;
+    bool is_sa;
 };
 char* getVar(Variable*var){
     char*temp=malloc(strlen(var->name)+2);
-    if(var->is_pointer){
+    if(var->is_pointer&&!var->is_sa){
         sprintf(temp,"*%s",var->name);
     }
     else{
@@ -86,5 +87,5 @@ char* getVar(Variable*var){
     return temp;
 }
 Variable* createVar(char*name){
-    return (Variable*){name,false};
+    return (Variable*){name,false,false};
 }
