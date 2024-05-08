@@ -280,7 +280,7 @@ char *translate_Stmt(TreeNode *root)
     {
         char *label1 = new_label();
         char *label2 = new_label();
-        char *code1 = translate_Cond(root->child[0], label1, label2);
+        char *code1 = translate_Cond(root->child[2], label1, label2);
         char *code2 = translate_Stmt(root->child[4]);
         char *ret = malloc(strlen(code1) + strlen(label1) + strlen(code2) + strlen(label2) + 10);
         sprintf(ret, "%sLABEL: %s:\n%sLABEL: %s:\n", code1, label1, code2, label2);
@@ -291,9 +291,10 @@ char *translate_Stmt(TreeNode *root)
         char *label1 = new_label();
         char *label2 = new_label();
         char *label3 = new_label();
-        char *code1 = translate_Cond(root->child[0], label1, label2);
+        char *code1 = translate_Cond(root->child[2], label1, label2);
         char *code2 = translate_Stmt(root->child[4]);
         char *code3 = translate_Stmt(root->child[6]);
+        //printf("%d\n", strlen(code1) + strlen(label1) + strlen(code2) + strlen(label2) + strlen(code3) + strlen(label3) + 30);
         char *ret = malloc(strlen(code1) + strlen(label1) + strlen(code2) + strlen(label2) + strlen(code3) + strlen(label3) + 30);
         sprintf(ret, "%sLABEL: %s:\n%sGOTO %s\nLABEL: %s:\n%sLABEL %s:\n", code1, label1, code2, label3, label2, code3, label3);
         return ret;
@@ -303,7 +304,7 @@ char *translate_Stmt(TreeNode *root)
         char *label1 = new_label();
         char *label2 = new_label();
         char *label3 = new_label();
-        char *code1 = translate_Cond(root->child[0], label2, label3);
+        char *code1 = translate_Cond(root->child[2], label2, label3);
         char *code2 = translate_Stmt(root->child[4]);
         char *ret = malloc(strlen(label1) + strlen(code1) + strlen(label2) + strlen(code2) + strlen(label1) + strlen(label3) + 30);
         sprintf(ret, "LABEL %s:\n%sLABEL %s:\n%sGOTO %s\nLABEL %s:\n", label1, code1, label2, code2, label1, label3);
@@ -423,8 +424,15 @@ char *translate_Exp(TreeNode *root, Variable *place)
             Variable *t2 = createVar(new_temp());
             char *code1 = translate_Exp(root->child[0], t1);
             char *code2 = translate_Exp(root->child[2], t2);
-            res = malloc(strlen(getVar(t1)) + strlen(getVar(t2)) + strlen(code1) + strlen(code2) + strlen(getVar(place)) + 30);
-            sprintf(res, "%s%s%s := %s %s %s\n", code1, code2, getVar(place), getVar(t1), basic3OperatorCode[i], getVar(t2));
+            if (place != NULL)
+            {
+                res = malloc(strlen(getVar(t1)) + strlen(getVar(t2)) + strlen(code1) + strlen(code2) + strlen(getVar(place)) + 30);
+                sprintf(res, "%s%s%s := %s %s %s\n", code1, code2, getVar(place), getVar(t1), basic3OperatorCode[i], getVar(t2));
+            }
+            else
+            {
+                assert(0);
+            }
         }
     }
     // 括号
@@ -435,17 +443,30 @@ char *translate_Exp(TreeNode *root, Variable *place)
     {
         int val = root->child[0]->int_val;
         res = malloc(30);
+        if (place == NULL)
+        {
+            return "";
+        }
         sprintf(res, "%s := #%d\n", getVar(place), val);
     }
     if (compareName(root, 1, "FLOAT"))
     {
         float val = root->child[0]->float_val;
         res = malloc(30);
+        if (place == NULL)
+        {
+            return "";
+        }
         sprintf(res, "%s := #%f\n", getVar(place), val);
     }
     // 变量
     if (compareName(root, 1, "ID"))
     {
+        res = malloc(30);
+        if (place == NULL)
+        {
+            return "";
+        }
         sprintf(res, "%s := %s\n", getVar(place), root->child[0]->id);
         if (find_symbol(root->child[0]->id)->kind == ARRAY || find_symbol(root->child[0]->id)->kind == STRUCTURE)
         {
@@ -459,6 +480,10 @@ char *translate_Exp(TreeNode *root, Variable *place)
         Variable *t1 = createVar(new_temp());
         char *code1 = translate_Exp(root->child[1], t1);
         res = malloc(strlen(getVar(t1)) + strlen(code1) + strlen(code1) + 30);
+        if (place == NULL)
+        {
+            return "";
+        }
         sprintf(res, "%s%s := #0 - %s\n", code1, getVar(place), getVar(t1));
     }
     // 数组解析
@@ -470,6 +495,10 @@ char *translate_Exp(TreeNode *root, Variable *place)
         char *code2 = translate_Exp(root->child[2], t2);
         Type element = find_symbol(root->child[0]->id)->content.array.elem;
         int size = size_of(element);
+        if (place == NULL)
+        {
+            return "";
+        }
         res = malloc(3 * strlen(getVar(t1)) + 3 * strlen(getVar(t2) + strlen(code1) + strlen(code2) + strlen(getVar(place)) + 30));
         sprintf(res, "%s%s%s := %s * %d\n%s := %s + %s\n%s := %s\n", code1, code2, getVar(t2), getVar(t2), size, getVar(t1), getVar(t1), getVar(t2), getVar(place), getVar(t1));
         place->is_pointer = true;
@@ -493,6 +522,10 @@ char *translate_Exp(TreeNode *root, Variable *place)
             offset += size_of(p->type);
             p = p->next;
         }
+        if (place == NULL)
+        {
+            return "";
+        }
         res = malloc(2 * strlen(getVar(t1)) + strlen(code1) + strlen(getVar(place) + 30));
         sprintf(res, "%s%s := %s + %d\n%s := %s\n", code1, getVar(t1), getVar(t1), offset, getVar(place), getVar(t1));
         place->is_pointer = true;
@@ -506,13 +539,25 @@ char *translate_Exp(TreeNode *root, Variable *place)
     {
         if (strcmp(root->child[0]->id, "read"))
         {
+            if (place == NULL)
+            {
+                return "";
+            }
             res = malloc(strlen(getVar(place)) + 30);
             sprintf(res, "READ %s\n", getVar(place));
         }
         else
         {
-            res = malloc(strlen(getVar(place)) + strlen(root->child[0]->id) + 30);
-            sprintf(res, "%s := CALL %s\n", getVar(place), root->child[0]->id);
+            if (place != NULL)
+            {
+                res = malloc(strlen(getVar(place)) + strlen(root->child[0]->id) + 30);
+                sprintf(res, "%s := CALL %s\n", getVar(place), root->child[0]->id);
+            }
+            else
+            {
+                res = malloc(strlen(root->child[0]->id) + 30);
+                sprintf(res, "CALL %s\n", root->child[0]->id);
+            }
         }
     }
     // 有参函数调用
@@ -525,8 +570,16 @@ char *translate_Exp(TreeNode *root, Variable *place)
         if (strcmp(root->child[0]->id, "write"))
         {
             assert(cnt == 1);
-            res = malloc(strlen(code1) + strlen(getVar(place)) + strlen(getVar(arglist[0])) + 30);
-            sprintf(res, "%sWRITE %s%s := #0\n", code1, getVar(arglist[0]), getVar(place));
+            if (place != NULL)
+            {
+                res = malloc(strlen(code1) + strlen(getVar(place)) + strlen(getVar(arglist[0])) + 30);
+                sprintf(res, "%sWRITE %s%s := #0\n", code1, getVar(arglist[0]), getVar(place));
+            }
+            else
+            {
+                res = malloc(strlen(code1) + strlen(getVar(arglist[0])) + 30);
+                sprintf(res, "%sWRITE %s\n", code1, getVar(arglist[0]));
+            }
         }
         else
         {
@@ -537,8 +590,16 @@ char *translate_Exp(TreeNode *root, Variable *place)
                 sprintf(t, "ARG %s\n", getVar(arglist[i]));
                 strcat(code2, t);
             }
-            res = malloc(strlen(code1) + strlen(code2) + strlen(getVar(place)) + strlen(root->child[0]->id) + 30);
-            sprintf(res, "%s%s%s := CALL %s\n", code1, code2, getVar(place), root->child[0]->id);
+            if (place != NULL)
+            {
+                res = malloc(strlen(code1) + strlen(code2) + strlen(getVar(place)) + strlen(root->child[0]->id) + 30);
+                sprintf(res, "%s%s%s := CALL %s\n", code1, code2, getVar(place), root->child[0]->id);
+            }
+            else
+            {
+                res = malloc(strlen(code1) + strlen(code2) + strlen(root->child[0]->id) + 30);
+                sprintf(res, "%s%sCALL %s\n", code1, code2, root->child[0]->id);
+            }
         }
     }
 
@@ -582,6 +643,10 @@ char *translate_Exp(TreeNode *root, Variable *place)
     // 布尔表达式
     if (compareName(root, 3, "Exp", "RELOP", "Exp") || compareName(root, 3, "Exp", "AND", "Exp") || compareName(root, 3, "Exp", "OR", "Exp") || compareName(root, 2, "NOT", "Exp"))
     {
+        if(place==NULL){
+            assert(0);
+            return "";
+        }
         char *label1 = new_label();
         char *label2 = new_label();
         char *code0 = malloc(30 + strlen(getVar(place)));
