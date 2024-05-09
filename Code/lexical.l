@@ -146,6 +146,7 @@ ID [a-zA-Z_][a-zA-Z0-9_]*
 %%
 
 int main(int argc, char** argv) { 
+    char*targetir="a.ir";
     if (argc > 1) 
     { 
         if (!(yyin = fopen(argv[1], "r"))) 
@@ -153,6 +154,10 @@ int main(int argc, char** argv) {
             perror(argv[1]); 
                 return 1; 
         }
+    }
+    if(argc>2)
+    {
+        targetir=argv[2];
     }
     // yydebug=1;
     yyrestart(yyin);
@@ -169,7 +174,9 @@ int main(int argc, char** argv) {
     char*res=removeEmptyLines(translate_Program(root));
     if(strlen(res)==0)
         return 0;
-    FILE *fp=fopen("./a.ir","w");//./workdir
+    char*path=malloc(100);
+    sprintf(path,"./%s",targetir);
+    FILE *fp=fopen(path,"w");//./workdir
     //输出中间代码
     fprintf(fp,"%s",res);
     fclose(fp);
