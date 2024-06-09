@@ -2087,7 +2087,7 @@ int main(int argc, char** argv) {
     char*res=removeEmptyLines(translate_Program(root));
     if(strlen(res)==0)
         return 0;
-    FILE *fp=fopen("./workdir/a.ir","w");//./workdir
+    FILE *fp=fopen("./a.ir","w");//./workdir
     //输出中间代码
     fprintf(fp,"%s",res);
     fclose(fp);
