@@ -37,7 +37,7 @@ syntax-c: $(YFILE)
 test:
 	for file in ../Test/test_4/*.cmm; do \
 		filename=$$(basename "$$file" .cmm); \
-		./parser "$$file" > ../Test/exp_lab3/"$$filename".txt; \
+		./parser "$$file" > ../Test/ir_lab4/"$$filename".txt; \
 	done
 
 

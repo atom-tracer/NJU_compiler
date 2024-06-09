@@ -1,7 +1,55 @@
-FUNCTION main :
-t0 := #1
-n := t0
+FUNCTION test :
+PARAM a1
+PARAM a2
+PARAM a3
+t0 := #0
+RETURN t0
+FUNCTION fact :
+PARAM n
 t1 := n
-a := t1
-t2 := #3
-a := t2
+t2 := #1
+IF t1 == t2 GOTO label0
+GOTO label1
+LABEL label0 :
+t3 := n
+RETURN t3
+GOTO label2
+LABEL label1 :
+t5 := n
+t8 := n
+t9 := #1
+t7 := t8 - t9
+ARG t7
+t6 := CALL fact
+t4 := t5 * t6
+RETURN t4
+LABEL label2 :
+FUNCTION main :
+t11 := #1
+t12 := #2
+t13 := #3
+ARG t13
+ARG t12
+ARG t11
+t10 := CALL test
+x := t10
+READ t16
+m := t16
+t17 := m
+t18 := #1
+IF t17 > t18 GOTO label3
+GOTO label4
+LABEL label3 :
+t20 := m
+ARG t20
+t19 := CALL fact
+result := t19
+GOTO label5
+LABEL label4 :
+t21 := #1
+result := t21
+LABEL label5 :
+t22 := result
+WRITE t22
+t23 := #0
+RETURN t23
