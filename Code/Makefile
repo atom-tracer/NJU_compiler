@@ -35,11 +35,10 @@ syntax-c: $(YFILE)
 .PHONY: clean test
 
 test:
-	for file in ../Test/lab3/*.cmm; do \
+	for file in ../Test/test_4/*.cmm; do \
 		filename=$$(basename "$$file" .cmm); \
 		./parser "$$file" > ../Test/exp_lab3/"$$filename".txt; \
 	done
-
 
 
 clean:

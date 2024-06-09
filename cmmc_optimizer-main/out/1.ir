@@ -1,0 +1,13 @@
+FUNCTION main :
+READ v1
+READ v3
+v15 := v1 + #1
+v16 := v15 * #2
+v18 := v16 + #4
+IF v18 == v16 GOTO L1
+LABEL L2 :
+GOTO L3
+LABEL L1 :
+LABEL L3 :
+RETURN #0
+
