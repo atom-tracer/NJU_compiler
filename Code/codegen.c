@@ -336,9 +336,9 @@ void genASM(char *IRcode)
         }
         // 将实参放入寄存器及栈上
         int TrueParamCnt = TrueParamListHead->Paramcnt;
-        if (TrueParamCnt >= 4)
+        if (TrueParamCnt > 4)
         {
-            fprintf(ASMfile, "addi $sp,$sp,-%d\n", (TrueParamCnt - 3) * 4);
+            fprintf(ASMfile, "addi $sp,$sp,-%d\n", (TrueParamCnt - 4) * 4);
         }
         TrueParamList *p = TrueParamListHead->next;
         for (int i = 0; i < TrueParamCnt; i++)
@@ -349,7 +349,7 @@ void genASM(char *IRcode)
             }
             else
             {
-                // TODO
+                sprintf(ASMfile, "sw %s,%d($sp)\n", RegisterDescriptionTable[getReg(p->name)].regname, (i - 4) * 4);
             }
             p = p->next;
         }
