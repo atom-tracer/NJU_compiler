@@ -67,7 +67,7 @@ void initCode()
     {
         RegisterDescriptionTable[i].cnt = 0;
         // RegisterDescriptionTable[i].timestamp = 0;
-        for (int j = 0; j < 7; j++)
+        for (int j = 0; j < 10; j++)
         {
             RegisterDescriptionTable[i].VarNames[j] = malloc(10);
         }
@@ -122,6 +122,17 @@ void TrueParamClear() // 把真实参数列表清空
     TrueParamListHead->next = NULL;
     TrueParamListHead->Paramcnt = 0;
     TrueParamListTail = TrueParamListHead;
+}
+void ParamRegClear() // 把传递实参会使用到的寄存器清空
+{
+    for (int i = 4; i <= 7; i++)
+    {
+        RegisterDescriptionTable[i].cnt = 0;
+        for (int j = 0; j < 10; j++)
+        {
+            memset(RegisterDescriptionTable[i].VarNames[j], 0, 10);
+        }
+    }
 }
 
 void PushVariableToStack(VaribleDescriptor *var) // 将一个局部变量压栈
@@ -481,6 +492,7 @@ void genASM(char *IRcode)
         // TrueFrameSize -= 14 * 4;
         fprintf(ASMfile, "  addi $sp,$sp,%d\n", 15 * 4);
         TrueFrameSize -= 15 * 4;
+        ParamRegClear();
     }
     else if (strcmp(eleArray[1], "=") == 0) // 在进行这种赋值操作之前，左值变量应当已经定义过了
     {

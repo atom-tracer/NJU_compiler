@@ -1,55 +1,151 @@
-FUNCTION test :
-PARAM a1
-PARAM a2
-PARAM a3
-t0 := #0
-RETURN t0
-FUNCTION fact :
-PARAM n
-t1 := n
-t2 := #1
-IF t1 == t2 GOTO label0
+FUNCTION main :
+t2 := #2024
+year := t2
+t3 := #5
+month := t3
+t4 := year
+WRITE t4
+t5 := month
+WRITE t5
+t6 := year
+t10 := year
+t11 := #100
+t8 := t10 / t11
+t9 := #100
+t7 := t8 * t9
+IF t6 == t7 GOTO label0
 GOTO label1
 LABEL label0 :
-t3 := n
-RETURN t3
-GOTO label2
-LABEL label1 :
-t5 := n
-t8 := n
-t9 := #1
-t7 := t8 - t9
-ARG t7
-t6 := CALL fact
-t4 := t5 * t6
-RETURN t4
-LABEL label2 :
-FUNCTION main :
-t11 := #1
-t12 := #2
-t13 := #3
-ARG t13
-ARG t12
-ARG t11
-t10 := CALL test
-x := t10
-t16 := #6
-m := t16
-t17 := m
-t18 := #1
-IF t17 > t18 GOTO label3
+t12 := year
+t16 := year
+t17 := #400
+t14 := t16 / t17
+t15 := #400
+t13 := t14 * t15
+IF t12 == t13 GOTO label3
 GOTO label4
 LABEL label3 :
-t20 := m
-ARG t20
-t19 := CALL fact
-result := t19
+t18 := month
+t19 := #2
+IF t18 == t19 GOTO label6
+GOTO label7
+LABEL label6 :
+t20 := #29
+WRITE t20
+GOTO label8
+LABEL label7 :
+t21 := month
+t25 := month
+t26 := #2
+t23 := t25 / t26
+t24 := #2
+t22 := t23 * t24
+IF t21 == t22 GOTO label9
+GOTO label10
+LABEL label9 :
+t27 := #30
+WRITE t27
+GOTO label11
+LABEL label10 :
+t28 := #31
+WRITE t28
+LABEL label11 :
+LABEL label8 :
 GOTO label5
 LABEL label4 :
-t21 := #1
-result := t21
+t29 := month
+t30 := #2
+IF t29 == t30 GOTO label12
+GOTO label13
+LABEL label12 :
+t31 := #28
+WRITE t31
+GOTO label14
+LABEL label13 :
+t32 := month
+t36 := month
+t37 := #2
+t34 := t36 / t37
+t35 := #2
+t33 := t34 * t35
+IF t32 == t33 GOTO label15
+GOTO label16
+LABEL label15 :
+t38 := #30
+WRITE t38
+GOTO label17
+LABEL label16 :
+t39 := #31
+WRITE t39
+LABEL label17 :
+LABEL label14 :
 LABEL label5 :
-t22 := result
-WRITE t22
-t23 := #0
-RETURN t23
+GOTO label2
+LABEL label1 :
+t40 := year
+t44 := year
+t45 := #4
+t42 := t44 / t45
+t43 := #4
+t41 := t42 * t43
+IF t40 == t41 GOTO label18
+GOTO label19
+LABEL label18 :
+t46 := month
+t47 := #2
+IF t46 == t47 GOTO label21
+GOTO label22
+LABEL label21 :
+t48 := #29
+WRITE t48
+GOTO label23
+LABEL label22 :
+t49 := month
+t53 := month
+t54 := #2
+t51 := t53 / t54
+t52 := #2
+t50 := t51 * t52
+IF t49 == t50 GOTO label24
+GOTO label25
+LABEL label24 :
+t55 := #30
+WRITE t55
+GOTO label26
+LABEL label25 :
+t56 := #31
+WRITE t56
+LABEL label26 :
+LABEL label23 :
+GOTO label20
+LABEL label19 :
+t57 := month
+t58 := #2
+IF t57 == t58 GOTO label27
+GOTO label28
+LABEL label27 :
+t59 := #28
+WRITE t59
+GOTO label29
+LABEL label28 :
+t60 := month
+t64 := month
+t65 := #2
+t62 := t64 / t65
+t63 := #2
+t61 := t62 * t63
+IF t60 == t61 GOTO label30
+GOTO label31
+LABEL label30 :
+t66 := #30
+WRITE t66
+GOTO label32
+LABEL label31 :
+t67 := #31
+WRITE t67
+LABEL label32 :
+LABEL label29 :
+LABEL label20 :
+LABEL label2 :
+t68 := #0
+RETURN t68
