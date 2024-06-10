@@ -6,6 +6,9 @@
 #include <string.h>
 #include "tools.h"
 typedef __uint32_t uint32_t;
+typedef int bool;
+#define true 1
+#define false 0
 enum PosRefType
 {
     POS_SP,
@@ -19,6 +22,7 @@ struct VaribleDescriptor
     int regNo;
     PosRefType posRef;
     int offset;
+    bool dirtybit;
     struct VaribleDescriptor *next;
     struct VaribleDescriptor *prev;
 };
