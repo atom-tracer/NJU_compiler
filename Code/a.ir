@@ -33,7 +33,7 @@ ARG t12
 ARG t11
 t10 := CALL test
 x := t10
-READ t16
+t16 := #6
 m := t16
 t17 := m
 t18 := #1

@@ -21,10 +21,9 @@ write:
   jr $ra
 
 test:
-  addi $sp, $sp, -40
-  sw $ra, 36($sp)
+  addi $sp, $sp, -36
   sw $fp, 32($sp)
-  addi $fp, $sp, 40
+  addi $fp, $sp, 36
   sw $s0, 0($sp)
   sw $s1, 4($sp)
   sw $s2, 8($sp)
@@ -43,16 +42,14 @@ test:
   lw $s5, 20($sp)
   lw $s6, 24($sp)
   lw $s7, 28($sp)
-  lw $ra, 36($sp)
   lw $fp, 32($sp)
-  addi $sp, $sp, 40
+  addi $sp, $sp, 36
   jr $ra
 
 fact:
-  addi $sp, $sp, -40
-  sw $ra, 36($sp)
+  addi $sp, $sp, -36
   sw $fp, 32($sp)
-  addi $fp, $sp, 40
+  addi $fp, $sp, 36
   sw $s0, 0($sp)
   sw $s1, 4($sp)
   sw $s2, 8($sp)
@@ -76,9 +73,8 @@ label0:
   lw $s5, 20($sp)
   lw $s6, 24($sp)
   lw $s7, 28($sp)
-  lw $ra, 36($sp)
   lw $fp, 32($sp)
-  addi $sp, $sp, 40
+  addi $sp, $sp, 36
   jr $ra
   j label2
 label1:
@@ -86,7 +82,7 @@ label1:
   move $t5,$a0
   li $t6,1
   sub $t7,$t5,$t6
-  addi $sp,$sp,-56
+  addi $sp,$sp,-60
   sw $t0,16($sp)
   sw $t1,20($sp)
   sw $t2,24($sp)
@@ -101,6 +97,7 @@ label1:
   sw $a1,4($sp)
   sw $a2,8($sp)
   sw $a3,12($sp)
+  sw $ra,56($sp)
   move $a0, $t7
   jal fact
   lw $t0,16($sp)
@@ -117,7 +114,8 @@ label1:
   lw $a1,4($sp)
   lw $a2,8($sp)
   lw $a3,12($sp)
-  addi $sp,$sp,56
+  lw $ra,56($sp)
+  addi $sp,$sp,60
   move $s0,$v0
   mul $s1,$t4,$s0
   move $v0, $s1
@@ -129,17 +127,15 @@ label1:
   lw $s5, 20($sp)
   lw $s6, 24($sp)
   lw $s7, 28($sp)
-  lw $ra, 36($sp)
   lw $fp, 32($sp)
-  addi $sp, $sp, 40
+  addi $sp, $sp, 36
   jr $ra
 label2:
 
 main:
-  addi $sp, $sp, -40
-  sw $ra, 36($sp)
+  addi $sp, $sp, -36
   sw $fp, 32($sp)
-  addi $fp, $sp, 40
+  addi $fp, $sp, 36
   sw $s0, 0($sp)
   sw $s1, 4($sp)
   sw $s2, 8($sp)
@@ -151,7 +147,7 @@ main:
   li $s2,1
   li $s3,2
   li $s4,3
-  addi $sp,$sp,-56
+  addi $sp,$sp,-60
   sw $t0,16($sp)
   sw $t1,20($sp)
   sw $t2,24($sp)
@@ -166,6 +162,7 @@ main:
   sw $a1,4($sp)
   sw $a2,8($sp)
   sw $a3,12($sp)
+  sw $ra,56($sp)
   move $a0, $s4
   move $a1, $s3
   move $a2, $s2
@@ -184,40 +181,11 @@ main:
   lw $a1,4($sp)
   lw $a2,8($sp)
   lw $a3,12($sp)
-  addi $sp,$sp,56
+  lw $ra,56($sp)
+  addi $sp,$sp,60
   move $s5,$v0
   move $s6,$s5
-  addi $sp,$sp,-56
-  sw $t0,16($sp)
-  sw $t1,20($sp)
-  sw $t2,24($sp)
-  sw $t3,28($sp)
-  sw $t4,32($sp)
-  sw $t5,36($sp)
-  sw $t6,40($sp)
-  sw $t7,44($sp)
-  sw $t8,48($sp)
-  sw $t9,52($sp)
-  sw $a0,0($sp)
-  sw $a1,4($sp)
-  sw $a2,8($sp)
-  sw $a3,12($sp)
-  jal read
-  lw $t0,16($sp)
-  lw $t1,20($sp)
-  lw $t2,24($sp)
-  lw $t3,28($sp)
-  lw $t4,32($sp)
-  lw $t5,36($sp)
-  lw $t6,40($sp)
-  lw $t7,44($sp)
-  lw $t8,48($sp)
-  lw $t9,52($sp)
-  lw $a0,0($sp)
-  lw $a1,4($sp)
-  lw $a2,8($sp)
-  lw $a3,12($sp)
-  addi $sp,$sp,56
+  li $s7,6
   move $t8,$s7
   move $t9,$t8
   addi $sp, $sp, -4
@@ -229,7 +197,7 @@ label3:
   addi $sp, $sp, -4
   sw $t1, 0($sp)
   move $t1,$t8
-  addi $sp,$sp,-56
+  addi $sp,$sp,-60
   sw $t0,16($sp)
   sw $t1,20($sp)
   sw $t2,24($sp)
@@ -244,6 +212,7 @@ label3:
   sw $a1,4($sp)
   sw $a2,8($sp)
   sw $a3,12($sp)
+  sw $ra,56($sp)
   move $a0, $t1
   jal fact
   lw $t0,16($sp)
@@ -260,7 +229,8 @@ label3:
   lw $a1,4($sp)
   lw $a2,8($sp)
   lw $a3,12($sp)
-  addi $sp,$sp,56
+  lw $ra,56($sp)
+  addi $sp,$sp,60
   addi $sp, $sp, -4
   sw $t2, 0($sp)
   move $t2,$v0
@@ -277,7 +247,7 @@ label5:
   addi $sp, $sp, -4
   sw $t5, 0($sp)
   move $t5,$t3
-  addi $sp,$sp,-56
+  addi $sp,$sp,-60
   sw $t0,16($sp)
   sw $t1,20($sp)
   sw $t2,24($sp)
@@ -292,6 +262,7 @@ label5:
   sw $a1,4($sp)
   sw $a2,8($sp)
   sw $a3,12($sp)
+  sw $ra,56($sp)
   move $a0, $t5
   jal write
   lw $t0,16($sp)
@@ -308,7 +279,8 @@ label5:
   lw $a1,4($sp)
   lw $a2,8($sp)
   lw $a3,12($sp)
-  addi $sp,$sp,56
+  lw $ra,56($sp)
+  addi $sp,$sp,60
   addi $sp, $sp, -4
   sw $t6, 0($sp)
   li $t6,0
@@ -322,7 +294,6 @@ label5:
   lw $s5, 20($sp)
   lw $s6, 24($sp)
   lw $s7, 28($sp)
-  lw $ra, 36($sp)
   lw $fp, 32($sp)
-  addi $sp, $sp, 40
+  addi $sp, $sp, 36
   jr $ra

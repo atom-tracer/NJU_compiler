@@ -317,16 +317,19 @@ void genASM(char *IRcode)
         // ParamClear();
         ParamCnt = 0;
         fprintf(ASMfile, "\n%s:\n", eleArray[1]);
-        int frameSize = 10 * 4;
+        // int frameSize = 10 * 4;
+        int frameSize = 9 * 4;
         TrueFrameSize += frameSize;
         fprintf(ASMfile, "  addi $sp, $sp, %d\n", -frameSize);
-        fprintf(ASMfile, "  sw $ra, %d($sp)\n", (frameSize - 4));
-        fprintf(ASMfile, "  sw $fp, %d($sp)\n", (frameSize - 8));
+        // fprintf(ASMfile, "  sw $ra, %d($sp)\n", (frameSize - 4));
+        // fprintf(ASMfile, "  sw $fp, %d($sp)\n", (frameSize - 8));
+        fprintf(ASMfile, "  sw $fp, %d($sp)\n", (frameSize - 4));
         fprintf(ASMfile, "  addi $fp, $sp, %d\n", frameSize);
         // 保存被调用者保存寄存器
         for (int i = 16; i <= 23; i++)
         {
-            fprintf(ASMfile, "  sw %s, %d($sp)\n", RegisterDescriptionTable[i].regname, frameSize - 4 * (10 - (i - 16)));
+            // fprintf(ASMfile, "  sw %s, %d($sp)\n", RegisterDescriptionTable[i].regname, frameSize - 4 * (10 - (i - 16)));
+            fprintf(ASMfile, "  sw %s, %d($sp)\n", RegisterDescriptionTable[i].regname, frameSize - 4 * (9 - (i - 16)));
         }
     }
     else if (strcmp(eleArray[0], "GOTO") == 0)
@@ -341,13 +344,16 @@ void genASM(char *IRcode)
             fprintf(ASMfile, "  addi $sp, $sp, %d\n", LocalFrameSize);
         LocalFrameSize = 0;
         //  恢复被调用者保存寄存器
-        int frameSize = (ParamListHead->Paramcnt + 10) * 4;
+        // int frameSize = (ParamListHead->Paramcnt + 10) * 4;
+        int frameSize = (ParamListHead->Paramcnt + 9) * 4;
         for (int i = 16; i <= 23; i++)
         {
-            fprintf(ASMfile, "  lw %s, %d($sp)\n", RegisterDescriptionTable[i].regname, frameSize - 4 * (10 - (i - 16)));
+            // fprintf(ASMfile, "  lw %s, %d($sp)\n", RegisterDescriptionTable[i].regname, frameSize - 4 * (10 - (i - 16)));
+            fprintf(ASMfile, "  lw %s, %d($sp)\n", RegisterDescriptionTable[i].regname, frameSize - 4 * (9 - (i - 16)));
         }
-        fprintf(ASMfile, "  lw $ra, %d($sp)\n", (frameSize - 4));
-        fprintf(ASMfile, "  lw $fp, %d($sp)\n", (frameSize - 8));
+        // fprintf(ASMfile, "  lw $ra, %d($sp)\n", (frameSize - 4));
+        // fprintf(ASMfile, "  lw $fp, %d($sp)\n", (frameSize - 8));
+        fprintf(ASMfile, "  lw $fp, %d($sp)\n", (frameSize - 4));
         fprintf(ASMfile, "  addi $sp, $sp, %d\n", frameSize);
         TrueFrameSize -= frameSize;
         fprintf(ASMfile, "  jr $ra\n");
@@ -383,9 +389,12 @@ void genASM(char *IRcode)
     else if (strcmp(eleArray[0], "CALL") == 0 || strcmp(eleArray[0], "WRITE") == 0 || strcmp(eleArray[0], "READ") == 0)
     {
         // 调用者保存寄存器
-        fprintf(ASMfile, "  addi $sp,$sp,-%d\n", 14 * 4);
-        TrueFrameSize += 14 * 4;
-        // 特殊对待WRITE
+        // fprintf(ASMfile, "  addi $sp,$sp,-%d\n", 14 * 4);
+        // TrueFrameSize += 14 * 4;
+        // 调用者应当保存ra
+        fprintf(ASMfile, "  addi $sp,$sp,-%d\n", 15 * 4);
+        TrueFrameSize += 15 * 4;
+        //  特殊对待WRITE
         if (strcmp(eleArray[0], "WRITE") == 0)
         {
             // 和ARG做的事情一样
@@ -409,6 +418,7 @@ void genASM(char *IRcode)
         {
             fprintf(ASMfile, "  sw %s,%d($sp)\n", RegisterDescriptionTable[i].regname, (i - 4) * 4);
         }
+        fprintf(ASMfile, "  sw $ra,%d($sp)\n", 14 * 4);
         // 将实参放入寄存器及栈上
         int TrueParamCnt = TrueParamListHead->Paramcnt;
         // 给多于4个的参数分配栈空间
@@ -465,8 +475,12 @@ void genASM(char *IRcode)
         {
             fprintf(ASMfile, "  lw %s,%d($sp)\n", RegisterDescriptionTable[i].regname, (i - 4) * 4);
         }
-        fprintf(ASMfile, "  addi $sp,$sp,%d\n", 14 * 4);
-        TrueFrameSize -= 14 * 4;
+        // 调用者恢复ra
+        fprintf(ASMfile, "  lw $ra,%d($sp)\n", 14 * 4);
+        // fprintf(ASMfile, "  addi $sp,$sp,%d\n", 14 * 4);
+        // TrueFrameSize -= 14 * 4;
+        fprintf(ASMfile, "  addi $sp,$sp,%d\n", 15 * 4);
+        TrueFrameSize -= 15 * 4;
     }
     else if (strcmp(eleArray[1], "=") == 0) // 在进行这种赋值操作之前，左值变量应当已经定义过了
     {
@@ -530,8 +544,23 @@ void genASM(char *IRcode)
             if (strcmp(eleArray[2], "CALL") == 0)
             {
                 // 调用者保存寄存器
-                fprintf(ASMfile, "  addi $sp,$sp,-%d\n", 14 * 4);
-                TrueFrameSize += 14 * 4;
+                // fprintf(ASMfile, "  addi $sp,$sp,-%d\n", 14 * 4);
+                // TrueFrameSize += 14 * 4;
+                // 调用者应当保存ra
+                fprintf(ASMfile, "  addi $sp,$sp,-%d\n", 15 * 4);
+                TrueFrameSize += 15 * 4;
+                //  特殊对待WRITE
+                if (strcmp(eleArray[0], "WRITE") == 0)
+                {
+                    // 和ARG做的事情一样
+                    TrueParamListTail->next = malloc(sizeof(TrueParamList));
+                    TrueParamListTail->next->prev = TrueParamListTail;
+                    TrueParamListTail = TrueParamListTail->next;
+                    strcpy(TrueParamListTail->name, eleArray[1]);
+                    TrueParamListTail->ParamNo = TrueParamListTail->prev->ParamNo + 1;
+                    TrueParamListTail->next = NULL;
+                    TrueParamListHead->Paramcnt++;
+                }
                 for (int i = 8; i <= 15; i++)
                 {
                     fprintf(ASMfile, "  sw %s,%d($sp)\n", RegisterDescriptionTable[i].regname, (i - 8 + 4) * 4);
@@ -544,8 +573,10 @@ void genASM(char *IRcode)
                 {
                     fprintf(ASMfile, "  sw %s,%d($sp)\n", RegisterDescriptionTable[i].regname, (i - 4) * 4);
                 }
+                fprintf(ASMfile, "  sw $ra,%d($sp)\n", 14 * 4);
                 // 将实参放入寄存器及栈上
                 int TrueParamCnt = TrueParamListHead->Paramcnt;
+                // 给多于4个的参数分配栈空间
                 if (TrueParamCnt > 4)
                 {
                     fprintf(ASMfile, "  addi $sp,$sp,-%d\n", (TrueParamCnt - 4) * 4);
@@ -568,7 +599,7 @@ void genASM(char *IRcode)
                 TrueParamClear();
                 // 调用函数
                 fprintf(ASMfile, "  jal %s\n", eleArray[3]);
-                // 回收多于4个的参数
+                //  回收多于4个的参数
                 if (ParamListHead->Paramcnt > 4)
                 {
                     fprintf(ASMfile, "  addi $sp,$sp,%d\n", (ParamListHead->Paramcnt - 4) * 4);
@@ -587,8 +618,12 @@ void genASM(char *IRcode)
                 {
                     fprintf(ASMfile, "  lw %s,%d($sp)\n", RegisterDescriptionTable[i].regname, (i - 4) * 4);
                 }
-                fprintf(ASMfile, "  addi $sp,$sp,%d\n", 14 * 4);
-                TrueFrameSize -= 14 * 4;
+                // 调用者恢复ra
+                fprintf(ASMfile, "  lw $ra,%d($sp)\n", 14 * 4);
+                // fprintf(ASMfile, "  addi $sp,$sp,%d\n", 14 * 4);
+                // TrueFrameSize -= 14 * 4;
+                fprintf(ASMfile, "  addi $sp,$sp,%d\n", 15 * 4);
+                TrueFrameSize -= 15 * 4;
                 fprintf(ASMfile, "  move %s,$v0\n", RegisterDescriptionTable[getReg(eleArray[0])].regname);
             }
             else
