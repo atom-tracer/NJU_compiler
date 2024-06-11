@@ -1,143 +1,137 @@
-FUNCTION Joseph :
-PARAM LEN
-DEC a 400
-t1 := #0
-i := t1
-t2 := LEN
-leftCount := t2
-t3 := #0
-index := t3
-t4 := #0
-count := t4
+FUNCTION squaRever :
+PARAM num
+t0 := #0
+flag := t0
+DEC array 12
+t2 := #0
+j := t2
+t5 := &array
+t6 := #0
+t7 := t6 * #4
+t5 := t5 + t7
+t3 := t5
+t8 := num
+t9 := #100
+t4 := t8 / t9
+*t3 := t4
+t12 := &array
+t13 := #1
+t14 := t13 * #4
+t12 := t12 + t14
+t10 := t12
+t17 := num
+t18 := #10
+t15 := t17 / t18
+t19 := #10
+t21 := &array
+t22 := #0
+t23 := t22 * #4
+t21 := t21 + t23
+t20 := t21
+t16 := t19 * *t20
+t11 := t15 - t16
+*t10 := t11
+t26 := &array
+t27 := #2
+t28 := t27 * #4
+t26 := t26 + t28
+t24 := t26
+t31 := num
+t33 := #100
+t35 := &array
+t36 := #0
+t37 := t36 * #4
+t35 := t35 + t37
+t34 := t35
+t32 := t33 * *t34
+t29 := t31 - t32
+t38 := #10
+t40 := &array
+t41 := #1
+t42 := t41 * #4
+t40 := t40 + t42
+t39 := t40
+t30 := t38 * *t39
+t25 := t29 - t30
+*t24 := t25
+t45 := &array
+t46 := #0
+t47 := t46 * #4
+t45 := t45 + t47
+t43 := t45
+t48 := &array
+t49 := #2
+t50 := t49 * #4
+t48 := t48 + t50
+t44 := t48
+IF *t43 != *t44 GOTO label0
+GOTO label1
 LABEL label0 :
-t5 := i
-t6 := LEN
-IF t5 < t6 GOTO label1
+t51 := #0
+flag := t51
 GOTO label2
 LABEL label1 :
-t9 := &a
-t10 := i
-t11 := t10 * #4
-t9 := t9 + t11
-t7 := t9
-t8 := #1
-*t7 := t8
-t13 := i
-t14 := #1
-t12 := t13 + t14
-i := t12
-GOTO label0
-LABEL label2 :
 LABEL label3 :
-t15 := leftCount
-t16 := #2
-IF t15 > t16 GOTO label4
+t52 := j
+t53 := #12
+IF t52 < t53 GOTO label4
 GOTO label5
 LABEL label4 :
-t19 := &a
-t20 := index
-t21 := t20 * #4
-t19 := t19 + t21
-t17 := t19
-t18 := #1
-IF *t17 == t18 GOTO label6
+t58 := j
+t59 := j
+t56 := t58 * t59
+t57 := num
+t54 := t56 - t57
+t55 := #0
+IF t54 == t55 GOTO label6
 GOTO label7
 LABEL label6 :
-t23 := count
-t24 := #1
-t22 := t23 + t24
-count := t22
-t25 := #3
-t26 := count
-IF t25 == t26 GOTO label8
-GOTO label9
-LABEL label8 :
-t29 := &a
-t30 := index
-t31 := t30 * #4
-t29 := t29 + t31
-t27 := t29
-t28 := #0
-*t27 := t28
-t32 := #0
-count := t32
-t34 := leftCount
-t35 := #1
-t33 := t34 - t35
-leftCount := t33
-LABEL label9 :
+t60 := #1
+flag := t60
 LABEL label7 :
-t37 := index
-t38 := #1
-t36 := t37 + t38
-index := t36
-t39 := index
-t40 := LEN
-IF t39 == t40 GOTO label10
-GOTO label11
-LABEL label10 :
-t41 := #0
-index := t41
-LABEL label11 :
+t62 := j
+t63 := #1
+t61 := t62 + t63
+j := t61
 GOTO label3
 LABEL label5 :
-t42 := #0
-i := t42
-LABEL label12 :
-t43 := i
-t44 := LEN
-IF t43 < t44 GOTO label13
-GOTO label14
-LABEL label13 :
-t45 := #1
-t47 := &a
-t48 := i
-t49 := t48 * #4
-t47 := t47 + t49
-t46 := t47
-IF t45 == *t46 GOTO label15
-GOTO label16
-LABEL label15 :
-t51 := i
-t52 := #1
-t50 := t51 + t52
-WRITE t50
-LABEL label16 :
-t54 := i
-t55 := #1
-t53 := t54 + t55
-i := t53
-GOTO label12
-LABEL label14 :
-t56 := #0
-RETURN t56
-FUNCTION main :
-READ t58
-N := t58
-t59 := #0
-t60 := N
-t61 := #3
-IF t60 > t61 GOTO label22
-GOTO label21
-LABEL label22 :
-t62 := N
-t63 := #100
-IF t62 <= t63 GOTO label20
-GOTO label21
-LABEL label20 :
-t59 := #1
-LABEL label21 :
-IF t59 != #0 GOTO label18
-GOTO label17
-LABEL label17 :
+LABEL label2 :
+t64 := flag
 t65 := #1
-t64 := #0 - t65
-WRITE t64
-GOTO label19
-LABEL label18 :
-t66 := N
-ARG t66
-t67 := CALL Joseph
-LABEL label19 :
-t68 := #0
-RETURN t68
+IF t64 == t65 GOTO label8
+GOTO label9
+LABEL label8 :
+t66 := #1
+RETURN t66
+GOTO label10
+LABEL label9 :
+t67 := #0
+RETURN t67
+LABEL label10 :
+FUNCTION main :
+t68 := #100
+i := t68
+LABEL label11 :
+t69 := i
+t70 := #150
+IF t69 < t70 GOTO label12
+GOTO label13
+LABEL label12 :
+t73 := i
+ARG t73
+t71 := CALL squaRever
+t72 := #1
+IF t71 == t72 GOTO label14
+GOTO label15
+LABEL label14 :
+t74 := i
+WRITE t74
+LABEL label15 :
+t76 := i
+t77 := #1
+t75 := t76 + t77
+i := t75
+GOTO label11
+LABEL label13 :
+t78 := #0
+RETURN t78

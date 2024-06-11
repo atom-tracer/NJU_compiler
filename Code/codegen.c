@@ -187,12 +187,11 @@ char *getOneIR()
     return line;
 }
 
-void RegRecycle(uint32_t reg) // 将一个寄存器中的内容溢出到内存中
+void RegRecycle(uint32_t reg, bool flushback) // 将一个寄存器中的内容溢出到内存中
 {
     int cnt = RegisterDescriptionTable[reg].cnt;
     for (int i = 0; i < cnt; i++)
     {
-        // fprintf(ASMfile, "  sw %s, %s\n", RegisterDescriptionTable[reg].regname, RegisterDescriptionTable[reg].VarNames[i]);
         VaribleDescriptor *head = VaribleDescriptionTable->next;
         while (head != NULL)
         {
@@ -207,7 +206,8 @@ void RegRecycle(uint32_t reg) // 将一个寄存器中的内容溢出到内存�
                 // {
                 //     CopyVariableToStack(head);
                 // }
-                CopyVariableToStack(head);
+                if (flushback)
+                    CopyVariableToStack(head);
                 head->regNo = -1;
                 break;
             }
@@ -220,7 +220,7 @@ void VariableRegClear() // 清空寄存器描述符表
 {
     for (int i = 8; i <= 15; i++)
     {
-        RegRecycle(i);
+        RegRecycle(i, false);
     }
 }
 void setRegofVarible(char *name, int reg) // 当变量被装进寄存器后，记录之
@@ -322,6 +322,7 @@ int getReg(char *name)
         // 等号右边如果是解引用变量，需要二次加载
         if (name[0] == '*')
         {
+            // TODO:to fix
             LoadVaribleIntoReg(name + 1, minReg);
             fprintf(ASMfile, "  lw %s,0(%s)\n", RegisterDescriptionTable[minReg].regname, RegisterDescriptionTable[minReg].regname);
         }
@@ -345,7 +346,7 @@ void handleRegUse(uint32_t reg)
 {
     if (reg >= 8 && reg <= 15)
     {
-        RegRecycle(reg);
+        RegRecycle(reg, true);
     }
 }
 // 解析一条中间代码
@@ -818,7 +819,7 @@ void genASM(char *IRcode)
                 }
                 else if (eleArray[3][0] == '/')
                 {
-                    fprintf(ASMfile, "   div %s,%s\n", RegisterDescriptionTable[getReg(eleArray[2])].regname, RegisterDescriptionTable[getReg(eleArray[4])].regname);
+                    fprintf(ASMfile, "  div %s,%s\n", RegisterDescriptionTable[getReg(eleArray[2])].regname, RegisterDescriptionTable[getReg(eleArray[4])].regname);
                     fprintf(ASMfile, "   mflo %s\n", RegisterDescriptionTable[getReg(eleArray[0])].regname);
                 }
                 else

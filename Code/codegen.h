@@ -67,7 +67,7 @@ FILE *IRfile, *ASMfile;
 
 void initCode();
 char *getOneIR();
-void RegRecycle(uint32_t reg);
+void RegRecycle(uint32_t reg, bool flushback);
 VaribleDescriptor *VaribleCreate(char *name);
 int getReg(char *name);
 void genASM(char *IRcode);
