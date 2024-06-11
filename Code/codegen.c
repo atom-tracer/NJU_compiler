@@ -386,12 +386,18 @@ void genASM(char *IRcode)
             // fprintf(ASMfile, "  sw %s, %d($sp)\n", RegisterDescriptionTable[i].regname, frameSize - 4 * (10 - (i - 16)));
             fprintf(ASMfile, "  sw %s, %d($sp)\n", RegisterDescriptionTable[i].regname, frameSize - 4 * (9 - (i - 16)));
         }
-        // 为局部变量分配空间
+        // 为局部变量在变量表中创建表项
         for (int i = 0; i < argsCnt[FuncCnt2]; i++)
         {
             PushVariableToStack(VaribleCreate(args[FuncCnt2][i]), argsize[FuncCnt2][i]);
         }
-        fprintf(ASMfile, "  addi $sp, $sp, -%d\n", argsCnt[FuncCnt2] * 4);
+        // 计算局部变量占用的空间
+        int sum = 0;
+        for (int i = 0; i < argsCnt[FuncCnt2]; i++)
+        {
+            sum += argsize[FuncCnt2][i];
+        }
+        fprintf(ASMfile, "  addi $sp, $sp, -%d\n", sum);
     }
     else if (strcmp(eleArray[0], "GOTO") == 0)
     {

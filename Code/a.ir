@@ -1,467 +1,143 @@
-FUNCTION hanoi :
-PARAM n
-PARAM p1
-PARAM p2
-PARAM p3
-t0 := n
-t1 := #1
-IF t0 == t1 GOTO label0
-GOTO label1
+FUNCTION Joseph :
+PARAM LEN
+DEC a 400
+t1 := #0
+i := t1
+t2 := LEN
+leftCount := t2
+t3 := #0
+index := t3
+t4 := #0
+count := t4
 LABEL label0 :
-t5 := p1
-t6 := #1000000
-t3 := t5 * t6
-t4 := p3
-t2 := t3 + t4
-WRITE t2
+t5 := i
+t6 := LEN
+IF t5 < t6 GOTO label1
 GOTO label2
 LABEL label1 :
-t8 := n
-t9 := #1
-t7 := t8 - t9
-t10 := p1
-t11 := p3
-t12 := p2
-ARG t12
-ARG t11
-ARG t10
-ARG t7
-t13 := CALL hanoi
-t17 := p1
-t18 := #1000000
-t15 := t17 * t18
-t16 := p3
-t14 := t15 + t16
-WRITE t14
-t20 := n
-t21 := #1
-t19 := t20 - t21
-t22 := p2
-t23 := p1
-t24 := p3
-ARG t24
-ARG t23
-ARG t22
-ARG t19
-t25 := CALL hanoi
+t9 := &a
+t10 := i
+t11 := t10 * #4
+t9 := t9 + t11
+t7 := t9
+t8 := #1
+*t7 := t8
+t13 := i
+t14 := #1
+t12 := t13 + t14
+i := t12
+GOTO label0
 LABEL label2 :
-t26 := #0
-RETURN t26
+LABEL label3 :
+t15 := leftCount
+t16 := #2
+IF t15 > t16 GOTO label4
+GOTO label5
+LABEL label4 :
+t19 := &a
+t20 := index
+t21 := t20 * #4
+t19 := t19 + t21
+t17 := t19
+t18 := #1
+IF *t17 == t18 GOTO label6
+GOTO label7
+LABEL label6 :
+t23 := count
+t24 := #1
+t22 := t23 + t24
+count := t22
+t25 := #3
+t26 := count
+IF t25 == t26 GOTO label8
+GOTO label9
+LABEL label8 :
+t29 := &a
+t30 := index
+t31 := t30 * #4
+t29 := t29 + t31
+t27 := t29
+t28 := #0
+*t27 := t28
+t32 := #0
+count := t32
+t34 := leftCount
+t35 := #1
+t33 := t34 - t35
+leftCount := t33
+LABEL label9 :
+LABEL label7 :
+t37 := index
+t38 := #1
+t36 := t37 + t38
+index := t36
+t39 := index
+t40 := LEN
+IF t39 == t40 GOTO label10
+GOTO label11
+LABEL label10 :
+t41 := #0
+index := t41
+LABEL label11 :
+GOTO label3
+LABEL label5 :
+t42 := #0
+i := t42
+LABEL label12 :
+t43 := i
+t44 := LEN
+IF t43 < t44 GOTO label13
+GOTO label14
+LABEL label13 :
+t45 := #1
+t47 := &a
+t48 := i
+t49 := t48 * #4
+t47 := t47 + t49
+t46 := t47
+IF t45 == *t46 GOTO label15
+GOTO label16
+LABEL label15 :
+t51 := i
+t52 := #1
+t50 := t51 + t52
+WRITE t50
+LABEL label16 :
+t54 := i
+t55 := #1
+t53 := t54 + t55
+i := t53
+GOTO label12
+LABEL label14 :
+t56 := #0
+RETURN t56
 FUNCTION main :
-t27 := #3
-sum := t27
-t28 := sum
-t29 := #1
-t30 := #2
-t31 := #3
-ARG t31
-ARG t30
-ARG t29
-ARG t28
-t32 := CALL hanoi
-t33 := #0
-RETURN t33
-
-
-
-.data
-_prompt: .asciiz "Enter an integer:"
-_ret: .asciiz "\n"
-.globl main
-.text
-read:
-  li $v0, 4
-  la $a0, _prompt
-  syscall
-  li $v0, 5
-  syscall
-  jr $ra
-
-write:
-  li $v0, 1
-  syscall
-  li $v0, 4
-  la $a0, _ret
-  syscall
-  move $v0, $0
-  jr $ra
-
-hanoi:
-  addi $sp, $sp, -36
-  sw $fp, 32($sp)
-  addi $fp, $sp, 36
-  sw $s0, 0($sp)
-  sw $s1, 4($sp)
-  sw $s2, 8($sp)
-  sw $s3, 12($sp)
-  sw $s4, 16($sp)
-  sw $s5, 20($sp)
-  sw $s6, 24($sp)
-  sw $s7, 28($sp)
-  addi $sp, $sp, -108
-  lw $t0, -40($fp)
-  move $t0,$a0
-  sw $t0, -40($fp)
-  lw $t1, -44($fp)
-  li $t1,1
-  sw $t1, -44($fp)
-  lw $t2, -44($fp)
-  lw $t3, -40($fp)
-  beq $t3, $t2, label0
-  sw $t2, -44($fp)
-  sw $t3, -40($fp)
-  j label1
-label0:
-  lw $t4, -48($fp)
-  move $t4,$a1
-  sw $t4, -48($fp)
-  lw $t5, -52($fp)
-  li $t5,1000000
-  sw $t5, -52($fp)
-  lw $t6, -52($fp) //t6
-  lw $t7, -48($fp) //t5
-  lw $t0, -56($fp) //t3
-  mul $t0,$t7,$t6
-  sw $t0, -56($fp)
-  sw $t6, -52($fp)
-  sw $t7, -48($fp)
-  lw $t1, -60($fp) //t4
-  move $t1,$a3
-  sw $t1, -60($fp)
-  lw $t2, -60($fp) //t4
-  lw $t3, -56($fp) //t3
-  lw $t4, -64($fp) //t2
-   add $t4,$t3,$t2
-  sw $t4, -64($fp)
-  sw $t2, -60($fp)
-  sw $t3, -56($fp)
-  addi $sp,$sp,-60
-  sw $t0,16($sp)
-  sw $t1,20($sp)
-  sw $t2,24($sp)
-  sw $t3,28($sp)
-  sw $t4,32($sp)
-  sw $t5,36($sp)
-  sw $t6,40($sp)
-  sw $t7,44($sp)
-  sw $t8,48($sp)
-  sw $t9,52($sp)
-  sw $a0,0($sp)
-  sw $a1,4($sp)
-  sw $a2,8($sp)
-  sw $a3,12($sp)
-  sw $ra,56($sp)
-  lw $a0, -64($fp)
-  jal write
-  lw $t0,16($sp)
-  lw $t1,20($sp)
-  lw $t2,24($sp)
-  lw $t3,28($sp)
-  lw $t4,32($sp)
-  lw $t5,36($sp)
-  lw $t6,40($sp)
-  lw $t7,44($sp)
-  lw $t8,48($sp)
-  lw $t9,52($sp)
-  lw $a0,0($sp)
-  lw $a1,4($sp)
-  lw $a2,8($sp)
-  lw $a3,12($sp)
-  lw $ra,56($sp)
-  addi $sp,$sp,60
-  j label2
-label1:
-  lw $t5, -68($fp)  //t8
-  move $t5,$a0
-  sw $t5, -68($fp)
-  lw $t6, -72($fp) //t9
-  li $t6,1
-  sw $t6, -72($fp)
-  lw $t7, -72($fp)  //t9
-  lw $t0, -68($fp) //t8
-  lw $t1, -76($fp) //t7
-   sub $t1,$t0,$t7
-  sw $t1, -76($fp)
-  sw $t0, -68($fp)
-  sw $t7, -72($fp)
-  lw $t2, -80($fp) //t10
-  move $t2,$a1
-  sw $t2, -80($fp)
-  lw $t3, -84($fp) //t11
-  move $t3,$a3
-  sw $t3, -84($fp)
-  lw $t4, -88($fp) //t12
-  move $t4,$a2
-  sw $t4, -88($fp)
-  addi $sp,$sp,-60
-  sw $t0,16($sp)
-  sw $t1,20($sp)
-  sw $t2,24($sp)
-  sw $t3,28($sp)
-  sw $t4,32($sp)
-  sw $t5,36($sp)
-  sw $t6,40($sp)
-  sw $t7,44($sp)
-  sw $t8,48($sp)
-  sw $t9,52($sp)
-  sw $a0,0($sp)
-  sw $a1,4($sp)
-  sw $a2,8($sp)
-  sw $a3,12($sp)
-  sw $ra,56($sp)
-  lw $a0, -88($fp)
-  lw $a1, -84($fp)
-  lw $a2, -80($fp)
-  lw $a3, -76($fp) //t7
-  jal hanoi
-  lw $t0,16($sp)
-  lw $t1,20($sp)
-  lw $t2,24($sp)
-  lw $t3,28($sp)
-  lw $t4,32($sp)
-  lw $t5,36($sp)
-  lw $t6,40($sp)
-  lw $t7,44($sp)
-  lw $t8,48($sp)
-  lw $t9,52($sp)
-  lw $a0,0($sp)
-  lw $a1,4($sp)
-  lw $a2,8($sp)
-  lw $a3,12($sp)
-  lw $ra,56($sp)
-  addi $sp,$sp,60
-  lw $t5, -92($fp)
-  move $t5,$v0
-  sw $t5, -92($fp)
-  lw $t6, -96($fp)
-  move $t6,$a1
-  sw $t6, -96($fp)
-  lw $t7, -100($fp)
-  li $t7,1000000
-  sw $t7, -100($fp)
-  lw $t0, -100($fp)
-  lw $t1, -96($fp)
-  lw $t2, -104($fp)
-   mul $t2,$t1,$t0
-  sw $t2, -104($fp)
-  sw $t0, -100($fp)
-  sw $t1, -96($fp)
-  lw $t3, -108($fp)
-  move $t3,$a3
-  sw $t3, -108($fp)
-  lw $t4, -108($fp)
-  lw $t5, -104($fp)
-  lw $t6, -112($fp)
-   add $t6,$t5,$t4
-  sw $t6, -112($fp)
-  sw $t4, -108($fp)
-  sw $t5, -104($fp)
-  addi $sp,$sp,-60
-  sw $t0,16($sp)
-  sw $t1,20($sp)
-  sw $t2,24($sp)
-  sw $t3,28($sp)
-  sw $t4,32($sp)
-  sw $t5,36($sp)
-  sw $t6,40($sp)
-  sw $t7,44($sp)
-  sw $t8,48($sp)
-  sw $t9,52($sp)
-  sw $a0,0($sp)
-  sw $a1,4($sp)
-  sw $a2,8($sp)
-  sw $a3,12($sp)
-  sw $ra,56($sp)
-  lw $a0, -112($fp)
-  jal write
-  lw $t0,16($sp)
-  lw $t1,20($sp)
-  lw $t2,24($sp)
-  lw $t3,28($sp)
-  lw $t4,32($sp)
-  lw $t5,36($sp)
-  lw $t6,40($sp)
-  lw $t7,44($sp)
-  lw $t8,48($sp)
-  lw $t9,52($sp)
-  lw $a0,0($sp)
-  lw $a1,4($sp)
-  lw $a2,8($sp)
-  lw $a3,12($sp)
-  lw $ra,56($sp)
-  addi $sp,$sp,60
-  lw $t7, -116($fp)
-  move $t7,$a0
-  sw $t7, -116($fp)
-  lw $t0, -120($fp)
-  li $t0,1
-  sw $t0, -120($fp)
-  lw $t1, -120($fp)
-  lw $t2, -116($fp)
-  lw $t3, -124($fp)
-   sub $t3,$t2,$t1
-  sw $t3, -124($fp)
-  sw $t1, -120($fp)
-  sw $t2, -116($fp)
-  lw $t4, -128($fp)
-  move $t4,$a2
-  sw $t4, -128($fp)
-  lw $t5, -132($fp)
-  move $t5,$a1
-  sw $t5, -132($fp)
-  lw $t6, -136($fp)
-  move $t6,$a3
-  sw $t6, -136($fp)
-  addi $sp,$sp,-60
-  sw $t0,16($sp)
-  sw $t1,20($sp)
-  sw $t2,24($sp)
-  sw $t3,28($sp)
-  sw $t4,32($sp)
-  sw $t5,36($sp)
-  sw $t6,40($sp)
-  sw $t7,44($sp)
-  sw $t8,48($sp)
-  sw $t9,52($sp)
-  sw $a0,0($sp)
-  sw $a1,4($sp)
-  sw $a2,8($sp)
-  sw $a3,12($sp)
-  sw $ra,56($sp)
-  lw $a0, -136($fp)
-  lw $a1, -132($fp)
-  lw $a2, -128($fp)
-  lw $a3, -124($fp)
-  jal hanoi
-  lw $t0,16($sp)
-  lw $t1,20($sp)
-  lw $t2,24($sp)
-  lw $t3,28($sp)
-  lw $t4,32($sp)
-  lw $t5,36($sp)
-  lw $t6,40($sp)
-  lw $t7,44($sp)
-  lw $t8,48($sp)
-  lw $t9,52($sp)
-  lw $a0,0($sp)
-  lw $a1,4($sp)
-  lw $a2,8($sp)
-  lw $a3,12($sp)
-  lw $ra,56($sp)
-  addi $sp,$sp,60
-  lw $t7, -140($fp)
-  move $t7,$v0
-  sw $t7, -140($fp)
-label2:
-  lw $t0, -144($fp)
-  li $t0,0
-  sw $t0, -144($fp)
-  lw $t1, -144($fp)
-  move $v0, $t1
-  sw $t1, -144($fp)
-  addi $sp, $sp, 108
-  lw $s0, 0($sp)
-  lw $s1, 4($sp)
-  lw $s2, 8($sp)
-  lw $s3, 12($sp)
-  lw $s4, 16($sp)
-  lw $s5, 20($sp)
-  lw $s6, 24($sp)
-  lw $s7, 28($sp)
-  lw $fp, 32($sp)
-  addi $sp, $sp, 36
-  jr $ra
-
-main:
-  addi $sp, $sp, -36
-  sw $fp, 32($sp)
-  addi $fp, $sp, 36
-  sw $s0, 0($sp)
-  sw $s1, 4($sp)
-  sw $s2, 8($sp)
-  sw $s3, 12($sp)
-  sw $s4, 16($sp)
-  sw $s5, 20($sp)
-  sw $s6, 24($sp)
-  sw $s7, 28($sp)
-  addi $sp, $sp, -32
-  lw $t2, -40($fp)
-  li $t2,3
-  sw $t2, -40($fp)
-  lw $t3, -40($fp)
-  lw $t4, -44($fp)
-  move $t4,$t3
-  sw $t4, -44($fp)
-  sw $t3, -40($fp)
-  lw $t5, -44($fp)
-  lw $t6, -48($fp)
-  move $t6,$t5
-  sw $t6, -48($fp)
-  sw $t5, -44($fp)
-  lw $t7, -52($fp)
-  li $t7,1
-  sw $t7, -52($fp)
-  lw $t0, -56($fp)
-  li $t0,2
-  sw $t0, -56($fp)
-  lw $t1, -60($fp)
-  li $t1,3
-  sw $t1, -60($fp)
-  addi $sp,$sp,-60
-  sw $t0,16($sp)
-  sw $t1,20($sp)
-  sw $t2,24($sp)
-  sw $t3,28($sp)
-  sw $t4,32($sp)
-  sw $t5,36($sp)
-  sw $t6,40($sp)
-  sw $t7,44($sp)
-  sw $t8,48($sp)
-  sw $t9,52($sp)
-  sw $a0,0($sp)
-  sw $a1,4($sp)
-  sw $a2,8($sp)
-  sw $a3,12($sp)
-  sw $ra,56($sp)
-  lw $a0, -60($fp)
-  lw $a1, -56($fp)
-  lw $a2, -52($fp)
-  lw $a3, -48($fp)
-  jal hanoi
-  lw $t0,16($sp)
-  lw $t1,20($sp)
-  lw $t2,24($sp)
-  lw $t3,28($sp)
-  lw $t4,32($sp)
-  lw $t5,36($sp)
-  lw $t6,40($sp)
-  lw $t7,44($sp)
-  lw $t8,48($sp)
-  lw $t9,52($sp)
-  lw $a0,0($sp)
-  lw $a1,4($sp)
-  lw $a2,8($sp)
-  lw $a3,12($sp)
-  lw $ra,56($sp)
-  addi $sp,$sp,60
-  lw $t2, -64($fp)
-  move $t2,$v0
-  sw $t2, -64($fp)
-  lw $t3, -68($fp)
-  li $t3,0
-  sw $t3, -68($fp)
-  lw $t4, -68($fp)
-  move $v0, $t4
-  sw $t4, -68($fp)
-  addi $sp, $sp, 32
-  lw $s0, 0($sp)
-  lw $s1, 4($sp)
-  lw $s2, 8($sp)
-  lw $s3, 12($sp)
-  lw $s4, 16($sp)
-  lw $s5, 20($sp)
-  lw $s6, 24($sp)
-  lw $s7, 28($sp)
-  lw $fp, 32($sp)
-  addi $sp, $sp, 36
-  jr $ra
+READ t58
+N := t58
+t59 := #0
+t60 := N
+t61 := #3
+IF t60 > t61 GOTO label22
+GOTO label21
+LABEL label22 :
+t62 := N
+t63 := #100
+IF t62 <= t63 GOTO label20
+GOTO label21
+LABEL label20 :
+t59 := #1
+LABEL label21 :
+IF t59 != #0 GOTO label18
+GOTO label17
+LABEL label17 :
+t65 := #1
+t64 := #0 - t65
+WRITE t64
+GOTO label19
+LABEL label18 :
+t66 := N
+ARG t66
+t67 := CALL Joseph
+LABEL label19 :
+t68 := #0
+RETURN t68
