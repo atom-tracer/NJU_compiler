@@ -32,22 +32,7 @@ fact:
   sw $s5, 20($sp)
   sw $s6, 24($sp)
   sw $s7, 28($sp)
-  addi $sp, $sp, -4
-  addi $sp, $sp, -4
-  addi $sp, $sp, -4
-  addi $sp, $sp, -4
-  addi $sp, $sp, -4
-  addi $sp, $sp, -4
-  addi $sp, $sp, -4
-  addi $sp, $sp, -4
-  addi $sp, $sp, -4
-  addi $sp, $sp, -4
-  addi $sp, $sp, -4
-  addi $sp, $sp, -4
-  addi $sp, $sp, -4
-  addi $sp, $sp, -4
-  addi $sp, $sp, -4
-  addi $sp, $sp, -4
+  addi $sp, $sp, -64
   lw $t0, -44($fp)
   move $t0,$a0
   sw $t0, -44($fp)
@@ -169,22 +154,7 @@ main:
   sw $s5, 20($sp)
   sw $s6, 24($sp)
   sw $s7, 28($sp)
-  addi $sp, $sp, -4
-  addi $sp, $sp, -4
-  addi $sp, $sp, -4
-  addi $sp, $sp, -4
-  addi $sp, $sp, -4
-  addi $sp, $sp, -4
-  addi $sp, $sp, -4
-  addi $sp, $sp, -4
-  addi $sp, $sp, -4
-  addi $sp, $sp, -4
-  addi $sp, $sp, -4
-  addi $sp, $sp, -4
-  addi $sp, $sp, -4
-  addi $sp, $sp, -4
-  addi $sp, $sp, -4
-  addi $sp, $sp, -4
+  addi $sp, $sp, -64
   addi $sp,$sp,-60
   sw $t0,16($sp)
   sw $t1,20($sp)

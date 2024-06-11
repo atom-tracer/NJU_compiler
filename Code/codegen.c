@@ -140,9 +140,9 @@ void ParamRegClear() // 把传递实参会使用到的寄存器清空
     }
 }
 
-void PushVariableToStack(VaribleDescriptor *var) // 将一个局部变量压栈
+void PushVariableToStack(VaribleDescriptor *var) // 在函数开头，在栈上为可能用到的局部变量一次性分配空间，但不生成指令
 {
-    fprintf(ASMfile, "  addi $sp, $sp, %d\n", -4);
+    // fprintf(ASMfile, "  addi $sp, $sp, %d\n", -4);
     TrueFrameSize += 4;
     LocalFrameSize += 4;
     if (var->regNo != -1)
@@ -291,26 +291,6 @@ int getReg(char *name)
         }
         head = head->next;
     }
-    // if (head == NULL)
-    // {
-    //     head = VaribleCreate(name);
-    // }
-    // 当前策略：LRU
-    // int mintime = 0x7fffffff;
-    // int minReg = 8;
-    // for (int i = 8; i <= 25; i++)
-    // {
-    //     if (RegisterDescriptionTable[i].timestamp < mintime)
-    //     {
-    //         mintime = RegisterDescriptionTable[i].timestamp;
-    //         minReg = i;
-    //     }
-    // }
-    // RegRecycle(minReg);
-    // // setRegofVarible(name, minReg);
-    // //  从内存中加载变量到寄存器
-    // LoadVaribleIntoReg(name, minReg);
-    // // fprintf(ASMfile, "  lw %s, %s\n", RegisterDescriptionTable[minReg].regname, name);
     int minReg = 8 + regCnt;
     LoadVaribleIntoReg(name, minReg);
     regCnt++;
@@ -366,6 +346,7 @@ void genASM(char *IRcode)
         {
             PushVariableToStack(VaribleCreate(args[FuncCnt2][i]));
         }
+        fprintf(ASMfile, "  addi $sp, $sp, -%d\n", argsCnt[FuncCnt2] * 4);
     }
     else if (strcmp(eleArray[0], "GOTO") == 0)
     {
@@ -488,8 +469,9 @@ void genASM(char *IRcode)
         else if (strcmp(eleArray[0], "READ") == 0)
         {
             fprintf(ASMfile, "  jal read\n");
-            if(index>1){
-                fprintf(ASMfile, "  move %s,$v0\n",RegisterDescriptionTable[getReg(eleArray[1])].regname);
+            if (index > 1)
+            {
+                fprintf(ASMfile, "  move %s,$v0\n", RegisterDescriptionTable[getReg(eleArray[1])].regname);
                 handleRegUse(getReg(eleArray[1]));
             }
         }
@@ -846,7 +828,7 @@ void initArg()
         free(IRcode);
     }
 }
-void targetCodeGen(char*irname,char* filename)
+void targetCodeGen(char *irname, char *filename)
 {
     IRfile = fopen(irname, "r+");
     ASMfile = fopen(filename, "w+");
