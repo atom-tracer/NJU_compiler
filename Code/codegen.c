@@ -358,10 +358,11 @@ void genASM(char *IRcode)
         fprintf(ASMfile, "  move $v0, %s\n", RegisterDescriptionTable[getReg(eleArray[1])].regname);
         handleRegUse(getReg(eleArray[1]));
         // 回收局部变量占用的空间
-        if (LocalFrameSize > 0)
-            // fprintf(ASMfile, "  addi $sp, $sp, %d\n", LocalFrameSize);
-            fprintf(ASMfile, "  addi $sp, $fp, -%d\n", TrueFrameSize - LocalFrameSize);
-        LocalFrameSize = 0;
+        // if (LocalFrameSize > 0)
+        //     // fprintf(ASMfile, "  addi $sp, $sp, %d\n", LocalFrameSize);
+        //     fprintf(ASMfile, "  addi $sp, $fp, -%d\n", TrueFrameSize - LocalFrameSize);
+        // LocalFrameSize = 0;
+        fprintf(ASMfile, "  addi $sp, $sp, %d\n", argsCnt[FuncCnt2] * 4);
         //  恢复被调用者保存寄存器
         // int frameSize = (ParamListHead->Paramcnt + 10) * 4;
         int frameSize = (ParamListHead->Paramcnt + 9) * 4;

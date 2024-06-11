@@ -52,7 +52,7 @@ label0:
   lw $t5, -68($fp)
   move $v0, $t5
   sw $t5, -68($fp)
-  addi $sp, $fp, -36
+  addi $sp, $sp, 64
   lw $s0, 0($sp)
   lw $s1, 4($sp)
   lw $s2, 8($sp)
@@ -129,6 +129,7 @@ label1:
   lw $t0, -100($fp)
   move $v0, $t0
   sw $t0, -100($fp)
+  addi $sp, $sp, 64
   lw $s0, 0($sp)
   lw $s1, 4($sp)
   lw $s2, 8($sp)
@@ -314,7 +315,7 @@ label5:
   lw $t4, -100($fp)
   move $v0, $t4
   sw $t4, -100($fp)
-  addi $sp, $fp, -36
+  addi $sp, $sp, 64
   lw $s0, 0($sp)
   lw $s1, 4($sp)
   lw $s2, 8($sp)
