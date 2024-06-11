@@ -1,17 +1,117 @@
 FUNCTION main :
-DEC x 4
-t2 := &x
+DEC x 20
 t3 := #0
-t4 := t3 * #4
-t2 := t2 + t4
-t1 := t2
-ARG *t1
-t5 := CALL read
-t7 := &x
-t8 := #0
-t9 := t8 * #4
-t7 := t7 + t9
-t6 := t7
-WRITE *t6
-t10 := #0
-RETURN t10
+i := t3
+t4 := #5
+N := t4
+t5 := #0
+j := t5
+LABEL label0 :
+t6 := i
+t7 := #5
+IF t6 < t7 GOTO label1
+GOTO label2
+LABEL label1 :
+t10 := &x
+t11 := i
+t12 := t11 * #4
+t10 := t10 + t12
+t8 := t10
+READ t9
+*t8 := t9
+t14 := i
+t15 := #1
+t13 := t14 + t15
+i := t13
+GOTO label0
+LABEL label2 :
+t16 := N
+i := t16
+LABEL label3 :
+t17 := i
+t18 := #0
+IF t17 > t18 GOTO label4
+GOTO label5
+LABEL label4 :
+LABEL label6 :
+t19 := j
+t21 := i
+t22 := #1
+t20 := t21 - t22
+IF t19 < t20 GOTO label7
+GOTO label8
+LABEL label7 :
+t25 := &x
+t26 := j
+t27 := t26 * #4
+t25 := t25 + t27
+t23 := t25
+t24 := #3
+IF *t23 > t24 GOTO label9
+GOTO label10
+LABEL label9 :
+t29 := &x
+t30 := j
+t31 := t30 * #4
+t29 := t29 + t31
+t28 := t29
+temp := *t28
+t34 := &x
+t35 := j
+t36 := t35 * #4
+t34 := t34 + t36
+t32 := t34
+t37 := &x
+t40 := j
+t41 := #1
+t38 := t40 + t41
+t39 := t38 * #4
+t37 := t37 + t39
+t33 := t37
+*t32 := *t33
+t44 := &x
+t47 := j
+t48 := #1
+t45 := t47 + t48
+t46 := t45 * #4
+t44 := t44 + t46
+t42 := t44
+t43 := temp
+*t42 := t43
+LABEL label10 :
+t50 := j
+t51 := #1
+t49 := t50 + t51
+j := t49
+GOTO label6
+LABEL label8 :
+t52 := #0
+j := t52
+t54 := i
+t55 := #1
+t53 := t54 - t55
+i := t53
+GOTO label3
+LABEL label5 :
+t56 := #0
+i := t56
+LABEL label11 :
+t57 := i
+t58 := #5
+IF t57 < t58 GOTO label12
+GOTO label13
+LABEL label12 :
+t60 := &x
+t61 := i
+t62 := t61 * #4
+t60 := t60 + t62
+t59 := t60
+WRITE *t59
+t64 := i
+t65 := #1
+t63 := t64 + t65
+i := t63
+GOTO label11
+LABEL label13 :
+t66 := #0
+RETURN t66
