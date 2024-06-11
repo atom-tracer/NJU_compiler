@@ -102,31 +102,7 @@ VaribleDescriptor *getVariableDescriptor(char *name)
     }
     assert(0); // 不应当找不到变量
 }
-ParamList *ParamPush(char *name) // 把参数压入参数列表
-{
-    ParamList *newParam = malloc(sizeof(ParamList));
-    strcpy(newParam->name, name);
-    newParam->next = ParamListHead->next;
-    newParam->prev = ParamListHead;
-    ParamListHead->next = newParam;
-    if (newParam->next != NULL)
-        newParam->next->prev = newParam;
-    newParam->offset = ParamListHead->Paramcnt++; // Re:0
-    return newParam;
-}
 
-void ParamClear() // 把参数列表清空
-{
-    ParamList *head = ParamListHead->next;
-    while (head != NULL)
-    {
-        ParamList *tmp = head;
-        head = head->next;
-        free(tmp);
-    }
-    ParamListHead->next = NULL;
-    ParamListHead->Paramcnt = 0;
-}
 void TrueParamClear() // 把真实参数列表清空
 {
     TrueParamList *head = TrueParamListHead->next;
@@ -198,14 +174,6 @@ void RegRecycle(uint32_t reg, bool flushback) // 将一个寄存器中的内容�
             if (strcmp(head->name, RegisterDescriptionTable[reg].VarNames[i]) == 0)
             {
                 assert(head->regNo != -1);
-                // if (head->posRef == POS_REG) // 只存在于寄存器中的变量，现在要给它分配内存了
-                // {
-                //     PushVariableToStack(head);
-                // }
-                // else if (head->dirtybit == true)
-                // {
-                //     CopyVariableToStack(head);
-                // }
                 if (flushback)
                     CopyVariableToStack(head);
                 head->regNo = -1;
@@ -322,7 +290,6 @@ int getReg(char *name)
         // 等号右边如果是解引用变量，需要二次加载
         if (name[0] == '*')
         {
-            // TODO:to fix
             LoadVaribleIntoReg(name + 1, minReg);
             fprintf(ASMfile, "  lw %s,0(%s)\n", RegisterDescriptionTable[minReg].regname, RegisterDescriptionTable[minReg].regname);
         }
@@ -378,14 +345,11 @@ void genASM(char *IRcode)
         int frameSize = 9 * 4;
         TrueFrameSize += frameSize;
         fprintf(ASMfile, "  addi $sp, $sp, %d\n", -frameSize);
-        // fprintf(ASMfile, "  sw $ra, %d($sp)\n", (frameSize - 4));
-        // fprintf(ASMfile, "  sw $fp, %d($sp)\n", (frameSize - 8));
         fprintf(ASMfile, "  sw $fp, %d($sp)\n", (frameSize - 4));
         fprintf(ASMfile, "  addi $fp, $sp, %d\n", frameSize);
         // 保存被调用者保存寄存器
         for (int i = 16; i <= 23; i++)
         {
-            // fprintf(ASMfile, "  sw %s, %d($sp)\n", RegisterDescriptionTable[i].regname, frameSize - 4 * (10 - (i - 16)));
             fprintf(ASMfile, "  sw %s, %d($sp)\n", RegisterDescriptionTable[i].regname, frameSize - 4 * (9 - (i - 16)));
         }
         // 为局部变量在变量表中创建表项
@@ -404,22 +368,14 @@ void genASM(char *IRcode)
     {
         fprintf(ASMfile, "  move $v0, %s\n", RegisterDescriptionTable[getReg(eleArray[1])].regname);
         handleRegUse(getReg(eleArray[1]));
-        // 回收局部变量占用的空间
-        // if (LocalFrameSize > 0)
-        //     // fprintf(ASMfile, "  addi $sp, $sp, %d\n", LocalFrameSize);
-        //     fprintf(ASMfile, "  addi $sp, $fp, -%d\n", TrueFrameSize - LocalFrameSize);
-        // LocalFrameSize = 0;
         fprintf(ASMfile, "  addi $sp, $sp, %d\n", LocalFrameSize);
         //  恢复被调用者保存寄存器
         // int frameSize = (ParamListHead->Paramcnt + 10) * 4;
         int frameSize = (ParamListHead->Paramcnt + 9) * 4;
         for (int i = 16; i <= 23; i++)
         {
-            // fprintf(ASMfile, "  lw %s, %d($sp)\n", RegisterDescriptionTable[i].regname, frameSize - 4 * (10 - (i - 16)));
             fprintf(ASMfile, "  lw %s, %d($sp)\n", RegisterDescriptionTable[i].regname, frameSize - 4 * (9 - (i - 16)));
         }
-        // fprintf(ASMfile, "  lw $ra, %d($sp)\n", (frameSize - 4));
-        // fprintf(ASMfile, "  lw $fp, %d($sp)\n", (frameSize - 8));
         fprintf(ASMfile, "  lw $fp, %d($sp)\n", (frameSize - 4));
         fprintf(ASMfile, "  addi $sp, $sp, %d\n", frameSize);
         TrueFrameSize -= frameSize;
@@ -427,14 +383,6 @@ void genASM(char *IRcode)
     }
     else if (strcmp(eleArray[0], "ARG") == 0)
     {
-        // 任务：记录实参的信息到真实参数列表
-        // TrueParamListTail->next = malloc(sizeof(TrueParamList));
-        // TrueParamListTail->next->prev = TrueParamListTail;
-        // TrueParamListTail = TrueParamListTail->next;
-        // strcpy(TrueParamListTail->name, eleArray[1]);
-        // TrueParamListTail->ParamNo = TrueParamListTail->prev->ParamNo + 1;
-        // TrueParamListTail->next = NULL;
-        // TrueParamListHead->Paramcnt++;
         TrueParamList *newParam = malloc(sizeof(TrueParamList));
         strcpy(newParam->name, eleArray[1]);
         newParam->next = TrueParamListHead->next;
@@ -575,17 +523,6 @@ void genASM(char *IRcode)
         TrueFrameSize -= 15 * 4;
         ParamRegClear();
     }
-    // else if (strcmp(eleArray[1], "=") == 0) // 在进行这种赋值操作之前，左值变量应当已经定义过了
-    // {
-    //     if (eleArray[0][0] == '*')
-    //     {
-    //         fprintf(ASMfile, "  sw %s,0(%s)\n", RegisterDescriptionTable[getReg(eleArray[2])].regname, RegisterDescriptionTable[getReg(eleArray[0] + 1)].regname);
-    //         handleRegUse(getReg(eleArray[2]));
-    //         handleRegUse(getReg(eleArray[0] + 1));
-    //     }
-    //     else
-    //         assert(0); // 先假设没有x=y这种赋值操作
-    // }
     else if (strcmp(eleArray[0], "IF") == 0)
     {
         if (strcmp(eleArray[2], "==") == 0)
@@ -777,8 +714,6 @@ void genASM(char *IRcode)
                 }
                 // 调用者恢复ra
                 fprintf(ASMfile, "  lw $ra,%d($sp)\n", 14 * 4);
-                // fprintf(ASMfile, "  addi $sp,$sp,%d\n", 14 * 4);
-                // TrueFrameSize -= 14 * 4;
                 fprintf(ASMfile, "  addi $sp,$sp,%d\n", 15 * 4);
                 TrueFrameSize -= 15 * 4;
                 // 最后讨论一下接住返回值的是不是解引用
@@ -803,11 +738,11 @@ void genASM(char *IRcode)
             {
                 if (eleArray[3][0] == '+')
                 {
-                    fprintf(ASMfile, "   add %s,%s,%s\n", RegisterDescriptionTable[getReg(eleArray[0])].regname, RegisterDescriptionTable[getReg(eleArray[2])].regname, RegisterDescriptionTable[getReg(eleArray[4])].regname);
+                    fprintf(ASMfile, "  add %s,%s,%s\n", RegisterDescriptionTable[getReg(eleArray[0])].regname, RegisterDescriptionTable[getReg(eleArray[2])].regname, RegisterDescriptionTable[getReg(eleArray[4])].regname);
                 }
                 else if (eleArray[3][0] == '-')
                 {
-                    fprintf(ASMfile, "   sub %s,%s,%s\n", RegisterDescriptionTable[getReg(eleArray[0])].regname, RegisterDescriptionTable[getReg(eleArray[2])].regname, RegisterDescriptionTable[getReg(eleArray[4])].regname);
+                    fprintf(ASMfile, "  sub %s,%s,%s\n", RegisterDescriptionTable[getReg(eleArray[0])].regname, RegisterDescriptionTable[getReg(eleArray[2])].regname, RegisterDescriptionTable[getReg(eleArray[4])].regname);
                 }
                 else if (eleArray[3][0] == '*')
                 {
@@ -816,7 +751,7 @@ void genASM(char *IRcode)
                 else if (eleArray[3][0] == '/')
                 {
                     fprintf(ASMfile, "  div %s,%s\n", RegisterDescriptionTable[getReg(eleArray[2])].regname, RegisterDescriptionTable[getReg(eleArray[4])].regname);
-                    fprintf(ASMfile, "   mflo %s\n", RegisterDescriptionTable[getReg(eleArray[0])].regname);
+                    fprintf(ASMfile, "  mflo %s\n", RegisterDescriptionTable[getReg(eleArray[0])].regname);
                 }
                 else
                 {

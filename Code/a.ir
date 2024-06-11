@@ -1,137 +1,159 @@
-FUNCTION squaRever :
-PARAM num
-t0 := #0
-flag := t0
-DEC array 12
+FUNCTION main :
+DEC b 12
+DEC c 40
 t2 := #0
-j := t2
-t5 := &array
-t6 := #0
-t7 := t6 * #4
-t5 := t5 + t7
-t3 := t5
-t8 := num
-t9 := #100
-t4 := t8 / t9
-*t3 := t4
-t12 := &array
-t13 := #1
-t14 := t13 * #4
-t12 := t12 + t14
-t10 := t12
-t17 := num
-t18 := #10
-t15 := t17 / t18
-t19 := #10
-t21 := &array
-t22 := #0
-t23 := t22 * #4
-t21 := t21 + t23
-t20 := t21
-t16 := t19 * *t20
-t11 := t15 - t16
-*t10 := t11
-t26 := &array
-t27 := #2
+i := t2
+DEC a 20
+LABEL label0 :
+t6 := i
+t7 := #5
+IF t6 < t7 GOTO label1
+GOTO label2
+LABEL label1 :
+t10 := &a
+t11 := i
+t12 := t11 * #4
+t10 := t10 + t12
+t8 := t10
+READ t9
+*t8 := t9
+t14 := i
+t15 := #1
+t13 := t14 + t15
+i := t13
+GOTO label0
+LABEL label2 :
+t16 := #0
+i := t16
+LABEL label3 :
+t17 := i
+t18 := #4
+IF t17 < t18 GOTO label4
+GOTO label5
+LABEL label4 :
+t20 := i
+t21 := #1
+t19 := t20 + t21
+j := t19
+LABEL label6 :
+t22 := j
+t23 := #5
+IF t22 < t23 GOTO label7
+GOTO label8
+LABEL label7 :
+t26 := &a
+t27 := i
 t28 := t27 * #4
 t26 := t26 + t28
 t24 := t26
-t31 := num
-t33 := #100
-t35 := &array
-t36 := #0
-t37 := t36 * #4
-t35 := t35 + t37
-t34 := t35
-t32 := t33 * *t34
-t29 := t31 - t32
-t38 := #10
-t40 := &array
-t41 := #1
-t42 := t41 * #4
-t40 := t40 + t42
-t39 := t40
-t30 := t38 * *t39
-t25 := t29 - t30
-*t24 := t25
-t45 := &array
-t46 := #0
-t47 := t46 * #4
-t45 := t45 + t47
-t43 := t45
-t48 := &array
-t49 := #2
-t50 := t49 * #4
-t48 := t48 + t50
-t44 := t48
-IF *t43 != *t44 GOTO label0
-GOTO label1
-LABEL label0 :
-t51 := #0
-flag := t51
-GOTO label2
-LABEL label1 :
-LABEL label3 :
-t52 := j
-t53 := #12
-IF t52 < t53 GOTO label4
-GOTO label5
-LABEL label4 :
-t58 := j
-t59 := j
-t56 := t58 * t59
-t57 := num
-t54 := t56 - t57
-t55 := #0
-IF t54 == t55 GOTO label6
-GOTO label7
-LABEL label6 :
-t60 := #1
-flag := t60
-LABEL label7 :
-t62 := j
-t63 := #1
-t61 := t62 + t63
-j := t61
-GOTO label3
-LABEL label5 :
-LABEL label2 :
-t64 := flag
-t65 := #1
-IF t64 == t65 GOTO label8
-GOTO label9
-LABEL label8 :
-t66 := #1
-RETURN t66
+t29 := &a
+t30 := j
+t31 := t30 * #4
+t29 := t29 + t31
+t25 := t29
+IF *t24 > *t25 GOTO label9
 GOTO label10
 LABEL label9 :
-t67 := #0
-RETURN t67
+t33 := &a
+t34 := i
+t35 := t34 * #4
+t33 := t33 + t35
+t32 := t33
+t := *t32
+t38 := &a
+t39 := i
+t40 := t39 * #4
+t38 := t38 + t40
+t36 := t38
+t41 := &a
+t42 := j
+t43 := t42 * #4
+t41 := t41 + t43
+t37 := t41
+*t36 := *t37
+t46 := &a
+t47 := j
+t48 := t47 * #4
+t46 := t46 + t48
+t44 := t46
+t45 := t
+*t44 := t45
 LABEL label10 :
-FUNCTION main :
-t68 := #100
-i := t68
+t50 := j
+t51 := #1
+t49 := t50 + t51
+j := t49
+GOTO label6
+LABEL label8 :
+t53 := i
+t54 := #1
+t52 := t53 + t54
+i := t52
+GOTO label3
+LABEL label5 :
+t55 := #0
+i := t55
 LABEL label11 :
-t69 := i
-t70 := #150
-IF t69 < t70 GOTO label12
+t56 := i
+t57 := #5
+IF t56 < t57 GOTO label12
 GOTO label13
 LABEL label12 :
-t73 := i
-ARG t73
-t71 := CALL squaRever
-t72 := #1
-IF t71 == t72 GOTO label14
-GOTO label15
-LABEL label14 :
-t74 := i
-WRITE t74
-LABEL label15 :
-t76 := i
-t77 := #1
-t75 := t76 + t77
-i := t75
+t59 := &a
+t60 := i
+t61 := t60 * #4
+t59 := t59 + t61
+t58 := t59
+WRITE *t58
+t63 := i
+t64 := #1
+t62 := t63 + t64
+i := t62
 GOTO label11
 LABEL label13 :
-t78 := #0
-RETURN t78
+t65 := &a
+b := t65
+t66 := &a
+c := t66
+t67 := #0
+i := t67
+LABEL label14 :
+t68 := i
+t69 := #5
+IF t68 < t69 GOTO label15
+GOTO label16
+LABEL label15 :
+t70 := i
+t71 := #3
+IF t70 < t71 GOTO label17
+GOTO label18
+LABEL label17 :
+t73 := &b
+t74 := i
+t75 := t74 * #4
+t73 := t73 + t75
+t72 := t73
+WRITE *t72
+t77 := &c
+t78 := i
+t79 := t78 * #4
+t77 := t77 + t79
+t76 := t77
+WRITE *t76
+GOTO label19
+LABEL label18 :
+t81 := &c
+t82 := i
+t83 := t82 * #4
+t81 := t81 + t83
+t80 := t81
+WRITE *t80
+LABEL label19 :
+t85 := i
+t86 := #1
+t84 := t85 + t86
+i := t84
+GOTO label14
+LABEL label16 :
+t87 := #0
+RETURN t87
