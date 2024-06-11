@@ -369,6 +369,7 @@ void genASM(char *IRcode)
     else if (strcmp(eleArray[0], "FUNCTION") == 0)
     {
         TrueFrameSize = 0;
+        LocalFrameSize = 0;
         FuncCnt2++;
         // ParamClear();
         ParamCnt = 0;
@@ -393,12 +394,7 @@ void genASM(char *IRcode)
             PushVariableToStack(VaribleCreate(args[FuncCnt2][i]), argsize[FuncCnt2][i]);
         }
         // 计算局部变量占用的空间
-        int sum = 0;
-        for (int i = 0; i < argsCnt[FuncCnt2]; i++)
-        {
-            sum += argsize[FuncCnt2][i];
-        }
-        fprintf(ASMfile, "  addi $sp, $sp, -%d\n", sum);
+        fprintf(ASMfile, "  addi $sp, $sp, -%d\n", LocalFrameSize);
     }
     else if (strcmp(eleArray[0], "GOTO") == 0)
     {
@@ -413,7 +409,7 @@ void genASM(char *IRcode)
         //     // fprintf(ASMfile, "  addi $sp, $sp, %d\n", LocalFrameSize);
         //     fprintf(ASMfile, "  addi $sp, $fp, -%d\n", TrueFrameSize - LocalFrameSize);
         // LocalFrameSize = 0;
-        fprintf(ASMfile, "  addi $sp, $sp, %d\n", argsCnt[FuncCnt2] * 4);
+        fprintf(ASMfile, "  addi $sp, $sp, %d\n", LocalFrameSize);
         //  恢复被调用者保存寄存器
         // int frameSize = (ParamListHead->Paramcnt + 10) * 4;
         int frameSize = (ParamListHead->Paramcnt + 9) * 4;
