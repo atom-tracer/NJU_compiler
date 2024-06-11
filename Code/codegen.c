@@ -323,6 +323,7 @@ void genASM(char *IRcode)
     }
     else if (strcmp(eleArray[0], "FUNCTION") == 0)
     {
+        TrueFrameSize = 0;
         FuncCnt2++;
         // ParamClear();
         ParamCnt = 0;
