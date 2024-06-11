@@ -5,9 +5,9 @@ int TrueFrameSize = 0;  // 整个栈帧的大小（包括存储的寄存器和�
 int LocalFrameSize = 0; // 存储局部变量的栈空间大小
 
 int FuncCnt = 0, FuncCnt2 = 0; // 函数个数，现在是第几个函数
-char *args[100][10000];
-int argsize[100][10000];
-int argsCnt[100];
+char *args[500][10000];
+int argsize[500][10000];
+int argsCnt[500];
 int regCnt = 0;
 void initCode()
 {
