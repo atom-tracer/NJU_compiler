@@ -715,12 +715,29 @@ void genASM(char *IRcode)
                 {
                     if (i < 4)
                     {
-                        LoadVaribleIntoReg(p->name, i + 4);
+                        if (p->name[0] == '*')
+                        {
+                            LoadVaribleIntoReg(p->name + 1, i + 4);
+                            fprintf(ASMfile, "  lw %s,0(%s)\n", RegisterDescriptionTable[i + 4].regname, RegisterDescriptionTable[i + 4].regname);
+                        }
+                        else
+                        {
+                            LoadVaribleIntoReg(p->name, i + 4);
+                        }
                     }
                     else
                     {
-                        fprintf(ASMfile, "  sw %s,%d($sp)\n", RegisterDescriptionTable[getReg(p->name)].regname, (i - 4) * 4);
-                        handleRegUse(getReg(p->name));
+                        if (p->name[0] == '*')
+                        {
+                            int tmpEmptyReg = getEmptyReg();
+                            LoadVaribleIntoReg(p->name + 1, tmpEmptyReg);
+                            fprintf(ASMfile, "  lw %s,0(%s)\n", RegisterDescriptionTable[tmpEmptyReg].regname, RegisterDescriptionTable[tmpEmptyReg].regname);
+                            fprintf(ASMfile, "  sw %s,%d($sp)\n", RegisterDescriptionTable[tmpEmptyReg].regname, (i - 4) * 4);
+                        }
+                        else
+                        {
+                            fprintf(ASMfile, "  sw %s,%d($sp)\n", RegisterDescriptionTable[getReg(p->name)].regname, (i - 4) * 4);
+                        }
                     }
                     p = p->next;
                 }
