@@ -425,12 +425,20 @@ void genASM(char *IRcode)
     else if (strcmp(eleArray[0], "ARG") == 0)
     {
         // 任务：记录实参的信息到真实参数列表
-        TrueParamListTail->next = malloc(sizeof(TrueParamList));
-        TrueParamListTail->next->prev = TrueParamListTail;
-        TrueParamListTail = TrueParamListTail->next;
-        strcpy(TrueParamListTail->name, eleArray[1]);
-        TrueParamListTail->ParamNo = TrueParamListTail->prev->ParamNo + 1;
-        TrueParamListTail->next = NULL;
+        // TrueParamListTail->next = malloc(sizeof(TrueParamList));
+        // TrueParamListTail->next->prev = TrueParamListTail;
+        // TrueParamListTail = TrueParamListTail->next;
+        // strcpy(TrueParamListTail->name, eleArray[1]);
+        // TrueParamListTail->ParamNo = TrueParamListTail->prev->ParamNo + 1;
+        // TrueParamListTail->next = NULL;
+        // TrueParamListHead->Paramcnt++;
+        TrueParamList *newParam = malloc(sizeof(TrueParamList));
+        strcpy(newParam->name, eleArray[1]);
+        newParam->next = TrueParamListHead->next;
+        newParam->prev = TrueParamListHead;
+        TrueParamListHead->next = newParam;
+        if (newParam->next != NULL)
+            newParam->next->prev = newParam;
         TrueParamListHead->Paramcnt++;
     }
     else if (strcmp(eleArray[0], "PARAM") == 0)
@@ -800,7 +808,7 @@ void genASM(char *IRcode)
                 }
                 else if (eleArray[3][0] == '*')
                 {
-                    fprintf(ASMfile, "   mul %s,%s,%s\n", RegisterDescriptionTable[getReg(eleArray[0])].regname, RegisterDescriptionTable[getReg(eleArray[2])].regname, RegisterDescriptionTable[getReg(eleArray[4])].regname);
+                    fprintf(ASMfile, "  mul %s,%s,%s\n", RegisterDescriptionTable[getReg(eleArray[0])].regname, RegisterDescriptionTable[getReg(eleArray[2])].regname, RegisterDescriptionTable[getReg(eleArray[4])].regname);
                 }
                 else if (eleArray[3][0] == '/')
                 {
