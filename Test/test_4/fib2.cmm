@@ -1,18 +1,11 @@
-int fact(int n)
-{
-    if (n == 1)
-        return n;
-    else
-        return (n * fact(n - 1));
-}
-int main()
-{
-    int m, result;
-    m = read();
-    if (m > 1)
-        result = fact(m);
-    else
-        result = 1;
-    write(result);
+struct A{
+    int d;
+    int c;
+};
+int main() {
+    A a;
+    int x[1];
+    read(x[0]);
+    write(x[0]);
     return 0;
 }

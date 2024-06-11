@@ -6,6 +6,7 @@ int LocalFrameSize = 0; // 存储局部变量的栈空间大小
 
 int FuncCnt = 0, FuncCnt2 = 0; // 函数个数，现在是第几个函数
 char *args[100][10000];
+int argsize[100][10000];
 int argsCnt[100];
 int regCnt = 0;
 void initCode()
@@ -793,40 +794,51 @@ void genASM(char *IRcode)
 void initArg()
 {
     char *IRcode;
+    int state = 0;
     while ((IRcode = getOneIR()) != NULL)
     {
         int index = 0;
         char *token = strtok(IRcode, " ");
+        char *eleArray[8] = {NULL};
         while (token != NULL && index < 8)
         {
-            if (token[0] != '#' && strcmp(token, "FUNCTION") != 0 && strcmp(token, "PARAM") != 0 && strcmp(token, "CALL") != 0 && strcmp(token, "READ") != 0 && strcmp(token, "WRITE") != 0 && strcmp(token, "ARG") != 0 && strcmp(token, "RETURN") != 0 && strcmp(token, "GOTO") != 0 && strcmp(token, "LABEL") != 0 && strcmp(token, "IF") != 0 && strcmp(token, ":=") != 0 && strcmp(token, "=") != 0 && strcmp(token, "+") != 0 && strcmp(token, "-") != 0 && strcmp(token, "*") != 0 && strcmp(token, "/") != 0)
-            {
-                bool flag = true;
-                for (int i = 0; i < argsCnt[FuncCnt]; i++)
-                {
-                    if (strcmp(args[FuncCnt][i], token) == 0)
-                    {
-                        flag = false;
-                        break;
-                    }
-                }
-                if (flag)
-                {
-                    char *tmp = malloc(10);
-                    strcpy(tmp, token);
-                    args[FuncCnt][argsCnt[FuncCnt]++] = tmp;
-                }
-            }
-            else if (strcmp(token, "FUNCTION") == 0)
-            {
-                FuncCnt++;
-                argsCnt[FuncCnt] = 0;
-                break;
-            }
+            eleArray[index] = token;
             index++;
             token = strtok(NULL, " ");
         }
-
+        if (strcmp(eleArray[0], "FUNCTION") == 0)
+        {
+            FuncCnt++;
+            argsCnt[FuncCnt] = 0;
+        }
+        else if (strcmp(eleArray[1], ":=") == 0)
+        {
+            if(eleArray[0][0]=='*')
+                eleArray[0]++;
+            bool flag = true;
+            for (int i = 0; i < argsCnt[FuncCnt]; i++)
+            {
+                if (strcmp(args[FuncCnt][i], eleArray[0]) == 0)
+                {
+                    flag = false;
+                    break;
+                }
+            }
+            if (flag)
+            {
+                char *tmp = malloc(12);
+                strcpy(tmp, eleArray[0]);
+                argsize[FuncCnt][argsCnt[FuncCnt]] = 4;
+                args[FuncCnt][argsCnt[FuncCnt]++] = tmp;
+            }
+        }
+        else if(strcmp(eleArray[0], "DEC") == 0)
+        {
+            char *tmp = malloc(12);
+            strcpy(tmp, eleArray[1]);
+            argsize[FuncCnt][argsCnt[FuncCnt]] = atoi(eleArray[2]);
+            args[FuncCnt][argsCnt[FuncCnt]++] = tmp;
+        }
         free(IRcode);
     }
 }
