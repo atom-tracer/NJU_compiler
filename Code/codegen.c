@@ -3,6 +3,11 @@ int increTime = 0;
 int ParamCnt = 0;
 int TrueFrameSize = 0;  // 整个栈帧的大小（包括存储的寄存器和局部变量）
 int LocalFrameSize = 0; // 存储局部变量的栈空间大小
+
+int FuncCnt = 0, FuncCnt2 = 0; // 函数个数，现在是第几个函数
+char *args[100][10000];
+int argsCnt[100];
+int regCnt = 0;
 void initCode()
 {
     fprintf(ASMfile, ".data\n");
@@ -140,7 +145,8 @@ void PushVariableToStack(VaribleDescriptor *var) // 将一个局部变量压栈
     fprintf(ASMfile, "  addi $sp, $sp, %d\n", -4);
     TrueFrameSize += 4;
     LocalFrameSize += 4;
-    fprintf(ASMfile, "  sw %s, 0($sp)\n", RegisterDescriptionTable[var->regNo].regname);
+    if (var->regNo != -1)
+        fprintf(ASMfile, "  sw %s, 0($sp)\n", RegisterDescriptionTable[var->regNo].regname);
     var->posRef = POS_FP;
     var->offset = -TrueFrameSize;
 }
@@ -181,14 +187,15 @@ void RegRecycle(uint32_t reg) // 将一个寄存器中的内容溢出到内存�
             if (strcmp(head->name, RegisterDescriptionTable[reg].VarNames[i]) == 0)
             {
                 assert(head->regNo != -1);
-                if (head->posRef == POS_REG) // 只存在于寄存器中的变量，现在要给它分配内存了
-                {
-                    PushVariableToStack(head);
-                }
+                // if (head->posRef == POS_REG) // 只存在于寄存器中的变量，现在要给它分配内存了
+                // {
+                //     PushVariableToStack(head);
+                // }
                 // else if (head->dirtybit == true)
                 // {
                 //     CopyVariableToStack(head);
                 // }
+                CopyVariableToStack(head);
                 head->regNo = -1;
                 break;
             }
@@ -273,7 +280,7 @@ VaribleDescriptor *VaribleCreate(char *name)
 int getReg(char *name)
 {
     VaribleDescriptor *head = VaribleDescriptionTable->next;
-    while (head != NULL) // 如果已经在reg里了
+    while (head != NULL) // 如果已经在reg里了(前4个参数)
     {
         if (strcmp(head->name, name) == 0)
         {
@@ -284,29 +291,40 @@ int getReg(char *name)
         }
         head = head->next;
     }
-    if (head == NULL)
-    {
-        head = VaribleCreate(name);
-    }
+    // if (head == NULL)
+    // {
+    //     head = VaribleCreate(name);
+    // }
     // 当前策略：LRU
-    int mintime = 0x7fffffff;
-    int minReg = 8;
-    for (int i = 8; i <= 25; i++)
-    {
-        if (RegisterDescriptionTable[i].timestamp < mintime)
-        {
-            mintime = RegisterDescriptionTable[i].timestamp;
-            minReg = i;
-        }
-    }
-    RegRecycle(minReg);
-    // setRegofVarible(name, minReg);
-    //  从内存中加载变量到寄存器
+    // int mintime = 0x7fffffff;
+    // int minReg = 8;
+    // for (int i = 8; i <= 25; i++)
+    // {
+    //     if (RegisterDescriptionTable[i].timestamp < mintime)
+    //     {
+    //         mintime = RegisterDescriptionTable[i].timestamp;
+    //         minReg = i;
+    //     }
+    // }
+    // RegRecycle(minReg);
+    // // setRegofVarible(name, minReg);
+    // //  从内存中加载变量到寄存器
+    // LoadVaribleIntoReg(name, minReg);
+    // // fprintf(ASMfile, "  lw %s, %s\n", RegisterDescriptionTable[minReg].regname, name);
+    int minReg = 8 + regCnt;
     LoadVaribleIntoReg(name, minReg);
-    // fprintf(ASMfile, "  lw %s, %s\n", RegisterDescriptionTable[minReg].regname, name);
+    regCnt++;
+    regCnt %= 8;
     return minReg;
 }
-
+void handleRegUse(uint32_t reg)
+{
+    if (reg >= 8 && reg <= 15)
+    {
+        RegRecycle(reg);
+    }
+}
+// 解析一条中间代码
 void genASM(char *IRcode)
 {
     int index = 0;
@@ -325,6 +343,7 @@ void genASM(char *IRcode)
     }
     else if (strcmp(eleArray[0], "FUNCTION") == 0)
     {
+        FuncCnt2++;
         // ParamClear();
         ParamCnt = 0;
         fprintf(ASMfile, "\n%s:\n", eleArray[1]);
@@ -342,6 +361,11 @@ void genASM(char *IRcode)
             // fprintf(ASMfile, "  sw %s, %d($sp)\n", RegisterDescriptionTable[i].regname, frameSize - 4 * (10 - (i - 16)));
             fprintf(ASMfile, "  sw %s, %d($sp)\n", RegisterDescriptionTable[i].regname, frameSize - 4 * (9 - (i - 16)));
         }
+        // 为局部变量分配空间
+        for (int i = 0; i < argsCnt[FuncCnt2]; i++)
+        {
+            PushVariableToStack(VaribleCreate(args[FuncCnt2][i]));
+        }
     }
     else if (strcmp(eleArray[0], "GOTO") == 0)
     {
@@ -350,6 +374,7 @@ void genASM(char *IRcode)
     else if (strcmp(eleArray[0], "RETURN") == 0)
     {
         fprintf(ASMfile, "  move $v0, %s\n", RegisterDescriptionTable[getReg(eleArray[1])].regname);
+        handleRegUse(getReg(eleArray[1]));
         // 回收局部变量占用的空间
         if (LocalFrameSize > 0)
             // fprintf(ASMfile, "  addi $sp, $sp, %d\n", LocalFrameSize);
@@ -449,6 +474,7 @@ void genASM(char *IRcode)
             else
             {
                 fprintf(ASMfile, "  sw %s,%d($sp)\n", RegisterDescriptionTable[getReg(p->name)].regname, (i - 4) * 4);
+                handleRegUse(getReg(p->name));
             }
             p = p->next;
         }
@@ -500,6 +526,8 @@ void genASM(char *IRcode)
         if (eleArray[0][0] == '*')
         {
             fprintf(ASMfile, "  sw %s,0(%s)\n", RegisterDescriptionTable[getReg(eleArray[2])].regname, RegisterDescriptionTable[getReg(eleArray[0] + 1)].regname);
+            handleRegUse(getReg(eleArray[2]));
+            handleRegUse(getReg(eleArray[0] + 1));
         }
         else
             assert(0); // 先假设没有x=y这种赋值操作
@@ -509,26 +537,38 @@ void genASM(char *IRcode)
         if (strcmp(eleArray[2], "==") == 0)
         {
             fprintf(ASMfile, "  beq %s, %s, %s\n", RegisterDescriptionTable[getReg(eleArray[1])].regname, RegisterDescriptionTable[getReg(eleArray[3])].regname, eleArray[5]);
+            handleRegUse(getReg(eleArray[1]));
+            handleRegUse(getReg(eleArray[3]));
         }
         else if (strcmp(eleArray[2], "!=") == 0)
         {
             fprintf(ASMfile, "  bne %s, %s, %s\n", RegisterDescriptionTable[getReg(eleArray[1])].regname, RegisterDescriptionTable[getReg(eleArray[3])].regname, eleArray[5]);
+            handleRegUse(getReg(eleArray[1]));
+            handleRegUse(getReg(eleArray[3]));
         }
         else if (strcmp(eleArray[2], ">") == 0)
         {
             fprintf(ASMfile, "  bgt %s, %s, %s\n", RegisterDescriptionTable[getReg(eleArray[1])].regname, RegisterDescriptionTable[getReg(eleArray[3])].regname, eleArray[5]);
+            handleRegUse(getReg(eleArray[1]));
+            handleRegUse(getReg(eleArray[3]));
         }
         else if (strcmp(eleArray[2], "<") == 0)
         {
             fprintf(ASMfile, "  blt %s, %s, %s\n", RegisterDescriptionTable[getReg(eleArray[1])].regname, RegisterDescriptionTable[getReg(eleArray[3])].regname, eleArray[5]);
+            handleRegUse(getReg(eleArray[1]));
+            handleRegUse(getReg(eleArray[3]));
         }
         else if (strcmp(eleArray[2], ">=") == 0)
         {
             fprintf(ASMfile, "  bge %s, %s, %s\n", RegisterDescriptionTable[getReg(eleArray[1])].regname, RegisterDescriptionTable[getReg(eleArray[3])].regname, eleArray[5]);
+            handleRegUse(getReg(eleArray[1]));
+            handleRegUse(getReg(eleArray[3]));
         }
         else if (strcmp(eleArray[2], "<=") == 0)
         {
             fprintf(ASMfile, "  ble %s, %s, %s\n", RegisterDescriptionTable[getReg(eleArray[1])].regname, RegisterDescriptionTable[getReg(eleArray[3])].regname, eleArray[5]);
+            handleRegUse(getReg(eleArray[1]));
+            handleRegUse(getReg(eleArray[3]));
         }
         else
             assert(0);
@@ -541,15 +581,20 @@ void genASM(char *IRcode)
             if (eleArray[2][0] == '*')
             {
                 fprintf(ASMfile, "  lw %s,0(%s)\n", RegisterDescriptionTable[getReg(eleArray[0])].regname, RegisterDescriptionTable[getReg(eleArray[2] + 1)].regname);
+                handleRegUse(getReg(eleArray[0]));
+                handleRegUse(getReg(eleArray[2] + 1));
             }
             else if (eleArray[2][0] == '#')
             {
                 fprintf(ASMfile, "  li %s,%s\n", RegisterDescriptionTable[getReg(eleArray[0])].regname, eleArray[2] + 1);
+                handleRegUse(getReg(eleArray[0]));
             }
             else
             {
                 // TODO:可优化
                 fprintf(ASMfile, "  move %s,%s\n", RegisterDescriptionTable[getReg(eleArray[0])].regname, RegisterDescriptionTable[getReg(eleArray[2])].regname);
+                handleRegUse(getReg(eleArray[0]));
+                handleRegUse(getReg(eleArray[2]));
             }
         }
         else if (index == 4)
@@ -605,6 +650,7 @@ void genASM(char *IRcode)
                     else
                     {
                         fprintf(ASMfile, "  sw %s,%d($sp)\n", RegisterDescriptionTable[getReg(p->name)].regname, (i - 4) * 4);
+                        handleRegUse(getReg(p->name));
                     }
                     p = p->next;
                 }
@@ -638,49 +684,172 @@ void genASM(char *IRcode)
                 fprintf(ASMfile, "  addi $sp,$sp,%d\n", 15 * 4);
                 TrueFrameSize -= 15 * 4;
                 fprintf(ASMfile, "  move %s,$v0\n", RegisterDescriptionTable[getReg(eleArray[0])].regname);
+                handleRegUse(getReg(eleArray[0]));
             }
             else
                 assert(0);
         }
         else if (index == 5)
         {
-            if (eleArray[3][0] == '+' && eleArray[4][1] == '#') // x := y + #k
+            if (eleArray[3][0] == '+')
             {
-                fprintf(ASMfile, "  addi %s,%s,%s\n", RegisterDescriptionTable[getReg(eleArray[0])].regname, RegisterDescriptionTable[getReg(eleArray[2])].regname, eleArray[4] + 1);
+                if (eleArray[2][0] == '#' && eleArray[4][0] == '#')
+                { // x := #k1 + #k2
+                    fprintf(ASMfile, "  li %s,%d\n", RegisterDescriptionTable[getReg(eleArray[0])].regname, atoi(eleArray[2] + 1) + atoi(eleArray[4] + 1));
+                }
+                else if (eleArray[2][0] == '#')
+                { // x := #k + y
+                    fprintf(ASMfile, "  addi %s,%s,%s\n", RegisterDescriptionTable[getReg(eleArray[0])].regname, RegisterDescriptionTable[getReg(eleArray[4])].regname, eleArray[2] + 1);
+                    handleRegUse(getReg(eleArray[4]));
+                }
+                else if (eleArray[4][0] == '#')
+                { // x := y + #k
+                    fprintf(ASMfile, "  addi %s,%s,%s\n", RegisterDescriptionTable[getReg(eleArray[0])].regname, RegisterDescriptionTable[getReg(eleArray[2])].regname, eleArray[4] + 1);
+                    handleRegUse(getReg(eleArray[2]));
+                }
+                else
+                { // x := y + z
+                    fprintf(ASMfile, "  add %s,%s,%s\n", RegisterDescriptionTable[getReg(eleArray[0])].regname, RegisterDescriptionTable[getReg(eleArray[2])].regname, RegisterDescriptionTable[getReg(eleArray[4])].regname);
+                    handleRegUse(getReg(eleArray[2]));
+                    handleRegUse(getReg(eleArray[4]));
+                }
+                handleRegUse(getReg(eleArray[0]));
             }
-            else if (eleArray[3][0] == '+' && eleArray[4][1] != '#') // x := y + z
+            else if (eleArray[3][0] == '-')
             {
-                fprintf(ASMfile, "  add %s,%s,%s\n", RegisterDescriptionTable[getReg(eleArray[0])].regname, RegisterDescriptionTable[getReg(eleArray[2])].regname, RegisterDescriptionTable[getReg(eleArray[4])].regname);
-            }
-            else if (eleArray[3][0] == '-' && eleArray[4][1] == '#') // x := y - #k
-            {
-                fprintf(ASMfile, "  subi %s,%s,%s\n", RegisterDescriptionTable[getReg(eleArray[0])].regname, RegisterDescriptionTable[getReg(eleArray[2])].regname, eleArray[4] + 1);
-            }
-            else if (eleArray[3][0] == '-' && eleArray[4][1] != '#') // x := y - z
-            {
-                fprintf(ASMfile, "  sub %s,%s,%s\n", RegisterDescriptionTable[getReg(eleArray[0])].regname, RegisterDescriptionTable[getReg(eleArray[2])].regname, RegisterDescriptionTable[getReg(eleArray[4])].regname);
+                if (eleArray[2][0] == '#' && eleArray[4][0] == '#')
+                { // x := #k1 - #k2
+                    fprintf(ASMfile, "  li %s,%d\n", RegisterDescriptionTable[getReg(eleArray[0])].regname, atoi(eleArray[2] + 1) - atoi(eleArray[4] + 1));
+                }
+                else if (eleArray[2][0] == '#')
+                { // x := #k - y
+                    fprintf(ASMfile, "  li %s,%s\n", RegisterDescriptionTable[getReg(eleArray[0])].regname, eleArray[2] + 1);
+                    fprintf(ASMfile, "  sub %s,%s,%s\n", RegisterDescriptionTable[getReg(eleArray[0])].regname, RegisterDescriptionTable[getReg(eleArray[0])].regname, RegisterDescriptionTable[getReg(eleArray[4])].regname);
+                    handleRegUse(getReg(eleArray[4]));
+                }
+                else if (eleArray[4][0] == '#')
+                { // x := y - #k
+                    fprintf(ASMfile, "  subi %s,%s,%s\n", RegisterDescriptionTable[getReg(eleArray[0])].regname, RegisterDescriptionTable[getReg(eleArray[2])].regname, eleArray[4] + 1);
+                    handleRegUse(getReg(eleArray[2]));
+                }
+                else
+                { // x := y - z
+                    fprintf(ASMfile, "  sub %s,%s,%s\n", RegisterDescriptionTable[getReg(eleArray[0])].regname, RegisterDescriptionTable[getReg(eleArray[2])].regname, RegisterDescriptionTable[getReg(eleArray[4])].regname);
+                    handleRegUse(getReg(eleArray[2]));
+                    handleRegUse(getReg(eleArray[4]));
+                }
+                handleRegUse(getReg(eleArray[0]));
             }
             else if (eleArray[3][0] == '*')
             {
-                fprintf(ASMfile, "  mul %s,%s,%s\n", RegisterDescriptionTable[getReg(eleArray[0])].regname, RegisterDescriptionTable[getReg(eleArray[2])].regname, RegisterDescriptionTable[getReg(eleArray[4])].regname);
+                if (eleArray[2][0] == '#' && eleArray[4][0] == '#')
+                { // x := #k1 * #k2
+                    fprintf(ASMfile, "  li %s,%d\n", RegisterDescriptionTable[getReg(eleArray[0])].regname, atoi(eleArray[2] + 1) * atoi(eleArray[4] + 1));
+                }
+                else if (eleArray[2][0] == '#')
+                { // x := #k * y
+                    fprintf(ASMfile, "  li %s,%s\n", RegisterDescriptionTable[getReg(eleArray[0])].regname, eleArray[2] + 1);
+                    fprintf(ASMfile, "  mul %s,%s,%s\n", RegisterDescriptionTable[getReg(eleArray[0])].regname, RegisterDescriptionTable[getReg(eleArray[0])].regname, RegisterDescriptionTable[getReg(eleArray[4])].regname);
+                    handleRegUse(getReg(eleArray[4]));
+                }
+                else if (eleArray[4][0] == '#')
+                { // x := y * #k
+                    fprintf(ASMfile, "  muli %s,%s,%s\n", RegisterDescriptionTable[getReg(eleArray[0])].regname, RegisterDescriptionTable[getReg(eleArray[2])].regname, eleArray[4] + 1);
+                    handleRegUse(getReg(eleArray[2]));
+                }
+                else
+                { // x := y * z
+                    fprintf(ASMfile, "  mul %s,%s,%s\n", RegisterDescriptionTable[getReg(eleArray[0])].regname, RegisterDescriptionTable[getReg(eleArray[2])].regname, RegisterDescriptionTable[getReg(eleArray[4])].regname);
+                    handleRegUse(getReg(eleArray[2]));
+                    handleRegUse(getReg(eleArray[4]));
+                }
+                handleRegUse(getReg(eleArray[0]));
             }
             else if (eleArray[3][0] == '/')
             {
-                fprintf(ASMfile, "  div %s,%s\n", RegisterDescriptionTable[getReg(eleArray[2])].regname, RegisterDescriptionTable[getReg(eleArray[4])].regname);
-                fprintf(ASMfile, "  mflo %s\n", RegisterDescriptionTable[getReg(eleArray[0])].regname);
+                if (eleArray[2][0] == '#' && eleArray[4][0] == '#')
+                { // x := #k1 / #k2
+                    fprintf(ASMfile, "  li %s,%d\n", RegisterDescriptionTable[getReg(eleArray[0])].regname, atoi(eleArray[2] + 1) / atoi(eleArray[4] + 1));
+                }
+                else if (eleArray[2][0] == '#')
+                { // x := #k / y
+                    fprintf(ASMfile, "  li %s,%s\n", RegisterDescriptionTable[getReg(eleArray[0])].regname, eleArray[2] + 1);
+                    fprintf(ASMfile, "  div %s,%s\n", RegisterDescriptionTable[getReg(eleArray[0])].regname, RegisterDescriptionTable[getReg(eleArray[4])].regname);
+                    fprintf(ASMfile, "  mflo %s\n", RegisterDescriptionTable[getReg(eleArray[0])].regname);
+                    handleRegUse(getReg(eleArray[4]));
+                }
+                else if (eleArray[4][0] == '#')
+                { // x := y / #k
+                    fprintf(ASMfile, "  divi %s,%s,%s\n", RegisterDescriptionTable[getReg(eleArray[0])].regname, RegisterDescriptionTable[getReg(eleArray[2])].regname, eleArray[4] + 1);
+                    fprintf(ASMfile, "  mflo %s\n", RegisterDescriptionTable[getReg(eleArray[0])].regname);
+                    handleRegUse(getReg(eleArray[2]));
+                }
+                else
+                { // x := y / z
+                    fprintf(ASMfile, "  div %s,%s\n", RegisterDescriptionTable[getReg(eleArray[2])].regname, RegisterDescriptionTable[getReg(eleArray[4])].regname);
+                    fprintf(ASMfile, "  mflo %s\n", RegisterDescriptionTable[getReg(eleArray[0])].regname);
+                    handleRegUse(getReg(eleArray[2]));
+                    handleRegUse(getReg(eleArray[4]));
+                }
+                handleRegUse(getReg(eleArray[0]));
             }
             else
+            {
                 assert(0);
+            }
         }
         else
             assert(0);
     }
 }
+void initArg()
+{
+    char *IRcode;
+    while ((IRcode = getOneIR()) != NULL)
+    {
+        int index = 0;
+        char *token = strtok(IRcode, " ");
+        while (token != NULL && index < 8)
+        {
+            if (token[0] != '#' && strcmp(token, "FUNCTION") != 0 && strcmp(token, "PARAM") != 0 && strcmp(token, "CALL") != 0 && strcmp(token, "READ") != 0 && strcmp(token, "WRITE") != 0 && strcmp(token, "ARG") != 0 && strcmp(token, "RETURN") != 0 && strcmp(token, "GOTO") != 0 && strcmp(token, "LABEL") != 0 && strcmp(token, "IF") != 0 && strcmp(token, ":=") != 0 && strcmp(token, "=") != 0 && strcmp(token, "+") != 0 && strcmp(token, "-") != 0 && strcmp(token, "*") != 0 && strcmp(token, "/") != 0)
+            {
+                bool flag = true;
+                for (int i = 0; i < argsCnt[FuncCnt]; i++)
+                {
+                    if (strcmp(args[FuncCnt][i], token) == 0)
+                    {
+                        flag = false;
+                        break;
+                    }
+                }
+                if (flag)
+                {
+                    char *tmp = malloc(10);
+                    strcpy(tmp, token);
+                    args[FuncCnt][argsCnt[FuncCnt]++] = tmp;
+                }
+            }
+            else if (strcmp(token, "FUNCTION") == 0)
+            {
+                FuncCnt++;
+                argsCnt[FuncCnt] = 0;
+                break;
+            }
+            index++;
+            token = strtok(NULL, " ");
+        }
 
+        free(IRcode);
+    }
+}
 void targetCodeGen()
 {
     IRfile = fopen("a.ir", "r+");
     ASMfile = fopen("ASM.asm", "w+");
+    // 扫描并记录每个函数中的局部变量
+    initArg();
+    fclose(IRfile);
+    IRfile = fopen("a.ir", "r+");
     initCode();
     char *IRcode;
     while ((IRcode = getOneIR()) != NULL)

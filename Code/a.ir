@@ -1,61 +1,28 @@
 FUNCTION main :
-t0 := #30
-N := t0
-t1 := #0
-num := t1
-t2 := #1
-i := t2
-t3 := #1
-k := t3
+READ t1
+n := t1
+t2 := n
+t3 := #0
+IF t2 > t3 GOTO label0
+GOTO label1
 LABEL label0 :
-t4 := k
-t5 := N
-IF t4 <= t5 GOTO label1
+t4 := #1
+WRITE t4
 GOTO label2
 LABEL label1 :
+t5 := n
+t6 := #0
+IF t5 < t6 GOTO label3
+GOTO label4
 LABEL label3 :
-t6 := i
-t7 := k
-IF t6 <= t7 GOTO label4
+t8 := #1
+t7 := #0 - t8
+WRITE t7
 GOTO label5
 LABEL label4 :
-t8 := k
-t12 := k
-t13 := i
-t10 := t12 / t13
-t11 := i
-t9 := t10 * t11
-IF t8 == t9 GOTO label6
-GOTO label7
-LABEL label6 :
-t15 := num
-t16 := #1
-t14 := t15 + t16
-num := t14
-LABEL label7 :
-t18 := i
-t19 := #1
-t17 := t18 + t19
-i := t17
-GOTO label3
+t9 := #0
+WRITE t9
 LABEL label5 :
-t20 := num
-t21 := #2
-IF t20 == t21 GOTO label8
-GOTO label9
-LABEL label8 :
-t22 := k
-WRITE t22
-LABEL label9 :
-t23 := #1
-i := t23
-t24 := #0
-num := t24
-t26 := k
-t27 := #1
-t25 := t26 + t27
-k := t25
-GOTO label0
 LABEL label2 :
-t28 := #0
-RETURN t28
+t10 := #0
+RETURN t10
