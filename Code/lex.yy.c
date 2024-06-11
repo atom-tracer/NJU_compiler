@@ -2066,6 +2066,7 @@ void yyfree (void * ptr )
 
 int main(int argc, char** argv) { 
     char*targetir="a.ir";
+    char*targetcode="a.s";
     if (argc > 1) 
     { 
         if (!(yyin = fopen(argv[1], "r"))) 
@@ -2077,6 +2078,9 @@ int main(int argc, char** argv) {
     if(argc>2)
     {
         targetir=argv[2];
+    }
+    if(argc>3){
+        targetcode=argv[3];
     }
     // yydebug=1;
     yyrestart(yyin);
@@ -2099,7 +2103,7 @@ int main(int argc, char** argv) {
     //输出中间代码
     fprintf(fp,"%s",res);
     fclose(fp);
-    targetCodeGen();
+    targetCodeGen(targetir,targetcode);
     //printf("%s",removeEmptyLines(translate_Program(root)));
     return 0; 
 } 

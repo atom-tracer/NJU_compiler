@@ -488,6 +488,10 @@ void genASM(char *IRcode)
         else if (strcmp(eleArray[0], "READ") == 0)
         {
             fprintf(ASMfile, "  jal read\n");
+            if(index>1){
+                fprintf(ASMfile, "  move %s,$v0\n",RegisterDescriptionTable[getReg(eleArray[1])].regname);
+                handleRegUse(getReg(eleArray[1]));
+            }
         }
         else
         {
@@ -842,14 +846,14 @@ void initArg()
         free(IRcode);
     }
 }
-void targetCodeGen()
+void targetCodeGen(char*irname,char* filename)
 {
-    IRfile = fopen("a.ir", "r+");
-    ASMfile = fopen("ASM.asm", "w+");
+    IRfile = fopen(irname, "r+");
+    ASMfile = fopen(filename, "w+");
     // 扫描并记录每个函数中的局部变量
     initArg();
     fclose(IRfile);
-    IRfile = fopen("a.ir", "r+");
+    IRfile = fopen(irname, "r+");
     initCode();
     char *IRcode;
     while ((IRcode = getOneIR()) != NULL)
