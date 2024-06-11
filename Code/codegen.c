@@ -145,7 +145,7 @@ void ParamRegClear() // 把传递实参会使用到的寄存器清空
     for (int i = 4; i <= 7; i++)
     {
         RegisterDescriptionTable[i].cnt = 0;
-        for (int j = 0; j < 10; j++)
+        for (int j = 0; j < 50; j++)
         {
             memset(RegisterDescriptionTable[i].VarNames[j], 0, 10);
         }
