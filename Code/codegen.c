@@ -186,6 +186,7 @@ char *getOneIR()
     line[strcspn(line, "\n")] = '\0';
     return line;
 }
+
 void RegRecycle(uint32_t reg) // 将一个寄存器中的内容溢出到内存中
 {
     int cnt = RegisterDescriptionTable[reg].cnt;
@@ -214,6 +215,13 @@ void RegRecycle(uint32_t reg) // 将一个寄存器中的内容溢出到内存�
         }
     }
     RegisterDescriptionTable[reg].cnt = 0;
+}
+void VariableRegClear() // 清空寄存器描述符表
+{
+    for (int i = 8; i <= 15; i++)
+    {
+        RegRecycle(i);
+    }
 }
 void setRegofVarible(char *name, int reg) // 当变量被装进寄存器后，记录之
 {
@@ -310,11 +318,16 @@ int getReg(char *name)
     }
     else
     {
-        LoadVaribleIntoReg(name, minReg);
+
         // 等号右边如果是解引用变量，需要二次加载
         if (name[0] == '*')
         {
+            LoadVaribleIntoReg(name + 1, minReg);
             fprintf(ASMfile, "  lw %s,0(%s)\n", RegisterDescriptionTable[minReg].regname, RegisterDescriptionTable[minReg].regname);
+        }
+        else
+        {
+            LoadVaribleIntoReg(name, minReg);
         }
     }
     regCnt++;
@@ -440,9 +453,6 @@ void genASM(char *IRcode)
     else if (strcmp(eleArray[0], "CALL") == 0 || strcmp(eleArray[0], "WRITE") == 0 || strcmp(eleArray[0], "READ") == 0)
     {
         // 调用者保存寄存器
-        // fprintf(ASMfile, "  addi $sp,$sp,-%d\n", 14 * 4);
-        // TrueFrameSize += 14 * 4;
-        // 调用者应当保存ra
         fprintf(ASMfile, "  addi $sp,$sp,-%d\n", 15 * 4);
         TrueFrameSize += 15 * 4;
         //  特殊对待WRITE
@@ -483,12 +493,29 @@ void genASM(char *IRcode)
         {
             if (i < 4)
             {
-                LoadVaribleIntoReg(p->name, i + 4);
+                if (p->name[0] == '*')
+                {
+                    LoadVaribleIntoReg(p->name + 1, i + 4);
+                    fprintf(ASMfile, "  lw %s,0(%s)\n", RegisterDescriptionTable[i + 4].regname, RegisterDescriptionTable[i + 4].regname);
+                }
+                else
+                {
+                    LoadVaribleIntoReg(p->name, i + 4);
+                }
             }
             else
             {
-                fprintf(ASMfile, "  sw %s,%d($sp)\n", RegisterDescriptionTable[getReg(p->name)].regname, (i - 4) * 4);
-                handleRegUse(getReg(p->name));
+                if (p->name[0] == '*')
+                {
+                    int tmpEmptyReg = getEmptyReg();
+                    LoadVaribleIntoReg(p->name + 1, tmpEmptyReg);
+                    fprintf(ASMfile, "  lw %s,0(%s)\n", RegisterDescriptionTable[tmpEmptyReg].regname, RegisterDescriptionTable[tmpEmptyReg].regname);
+                    fprintf(ASMfile, "  sw %s,%d($sp)\n", RegisterDescriptionTable[tmpEmptyReg].regname, (i - 4) * 4);
+                }
+                else
+                {
+                    fprintf(ASMfile, "  sw %s,%d($sp)\n", RegisterDescriptionTable[getReg(p->name)].regname, (i - 4) * 4);
+                }
             }
             p = p->next;
         }
@@ -532,62 +559,47 @@ void genASM(char *IRcode)
         {
             fprintf(ASMfile, "  lw %s,%d($sp)\n", RegisterDescriptionTable[i].regname, (i - 4) * 4);
         }
-        // 调用者恢复ra
         fprintf(ASMfile, "  lw $ra,%d($sp)\n", 14 * 4);
-        // fprintf(ASMfile, "  addi $sp,$sp,%d\n", 14 * 4);
-        // TrueFrameSize -= 14 * 4;
         fprintf(ASMfile, "  addi $sp,$sp,%d\n", 15 * 4);
         TrueFrameSize -= 15 * 4;
         ParamRegClear();
     }
-    else if (strcmp(eleArray[1], "=") == 0) // 在进行这种赋值操作之前，左值变量应当已经定义过了
-    {
-        if (eleArray[0][0] == '*')
-        {
-            fprintf(ASMfile, "  sw %s,0(%s)\n", RegisterDescriptionTable[getReg(eleArray[2])].regname, RegisterDescriptionTable[getReg(eleArray[0] + 1)].regname);
-            handleRegUse(getReg(eleArray[2]));
-            handleRegUse(getReg(eleArray[0] + 1));
-        }
-        else
-            assert(0); // 先假设没有x=y这种赋值操作
-    }
+    // else if (strcmp(eleArray[1], "=") == 0) // 在进行这种赋值操作之前，左值变量应当已经定义过了
+    // {
+    //     if (eleArray[0][0] == '*')
+    //     {
+    //         fprintf(ASMfile, "  sw %s,0(%s)\n", RegisterDescriptionTable[getReg(eleArray[2])].regname, RegisterDescriptionTable[getReg(eleArray[0] + 1)].regname);
+    //         handleRegUse(getReg(eleArray[2]));
+    //         handleRegUse(getReg(eleArray[0] + 1));
+    //     }
+    //     else
+    //         assert(0); // 先假设没有x=y这种赋值操作
+    // }
     else if (strcmp(eleArray[0], "IF") == 0)
     {
         if (strcmp(eleArray[2], "==") == 0)
         {
             fprintf(ASMfile, "  beq %s, %s, %s\n", RegisterDescriptionTable[getReg(eleArray[1])].regname, RegisterDescriptionTable[getReg(eleArray[3])].regname, eleArray[5]);
-            handleRegUse(getReg(eleArray[1]));
-            handleRegUse(getReg(eleArray[3]));
         }
         else if (strcmp(eleArray[2], "!=") == 0)
         {
             fprintf(ASMfile, "  bne %s, %s, %s\n", RegisterDescriptionTable[getReg(eleArray[1])].regname, RegisterDescriptionTable[getReg(eleArray[3])].regname, eleArray[5]);
-            handleRegUse(getReg(eleArray[1]));
-            handleRegUse(getReg(eleArray[3]));
         }
         else if (strcmp(eleArray[2], ">") == 0)
         {
             fprintf(ASMfile, "  bgt %s, %s, %s\n", RegisterDescriptionTable[getReg(eleArray[1])].regname, RegisterDescriptionTable[getReg(eleArray[3])].regname, eleArray[5]);
-            handleRegUse(getReg(eleArray[1]));
-            handleRegUse(getReg(eleArray[3]));
         }
         else if (strcmp(eleArray[2], "<") == 0)
         {
             fprintf(ASMfile, "  blt %s, %s, %s\n", RegisterDescriptionTable[getReg(eleArray[1])].regname, RegisterDescriptionTable[getReg(eleArray[3])].regname, eleArray[5]);
-            handleRegUse(getReg(eleArray[1]));
-            handleRegUse(getReg(eleArray[3]));
         }
         else if (strcmp(eleArray[2], ">=") == 0)
         {
             fprintf(ASMfile, "  bge %s, %s, %s\n", RegisterDescriptionTable[getReg(eleArray[1])].regname, RegisterDescriptionTable[getReg(eleArray[3])].regname, eleArray[5]);
-            handleRegUse(getReg(eleArray[1]));
-            handleRegUse(getReg(eleArray[3]));
         }
         else if (strcmp(eleArray[2], "<=") == 0)
         {
             fprintf(ASMfile, "  ble %s, %s, %s\n", RegisterDescriptionTable[getReg(eleArray[1])].regname, RegisterDescriptionTable[getReg(eleArray[3])].regname, eleArray[5]);
-            handleRegUse(getReg(eleArray[1]));
-            handleRegUse(getReg(eleArray[3]));
         }
         else
             assert(0);
@@ -597,7 +609,7 @@ void genASM(char *IRcode)
         VaribleCreate(eleArray[0]);
         if (index == 3)
         {
-            if (eleArray[0] != '*')
+            if (eleArray[0][0] != '*')
             {
                 if (eleArray[2][0] == '#')
                 {
@@ -888,6 +900,7 @@ void targetCodeGen(char *irname, char *filename)
     while ((IRcode = getOneIR()) != NULL)
     {
         genASM(IRcode);
+        VariableRegClear();
         free(IRcode);
     }
     fclose(IRfile);
