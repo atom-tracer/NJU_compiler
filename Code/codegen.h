@@ -31,7 +31,7 @@ struct RegisterDescriptor
     int cnt;
     int timestamp;
     char regname[5];
-    char *VarNames[10];
+    char *VarNames[50];
 };
 
 struct ParamList

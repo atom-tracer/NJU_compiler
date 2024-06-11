@@ -73,7 +73,7 @@ void initCode()
     {
         RegisterDescriptionTable[i].cnt = 0;
         // RegisterDescriptionTable[i].timestamp = 0;
-        for (int j = 0; j < 10; j++)
+        for (int j = 0; j < 50; j++)
         {
             RegisterDescriptionTable[i].VarNames[j] = malloc(10);
         }
