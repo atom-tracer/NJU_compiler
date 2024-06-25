@@ -34,17 +34,6 @@ struct RegisterDescriptor
     char *VarNames[50];
 };
 
-struct ParamList
-{
-    int Paramcnt;
-    int ParamNo;       // 第几个参数
-    PosRefType posRef; // 寻找参数的方式
-    int offset;        // 参数的偏移
-    char name[10];
-    struct ParamList *next;
-    struct ParamList *prev;
-};
-
 struct TrueParamList
 {
     int Paramcnt; // 从1计数

@@ -1,46 +1,22 @@
-int main()
-{
-    int b[3], c[10];
-    int i = 0, j, t, a[5];
-    while(i < 5)
-    {
-        a[i] = read();
-        i = i + 1;
-    }
-    i = 0;
-    while(i < 4)
-    {
-        j = i + 1;
-        while(j < 5)
-        {
-            if(a[i] > a[j])
-            {
-                t = a[i];
-                a[i] = a[j];
-                a[j] = t;
-            }
-            j = j + 1;
-        }
-        i = i + 1;
-    }
-    i = 0;
-    while(i < 5)
-    {
-        write(a[i]);
-        i = i + 1;
-    }
-    b = a;
-    c = a;
-    i = 0;
-    while(i < 5){
-        if(i < 3){
-            write(b[i]);
-            write(c[i]);
-        }
-        else{
-            write(c[i]);
-        }
-        i = i + 1;
-    }
+int add(int ai, int aj) {
+    return ai + aj;
+}
+
+int sub(int si, int sj) {
+    return si - sj;
+}
+
+int mul(int mi, int mj) {
+    return mi * mj;
+}
+
+int main() {
+    int i, j, k, l, res;
+    i = read();
+    j = read();
+    k = read();
+    l = read();
+    res = add(mul(sub(i, j), sub(i, j)), add(k, l));
+    write(res);
     return 0;
 }
